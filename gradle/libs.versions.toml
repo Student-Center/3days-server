@@ -1,4 +1,5 @@
 [versions]
+# plugin versions
 java = "21"
 spring = "6.1.10"
 spring-boot = "3.3.0"
@@ -6,11 +7,16 @@ spring-boot-dependency-management = "1.1.6"
 kotlin = "2.0.0"
 sonar-cloud = "4.4.1.3373"
 
+# common module library versions
+uuid-creator = "5.3.3"
+
+# jpa module library versions
 mysql = "8.0.33"
 flyway = "10.6.0"
 
 [libraries]
-
+# common module
+uuid-creator = { group = "com.github.f4b6a3", name = "uuid-creator", version.ref = "uuid-creator" }
 
 # jpa module
 spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "spring-boot" }
