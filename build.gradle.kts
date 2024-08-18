@@ -37,6 +37,23 @@ subprojects {
     apply(plugin = rootProject.libs.plugins.spring.dependency.management.get().pluginId)
 
     dependencies {
+        implementation(rootProject.libs.kotlin.logging)
+        implementation(rootProject.libs.kotlin.stdlib)
+        implementation(rootProject.libs.kotlin.reflect)
+        implementation(rootProject.libs.kotlin.coroutines.core)
+
+        implementation(rootProject.libs.jackson.module.kotlin)
+        implementation(rootProject.libs.jackson.databind)
+        implementation(rootProject.libs.jackson.jsr310)
+
+        annotationProcessor(rootProject.libs.spring.boot.configuration.processor)
+
+        testImplementation(rootProject.libs.mockk)
+        testImplementation(rootProject.libs.spring.mockk)
+        testImplementation(rootProject.libs.kotest.runner.junit5)
+        testImplementation(rootProject.libs.kotest.assertions.core)
+        testImplementation(rootProject.libs.kotest.extensions.spring)
+        testImplementation(rootProject.libs.spring.boot.starter.test)
 
         testImplementation(kotlin("test"))
     }

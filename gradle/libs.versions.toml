@@ -7,6 +7,15 @@ spring-boot-dependency-management = "1.1.6"
 kotlin = "2.0.0"
 sonar-cloud = "4.4.1.3373"
 
+# subprojects library versions
+kotlin-logging = "7.0.0"
+kotlin-coroutines = "1.8.1"
+jackson = "2.17.2"
+mockk = "1.13.7"
+spring-mockk = "4.0.2"
+kotest = "5.9.1"
+kotest-extensions-spring = "1.3.0"
+
 # common module library versions
 uuid-creator = "5.3.3"
 
@@ -18,6 +27,22 @@ flyway = "10.6.0"
 springdoc-openapi = "2.6.0"
 
 [libraries]
+# subprojects libraries
+kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
+kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect", version.ref = "kotlin" }
+kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
+jackson-module-kotlin = { group = "com.fasterxml.jackson.module", name = "jackson-module-kotlin", version.ref = "jackson" }
+jackson-databind = { group = "com.fasterxml.jackson.core", name = "jackson-databind", version.ref = "jackson" }
+jackson-jsr310 = { group = "com.fasterxml.jackson.datatype", name = "jackson-datatype-jsr310", version.ref = "jackson" }
+spring-boot-configuration-processor = { group = "org.springframework.boot", name = "spring-boot-configuration-processor", version.ref = "spring-boot" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+spring-mockk = { group = "com.ninja-squad", name = "springmockk", version.ref = "spring-mockk" }
+kotest-runner-junit5 = { group = "io.kotest", name = "kotest-runner-junit5", version.ref = "kotest" }
+kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotest-extensions-spring = { group = "io.kotest.extensions", name = "kotest-extensions-spring", version.ref = "kotest-extensions-spring" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test", version.ref = "spring-boot" }
+
 # common module
 uuid-creator = { group = "com.github.f4b6a3", name = "uuid-creator", version.ref = "uuid-creator" }
 
