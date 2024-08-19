@@ -1,0 +1,15 @@
+server:
+  port: 8080
+  shutdown: graceful
+spring:
+  profiles:
+    active: local
+    include:
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  docker:
+    compose:
+      file: ./bootstrap/api/compose.yaml
