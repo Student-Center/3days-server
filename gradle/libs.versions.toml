@@ -46,6 +46,10 @@ spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-
 # common module
 uuid-creator = { group = "com.github.f4b6a3", name = "uuid-creator", version.ref = "uuid-creator" }
 
+# application module
+spring-tx = { group = "org.springframework", name = "spring-tx", version.ref = "spring" }
+spring-boot-core = { group = "org.springframework.boot", name = "spring-boot", version.ref = "spring-boot" }
+
 # jpa module
 spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "spring-boot" }
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }

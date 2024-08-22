@@ -9,4 +9,7 @@ jar.enabled = true
 dependencies {
     implementation(project(":support:common"))
     implementation(project(":domain"))
+
+    implementation(libs.spring.tx)
+    implementation(libs.spring.boot.core)
 }
