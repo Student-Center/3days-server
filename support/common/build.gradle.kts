@@ -8,4 +8,6 @@ jar.enabled = true
 
 dependencies {
     implementation(libs.uuid.creator)
+    implementation(libs.java.jwt)
+    implementation(libs.jwks.rsa)
 }
