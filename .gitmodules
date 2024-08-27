@@ -1,0 +1,3 @@
+[submodule "weave2-api"]
+	path = openapi
+	url = https://github.com/Student-Center/weave2-api.git
