@@ -45,6 +45,7 @@ subprojects {
         implementation(rootProject.libs.jackson.module.kotlin)
         implementation(rootProject.libs.jackson.databind)
         implementation(rootProject.libs.jackson.jsr310)
+        implementation(rootProject.libs.jackson.dataformat.yaml)
 
         annotationProcessor(rootProject.libs.spring.boot.configuration.processor)
 
