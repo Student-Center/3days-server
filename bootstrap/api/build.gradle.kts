@@ -20,12 +20,13 @@ dependencies {
 
 openApiGenerate {
     generatorName.set("kotlin-spring")
-    inputSpec.set("$rootDir/openapi/v1/auth.yaml")
-    outputDir.set("$buildDir/generated")
+    inputSpecRootDirectory.set("$rootDir/openapi")
+    outputDir.set("$rootDir/${layout.buildDirectory}/generated")
     apiPackage.set("com.sc.weave2.oas.api")
     modelPackage.set("com.sc.weave2.oas.model")
     configOptions.set(mapOf(
         "interfaceOnly" to "true",
         "useTags" to "true"
     ))
+    openapiGeneratorIgnoreList.add("./.gitignore")
 }

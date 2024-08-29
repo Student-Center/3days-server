@@ -42,3 +42,6 @@ bin/
 .DS_Store
 
 .idea/
+
+### OAS generated
+bootstrap/api/build/
