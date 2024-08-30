@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.base.domain
+package com.threedays.support.common.base.domain
 
 abstract class DomainEntity<T : DomainEntity<T, ID>, ID : TypeId<*>> {
     abstract val id: ID

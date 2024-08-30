@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.uuid
+package com.threedays.support.common.uuid
 
 import com.github.f4b6a3.uuid.UuidCreator
 import java.util.*

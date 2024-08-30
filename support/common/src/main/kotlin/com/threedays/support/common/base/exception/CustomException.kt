@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.base.exception
+package com.threedays.support.common.base.exception
 
 abstract class CustomException(
     codePrefix: String = DEFAULT_CODE_PREFIX,

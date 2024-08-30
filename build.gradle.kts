@@ -14,7 +14,7 @@ plugins {
 }
 
 allprojects {
-    group = "com.sc.weave2"
+    group = "com.threedays"
     version = "0.0.1-SNAPSHOT"
 
     repositories {

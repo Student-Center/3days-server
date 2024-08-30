@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.security.jwt
+package com.threedays.support.common.security.jwt
 
 import com.auth0.jwt.interfaces.DecodedJWT
 import java.time.Instant

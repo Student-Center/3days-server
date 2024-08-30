@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.base.domain
+package com.threedays.support.common.base.domain
 
 abstract class TypeId<T : Any>(open val value: T) {
     override fun equals(other: Any?): Boolean {

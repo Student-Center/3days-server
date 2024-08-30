@@ -1,4 +1,4 @@
-package com.sc.weave2.bootstrap
+package com.threedays.bootstrap
 
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -6,7 +6,7 @@ import org.springframework.boot.runApplication
 import java.util.*
 
 @SpringBootApplication
-class WeaveApiApplication {
+class ThreeDaysApplication {
 
     @PostConstruct
     fun started() {
@@ -17,5 +17,5 @@ class WeaveApiApplication {
 
 
 fun main(args: Array<String>) {
-    runApplication<WeaveApiApplication>(*args)
+    runApplication<ThreeDaysApplication>(*args)
 }

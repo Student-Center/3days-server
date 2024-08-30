@@ -1,6 +1,6 @@
-package com.sc.weave2.support.common.security.jwt
+package com.threedays.support.common.security.jwt
 
-import com.sc.weave2.support.common.base.exception.CustomException
+import com.threedays.support.common.base.exception.CustomException
 
 sealed class JwtException(
     codeNumber: Int,

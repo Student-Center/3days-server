@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.base.domain
+package com.threedays.support.common.base.domain
 
 import java.util.*
 

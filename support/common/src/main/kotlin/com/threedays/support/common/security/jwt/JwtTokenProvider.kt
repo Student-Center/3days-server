@@ -1,4 +1,4 @@
-package com.sc.weave2.support.common.security.jwt
+package com.threedays.support.common.security.jwt
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
