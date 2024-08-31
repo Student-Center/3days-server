@@ -1,4 +1,4 @@
-package com.threedays.bootstrap
+package com.threedays.bootstrap.api
 
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
