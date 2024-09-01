@@ -7,7 +7,7 @@ import java.time.Year
 
 data class UserDesiredPartner(
     override val id: UserId,
-    val ageRange: ClosedRange<Year>,
+    val birthYearRange: ClosedRange<Year>,
     val job: Job,
     val preferDistance: PreferDistance
 ) : DomainEntity<UserDesiredPartner, UserId>() {
@@ -17,6 +17,5 @@ data class UserDesiredPartner(
         INCLUDE_SURROUNDING_REGIONS,
         ANYWHERE
     }
-
 
 }
