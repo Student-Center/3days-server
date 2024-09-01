@@ -1,4 +1,4 @@
-package com.sc.weave2.domain.user.vo
+package com.threedays.domain.user.vo
 
 import com.threedays.support.common.base.domain.TypeId
 import java.util.*

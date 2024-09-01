@@ -1,6 +1,6 @@
-package com.sc.weave2.domain.user.entity
+package com.threedays.domain.user.entity
 
-import com.sc.weave2.domain.user.vo.UserId
+import com.threedays.domain.user.vo.UserId
 import com.threedays.support.common.base.domain.AggregateRoot
 
 

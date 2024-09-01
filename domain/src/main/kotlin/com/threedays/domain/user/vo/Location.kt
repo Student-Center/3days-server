@@ -1,4 +1,4 @@
-package com.sc.weave2.domain.user.vo
+package com.threedays.domain.user.vo
 
 @JvmInline
 value class Location(val value: String)
