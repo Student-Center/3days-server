@@ -2,5 +2,13 @@ package com.threedays.domain.user.vo
 
 enum class Gender {
     MAN,
-    WOMAN,
+    WOMAN;
+
+    fun opposite(): Gender {
+        return when (this) {
+            MAN -> WOMAN
+            WOMAN -> MAN
+        }
+    }
+
 }
