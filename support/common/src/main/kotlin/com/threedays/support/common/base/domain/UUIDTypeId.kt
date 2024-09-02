@@ -1,5 +1,6 @@
 package com.threedays.support.common.base.domain
 
+import com.threedays.support.common.uuid.UUIDCreator
 import java.util.*
 
 abstract class UUIDTypeId(override val value: UUID) : TypeId<UUID>(value) {
@@ -14,7 +15,7 @@ abstract class UUIDTypeId(override val value: UUID) : TypeId<UUID>(value) {
             throw IllegalArgumentException("Invalid ${T::class.simpleName}")
         }
 
-        inline fun <reified T : UUIDTypeId> random(): T = from<T>(UUID.randomUUID())
+        inline fun <reified T : UUIDTypeId> random(): T = from<T>(UUIDCreator.create())
     }
 
 }

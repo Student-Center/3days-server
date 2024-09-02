@@ -55,6 +55,7 @@ subprojects {
         testImplementation(rootProject.libs.kotest.assertions.core)
         testImplementation(rootProject.libs.kotest.extensions.spring)
         testImplementation(rootProject.libs.spring.boot.starter.test)
+        testImplementation(rootProject.libs.fixture.monkey)
 
         testImplementation(kotlin("test"))
     }
