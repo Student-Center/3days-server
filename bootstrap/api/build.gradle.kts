@@ -10,7 +10,7 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(project(":application"))
-    implementation(project(":infrastructure:jpa"))
+    implementation(project(":infrastructure:persistence"))
 
     implementation(libs.spring.boot.starter.web)
 

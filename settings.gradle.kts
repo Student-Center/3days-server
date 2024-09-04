@@ -16,8 +16,8 @@ include(":application")
 project(":application").projectDir = file("application")
 
 // infrastructure
-include(":infrastructure:jpa")
-project(":infrastructure:jpa").projectDir = file("infrastructure/jpa")
+include(":infrastructure:persistence")
+project(":infrastructure:persistence").projectDir = file("infrastructure/persistence")
 
 // bootstrap
 include(":bootstrap:api")

@@ -23,9 +23,10 @@ uuid-creator = "5.3.3"
 auth0-java-jwt = "4.4.0"
 auth0-jwks-rsa = "0.22.1"
 
-# jpa module library versions
+# persistence module library versions
 mysql = "8.0.33"
 flyway = "10.6.0"
+exposed = "0.54.0"
 
 # api module library versions
 springdoc-openapi = "2.6.0"
@@ -58,11 +59,11 @@ jwks-rsa = { group = "com.auth0", name = "jwks-rsa", version.ref = "auth0-jwks-r
 spring-tx = { group = "org.springframework", name = "spring-tx", version.ref = "spring" }
 spring-boot-core = { group = "org.springframework.boot", name = "spring-boot", version.ref = "spring-boot" }
 
-# jpa module
-spring-boot-starter-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "spring-boot" }
+# persistence module
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
 flyway-mysql = { group = "org.flywaydb", name = "flyway-mysql", version.ref = "flyway" }
 mysql-connector-java = { group = "mysql", name = "mysql-connector-java", version.ref = "mysql" }
+spring-exposed = { group = "org.jetbrains.exposed", name = "exposed-spring-boot-starter", version.ref = "exposed" }
 
 # api module
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring-boot" }
