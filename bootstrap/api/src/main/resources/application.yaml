@@ -5,6 +5,8 @@ spring:
   profiles:
     active: local
     include:
+      - application
+      - persistence
 ---
 spring:
   config:

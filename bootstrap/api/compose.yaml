@@ -1,3 +1,4 @@
+name: 3days-api
 version: '3.8'
 services:
   mysql:
