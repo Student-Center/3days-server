@@ -4,7 +4,7 @@ import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
 import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.Job
-import com.threedays.domain.user.vo.Location
+import com.threedays.domain.user.vo.LocationId
 import com.threedays.domain.user.vo.UserId
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
@@ -29,7 +29,7 @@ data class User(
             userBirthYear: Year,
             userCompany: Company,
             userJob: Job,
-            userLocations: List<Location>,
+            userLocationIds: List<LocationId>,
             partnerBirthYearRange: ClosedRange<Year>,
             partnerJob: Job,
             partnerPreferDistance: PreferDistance
@@ -42,7 +42,7 @@ data class User(
                 birthYear = userBirthYear,
                 company = userCompany,
                 job = userJob,
-                locations = userLocations,
+                locationIds = userLocationIds,
             )
 
             val desiredPartner = UserDesiredPartner(

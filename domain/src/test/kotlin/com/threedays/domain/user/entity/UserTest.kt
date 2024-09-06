@@ -7,7 +7,7 @@ import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitra
 import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.Job
-import com.threedays.domain.user.vo.Location
+import com.threedays.domain.user.vo.LocationId
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -30,7 +30,7 @@ class UserTest : DescribeSpec({
             val userBirthYear: Year = fixtureMonkey.giveMeBuilder<Year>().sample()
             val userCompany: Company = fixtureMonkey.giveMeBuilder<Company>().sample()
             val userJob: Job = fixtureMonkey.giveMeBuilder<Job>().sample()
-            val userLocations: List<Location> = fixtureMonkey.giveMe<Location>(3)
+            val userLocations: List<LocationId> = fixtureMonkey.giveMe<LocationId>(3)
             val partnerBirthYearRange: ClosedRange<Year> =
                 fixtureMonkey.giveMeBuilder<ClosedRange<Year>>().sample()
             val partnerJob: Job = fixtureMonkey.giveMeBuilder<Job>().sample()
@@ -44,7 +44,7 @@ class UserTest : DescribeSpec({
                 userBirthYear = userBirthYear,
                 userCompany = userCompany,
                 userJob = userJob,
-                userLocations = userLocations,
+                userLocationIds = userLocations,
                 partnerBirthYearRange = partnerBirthYearRange,
                 partnerJob = partnerJob,
                 partnerPreferDistance = partnerPreferDistance
@@ -57,7 +57,7 @@ class UserTest : DescribeSpec({
             user.profile.birthYear shouldBe userBirthYear
             user.profile.company shouldBe userCompany
             user.profile.job shouldBe userJob
-            user.profile.locations shouldBe userLocations
+            user.profile.locationIds shouldBe userLocations
             user.desiredPartner.birthYearRange shouldBe partnerBirthYearRange
             user.desiredPartner.job shouldBe partnerJob
             user.desiredPartner.preferDistance shouldBe partnerPreferDistance
