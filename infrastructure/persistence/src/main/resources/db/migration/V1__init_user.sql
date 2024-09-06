@@ -1,8 +1,9 @@
 -- Create locations table
 CREATE TABLE locations
 (
-    id   BINARY(16) PRIMARY KEY,
-    name VARCHAR(255) NOT NULL
+    id         BINARY(16) PRIMARY KEY,
+    region     VARCHAR(255) NOT NULL,
+    sub_region VARCHAR(255) NOT NULL
 );
 
 -- Create user_desired_partners table
@@ -27,9 +28,7 @@ CREATE TABLE user_locations
 (
     user_id     BINARY(16),
     location_id BINARY(16),
-    PRIMARY KEY (user_id, location_id),
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (location_id) REFERENCES locations (id) ON DELETE CASCADE
+    PRIMARY KEY (user_id, location_id)
 );
 
 -- Create user_profiles table

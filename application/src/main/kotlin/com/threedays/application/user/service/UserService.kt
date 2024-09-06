@@ -18,7 +18,7 @@ class UserService (
             userBirthYear = command.userBirthYear,
             userCompany = command.userCompany,
             userJob = command.userJob,
-            userLocations = command.userLocations,
+            userLocationIds = command.userLocationIds,
             partnerBirthYearRange = command.partnerBirthYearRange,
             partnerJob = command.partnerJob,
             partnerPreferDistance = command.partnerPreferDistance,

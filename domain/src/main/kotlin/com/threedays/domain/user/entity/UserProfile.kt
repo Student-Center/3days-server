@@ -3,7 +3,7 @@ package com.threedays.domain.user.entity
 import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.Job
-import com.threedays.domain.user.vo.Location
+import com.threedays.domain.user.vo.LocationId
 import com.threedays.domain.user.vo.UserId
 import com.threedays.support.common.base.domain.DomainEntity
 import java.time.Year
@@ -14,5 +14,5 @@ data class UserProfile(
     val birthYear: Year,
     val company: Company,
     val job: Job,
-    val locations: List<Location>
+    val locationIds: List<LocationId>
 ) : DomainEntity<UserProfile, UserId>()

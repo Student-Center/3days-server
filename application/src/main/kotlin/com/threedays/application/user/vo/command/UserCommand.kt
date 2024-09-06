@@ -5,7 +5,7 @@ import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
 import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.Job
-import com.threedays.domain.user.vo.Location
+import com.threedays.domain.user.vo.LocationId
 import java.time.Year
 
 sealed class UserCommand {
@@ -16,9 +16,10 @@ sealed class UserCommand {
         val userBirthYear: Year,
         val userCompany: Company,
         val userJob: Job,
-        val userLocations: List<Location>,
+        val userLocationIds: List<LocationId>,
         val partnerBirthYearRange: ClosedRange<Year>,
         val partnerJob: Job,
         val partnerPreferDistance: PreferDistance
     )
+
 }

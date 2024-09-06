@@ -7,18 +7,15 @@ import com.threedays.domain.user.repository.UserRepository
 import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.Job
-import com.threedays.domain.user.vo.Location
+import com.threedays.domain.user.vo.LocationId
 import com.threedays.domain.user.vo.UserId
-import com.threedays.persistence.user.entity.LocationEntity
 import com.threedays.persistence.user.entity.UserDesiredPartnerEntity
 import com.threedays.persistence.user.entity.UserEntity
 import com.threedays.persistence.user.entity.UserLocationEntity
 import com.threedays.persistence.user.entity.UserProfileEntity
-import com.threedays.support.common.uuid.UUIDCreator
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
@@ -49,15 +46,18 @@ class UserPersistenceAdapter : UserRepository {
         val profileData = UserProfileEntity
             .selectAll()
             .where { UserProfileEntity.id eq id.value }
-            .singleOrNull()
-            ?: return null
+            .singleOrNull() ?: return null
 
         val desiredPartnerData = UserDesiredPartnerEntity
             .selectAll()
             .where { UserDesiredPartnerEntity.id eq id.value }
             .singleOrNull() ?: return null
 
-        val locations = findUserLocations(id)
+        val locations = UserLocationEntity
+            .selectAll()
+            .where { UserLocationEntity.userId eq id.value }
+            .map { LocationId(it[UserLocationEntity.locationId].value) }
+
 
         return User(
             id = UserId(userData[UserEntity.id].value),
@@ -71,7 +71,7 @@ class UserPersistenceAdapter : UserRepository {
         listOf(
             UserEntity,
             UserDesiredPartnerEntity,
-            UserProfileEntity
+            UserProfileEntity,
         ).forEach { it.deleteWhere { _ -> it.id eq id.value } }
         UserLocationEntity.deleteWhere { userId eq id.value }
     }
@@ -80,67 +80,40 @@ class UserPersistenceAdapter : UserRepository {
 
     private fun insertUser(user: User) {
         val userId = UserEntity.insertAndGetId { it.fromUser(user) }
-        UserProfileEntity.insert { it.fromUserProfile(user.profile) }
-        insertUserLocations(userId, user.profile.locations)
-        UserDesiredPartnerEntity.insert { it.fromUserDesiredPartner(user.desiredPartner) }
+        UserProfileEntity.insertAndGetId { it.fromUserProfile(user.profile) }
+        UserDesiredPartnerEntity.insertAndGetId { it.fromUserDesiredPartner(user.desiredPartner) }
+        insertUserLocations(userId.value, user.profile.locationIds)
     }
 
     private fun updateUser(user: User) {
         UserEntity.update({ UserEntity.id eq user.id.value }) { it.fromUser(user) }
         UserProfileEntity.update({ UserProfileEntity.id eq user.id.value }) {
-            it.fromUserProfile(
-                user.profile
-            )
+            it.fromUserProfile(user.profile)
         }
-        updateUserLocations(user.id, user.profile.locations)
         UserDesiredPartnerEntity.update({ UserDesiredPartnerEntity.id eq user.id.value }) {
             it.fromUserDesiredPartner(user.desiredPartner)
+        }
+        updateUserLocations(user.id.value, user.profile.locationIds)
+    }
+
+    private fun insertUserLocations(
+        userId: UUID,
+        locations: List<LocationId>
+    ) {
+        locations.forEach { locationId ->
+            UserLocationEntity.insert {
+                it[UserLocationEntity.userId] = userId
+                it[UserLocationEntity.locationId] = locationId.value
+            }
         }
     }
 
     private fun updateUserLocations(
-        userId: UserId,
-        newLocations: List<Location>
+        userId: UUID,
+        locations: List<LocationId>
     ) {
-        val existingLocations: List<Location> = findUserLocations(userId)
-        val locationsToRemove: List<Location> = existingLocations - newLocations.toSet()
-        val locationsToAdd: List<Location> = newLocations - existingLocations.toSet()
-
-        removeUserLocations(userId, locationsToRemove)
-        insertUserLocations(EntityID(userId.value, UserEntity), locationsToAdd)
-    }
-
-    private fun findUserLocations(userId: UserId): List<Location> =
-        UserLocationEntity.innerJoin(LocationEntity).selectAll()
-            .where { UserLocationEntity.userId eq userId.value }
-            .map { Location(it[LocationEntity.name]) }
-
-    private fun removeUserLocations(
-        userId: UserId,
-        locationsToRemove: List<Location>
-    ) {
-        locationsToRemove.forEach { location ->
-            // TODO : 이름으로 찾기 -> ID로 찾기
-            LocationEntity.findByName(location.value)?.let { locationId ->
-                // TODO : 벌크 처리
-                UserLocationEntity.deleteWhere {
-                    (UserLocationEntity.userId eq userId.value) and (UserLocationEntity.locationId eq locationId)
-                }
-            }
-        }
-    }
-
-    private fun insertUserLocations(
-        userId: EntityID<UUID>,
-        locations: List<Location>
-    ) {
-        locations.forEach { location ->
-            val locationId = LocationEntity.insertAndGetId { it.fromLocation(location) }
-            UserLocationEntity.insert {
-                it[this.userId] = userId
-                it[this.locationId] = locationId
-            }
-        }
+        UserLocationEntity.deleteWhere { UserLocationEntity.userId eq userId }
+        insertUserLocations(userId, locations)
     }
 
     private fun InsertStatement<EntityID<UUID>>.fromUser(user: User) {
@@ -152,7 +125,7 @@ class UserPersistenceAdapter : UserRepository {
         this[UserEntity.name] = user.name.value
     }
 
-    private fun InsertStatement<Number>.fromUserProfile(profile: UserProfile) {
+    private fun InsertStatement<EntityID<UUID>>.fromUserProfile(profile: UserProfile) {
         this[UserProfileEntity.id] = profile.id.value
         this[UserProfileEntity.gender] = profile.gender.name
         this[UserProfileEntity.birthYear] = profile.birthYear.value
@@ -167,12 +140,7 @@ class UserPersistenceAdapter : UserRepository {
         this[UserProfileEntity.job] = profile.job.value
     }
 
-    private fun InsertStatement<EntityID<UUID>>.fromLocation(location: Location) {
-        this[LocationEntity.id] = UUIDCreator.create()
-        this[LocationEntity.name] = location.value
-    }
-
-    private fun InsertStatement<Number>.fromUserDesiredPartner(desiredPartner: UserDesiredPartner) {
+    private fun InsertStatement<EntityID<UUID>>.fromUserDesiredPartner(desiredPartner: UserDesiredPartner) {
         this[UserDesiredPartnerEntity.id] = desiredPartner.id.value
         this[UserDesiredPartnerEntity.birthYearRangeStart] =
             desiredPartner.birthYearRange.start.value
@@ -191,13 +159,13 @@ class UserPersistenceAdapter : UserRepository {
         this[UserDesiredPartnerEntity.preferDistance] = desiredPartner.preferDistance.name
     }
 
-    private fun ResultRow.toUserProfile(locations: List<Location>) = UserProfile(
+    private fun ResultRow.toUserProfile(locations: List<LocationId>) = UserProfile(
         id = UserId(this[UserProfileEntity.id].value),
         gender = Gender.valueOf(this[UserProfileEntity.gender]),
         birthYear = Year.of(this[UserProfileEntity.birthYear]),
         company = Company(this[UserProfileEntity.company]),
         job = Job(this[UserProfileEntity.job]),
-        locations = locations
+        locationIds = locations
     )
 
     private fun ResultRow.toUserDesiredPartner() = UserDesiredPartner(
@@ -206,12 +174,4 @@ class UserPersistenceAdapter : UserRepository {
         job = Job(this[UserDesiredPartnerEntity.job]),
         preferDistance = UserDesiredPartner.PreferDistance.valueOf(this[UserDesiredPartnerEntity.preferDistance])
     )
-
-    private companion object {
-        fun LocationEntity.findByName(name: String): EntityID<UUID>? =
-            selectAll()
-                .where { LocationEntity.name eq name }
-                .map { it[LocationEntity.id] }
-                .firstOrNull()
-    }
 }
