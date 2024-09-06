@@ -120,7 +120,9 @@ class UserPersistenceAdapter : UserRepository {
         locationsToRemove: List<Location>
     ) {
         locationsToRemove.forEach { location ->
+            // TODO : 이름으로 찾기 -> ID로 찾기
             LocationEntity.findByName(location.value)?.let { locationId ->
+                // TODO : 벌크 처리
                 UserLocationEntity.deleteWhere {
                     (UserLocationEntity.userId eq userId.value) and (UserLocationEntity.locationId eq locationId)
                 }
@@ -206,9 +208,10 @@ class UserPersistenceAdapter : UserRepository {
     )
 
     private companion object {
-
         fun LocationEntity.findByName(name: String): EntityID<UUID>? =
-            selectAll().where { LocationEntity.name eq name }.map { it[LocationEntity.id] }
+            selectAll()
+                .where { LocationEntity.name eq name }
+                .map { it[LocationEntity.id] }
                 .firstOrNull()
     }
 }
