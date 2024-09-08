@@ -83,3 +83,34 @@ subprojects {
         useJUnitPlatform()
     }
 }
+
+sonar {
+    properties {
+        property("sonar.projectKey", "Student-Center_3days-server")
+        property("sonar.organization", "student-center")
+        property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.java.coveragePlugin", "jacoco")
+        property("sonar.coverage.jacoco.xmlReportPaths", layout.projectDirectory.file("support/jacoco/build/reports/jacoco/testCodeCoverageReport/testCodeCoverageReport.xml"))
+    }
+}
+
+
+val allProjects = project.allprojects
+    .asSequence()
+    .filter { it.name != "3days-server" }
+    .filter { it.name != "support" }
+    .filter { it.name != "domain" }
+    .filter { it.name != "application" }
+    .filter { it.name != "infrastructure" }
+    .filter { it.name != "bootstrap" }
+    .toList()
+
+project(":support:jacoco") {
+    apply(plugin = "jacoco-report-aggregation")
+
+    dependencies {
+        allProjects.forEach {
+            add("jacocoAggregation", project(it.path))
+        }
+    }
+}

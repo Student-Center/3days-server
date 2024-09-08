@@ -7,6 +7,9 @@ rootProject.name = "3days-server"
 include(":support:common")
 project(":support:common").projectDir = file("support/common")
 
+include(":support:jacoco")
+project(":support:jacoco").projectDir = file("support/jacoco")
+
 // domain
 include(":domain")
 project(":domain").projectDir = file("domain")
