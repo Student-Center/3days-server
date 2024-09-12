@@ -12,4 +12,6 @@ dependencies {
 
     implementation(libs.spring.tx)
     implementation(libs.spring.boot.core)
+
+    testFixturesImplementation(testFixtures(project(":domain")))
 }

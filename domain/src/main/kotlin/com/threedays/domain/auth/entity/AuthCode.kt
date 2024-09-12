@@ -2,12 +2,16 @@ package com.threedays.domain.auth.entity
 
 import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.vo.AuthCodeId
+import com.threedays.domain.auth.vo.PhoneNumber
+import com.threedays.domain.support.common.ClientOS
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
 import java.time.LocalDateTime
 
 data class AuthCode(
     override val id: AuthCodeId,
+    val clientOS: ClientOS,
+    val phoneNumber: PhoneNumber,
     val code: Code,
     val expireAt: LocalDateTime,
 ) : AggregateRoot<AuthCode, AuthCodeId>() {
@@ -33,10 +37,19 @@ data class AuthCode(
 
     companion object {
 
-        fun create(expireAt: LocalDateTime): AuthCode {
-            return AuthCode(UUIDTypeId.random(), Code.generate(), expireAt)
+        fun create(
+            clientOS: ClientOS,
+            phoneNumber: String,
+            expireAt: LocalDateTime
+        ): AuthCode {
+            return AuthCode(
+                id = UUIDTypeId.random(),
+                clientOS = clientOS,
+                phoneNumber = PhoneNumber(phoneNumber),
+                code = Code.generate(),
+                expireAt = expireAt
+            )
         }
-
     }
 
     fun verify(code: Code) {
