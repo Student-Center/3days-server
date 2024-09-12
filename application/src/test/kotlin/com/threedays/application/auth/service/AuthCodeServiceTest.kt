@@ -31,6 +31,11 @@ class AuthCodeServiceTest : DescribeSpec({
         authProperties = authProperties
     )
 
+    afterEach {
+        authCodeRepository.clear()
+        authCodeSmsSender.clear()
+    }
+
     describe("인증 코드 생성") {
         it("새로운 인증코드를 생성하고, SMS를 발송한다") {
             // arrange
