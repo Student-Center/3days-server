@@ -45,7 +45,7 @@ class AuthCodeSmsSenderCoolSmsAdapter(
         }.onFailure {
             logger.error(it) { "[Auth Code SMS] Failed to send : ${authCode.phoneNumber.value}, reason : ${it.message}" }
         }.onSuccess {
-            logger.info { "[Auth Code SMS] Sent to : ${authCode.phoneNumber.value}" }
+            logger.debug { "[Auth Code SMS] Sent to : ${authCode.phoneNumber.value}" }
         }
     }
 
