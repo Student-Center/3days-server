@@ -11,6 +11,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":application"))
     implementation(project(":infrastructure:persistence"))
+    implementation(project(":infrastructure:sms"))
 
     implementation(libs.spring.boot.starter.web)
 

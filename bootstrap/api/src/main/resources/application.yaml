@@ -7,6 +7,7 @@ spring:
     include:
       - application
       - persistence
+      - sms
 ---
 spring:
   config:
