@@ -31,6 +31,9 @@ exposed = "0.54.0"
 # api module library versions
 springdoc-openapi = "2.6.0"
 
+# sms-client module library versions
+cool-sms = "4.3.0"
+
 [libraries]
 # subprojects libraries
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
@@ -64,6 +67,9 @@ flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "fly
 flyway-mysql = { group = "org.flywaydb", name = "flyway-mysql", version.ref = "flyway" }
 mysql-connector-java = { group = "mysql", name = "mysql-connector-java", version.ref = "mysql" }
 spring-exposed = { group = "org.jetbrains.exposed", name = "exposed-spring-boot-starter", version.ref = "exposed" }
+
+# sms-client module
+cool-sms = { group = "net.nurigo", name = "sdk", version.ref = "cool-sms" }
 
 # api module
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring-boot" }

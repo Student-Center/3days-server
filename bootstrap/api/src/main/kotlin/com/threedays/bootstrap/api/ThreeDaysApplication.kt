@@ -2,6 +2,7 @@ package com.threedays.bootstrap.api
 
 import com.threedays.application.support.ApplicationConfig
 import com.threedays.persistence.support.PersistenceConfig
+import com.threedays.sms.support.SmsConfig
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
@@ -11,6 +12,7 @@ import java.util.*
 @SpringBootApplication
 @Import(
     value = [
+        SmsConfig::class,
         PersistenceConfig::class,
         ApplicationConfig::class
     ]

@@ -62,4 +62,9 @@ data class AuthCode(
         }
     }
 
+    fun getSmsMessage(): String = when (clientOS) {
+        ClientOS.AOS -> "<#> 3days - 인증번호는 ${code.value} 입니다."
+        ClientOS.IOS -> "3days - 인증번호는 ${code.value} 입니다."
+    }
+
 }
