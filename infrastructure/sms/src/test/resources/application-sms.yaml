@@ -1,5 +1,0 @@
-sms:
-  api-key: ${SMS_API_KEY}
-  api-secret: ${SMS_API_SECRET}
-  api-domain-url: ${SMS_DOMAIN}
-  sender-number: ${SMS_SENDER_NUMBER}
