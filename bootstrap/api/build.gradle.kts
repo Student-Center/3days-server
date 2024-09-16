@@ -6,18 +6,16 @@ plugins {
 dependencies {
     apply(plugin = rootProject.libs.plugins.openapi.generator.get().pluginId)
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${libs.versions.springdoc.openapi.get()}")
-    implementation("io.swagger.core.v3:swagger-annotations:${libs.versions.swagger.annotations.get()}")
-    implementation("org.springframework.boot:spring-boot-starter-validation")
-
     implementation(project(":support:common"))
-
     implementation(project(":domain"))
     implementation(project(":application"))
     implementation(project(":infrastructure:persistence"))
     implementation(project(":infrastructure:sms"))
 
     implementation(libs.spring.boot.starter.web)
+    implementation(libs.springdoc.openapi.webmvc.ui)
+    implementation(libs.swagger.annotations)
+    implementation(libs.spring.boot.starter.validation)
 
     developmentOnly(libs.spring.boot.devtools)
     developmentOnly(libs.spring.boot.docker.compose)
@@ -49,4 +47,3 @@ sourceSets {
         kotlin.srcDir("$openApiGeneratePath/src/main/kotlin")
     }
 }
-
