@@ -30,3 +30,7 @@ openApiGenerate {
         "useTags" to "true"
     ))
 }
+
+tasks.named("compileKotlin") {
+    dependsOn("openApiGenerate")
+}
