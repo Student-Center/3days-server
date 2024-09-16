@@ -6,6 +6,12 @@ plugins {
 dependencies {
     apply(plugin = rootProject.libs.plugins.openapi.generator.get().pluginId)
 
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
+    implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
+    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
+    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+
     implementation(project(":support:common"))
 
     implementation(project(":domain"))
@@ -31,11 +37,12 @@ openApiGenerate {
         mapOf(
             "interfaceOnly" to "true",
             "useTags" to "true",
+            "useSpringBoot3" to "true",  // SpringBoot 3, Jakarta 의존성 사용
         )
     )
 }
 
-tasks.named("compileKotlin") {
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn("openApiGenerate")
 }
 
@@ -44,3 +51,4 @@ sourceSets {
         kotlin.srcDir("$openApiGeneratePath/src/main/kotlin")
     }
 }
+
