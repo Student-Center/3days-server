@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id(libs.plugins.openapi.generator.get().pluginId) version libs.plugins.openapi.generator.get().version.toString()
 }
@@ -33,12 +35,12 @@ openApiGenerate {
         mapOf(
             "interfaceOnly" to "true",
             "useTags" to "true",
-            "useSpringBoot3" to "true",  // SpringBoot 3, Jakarta 의존성 사용
+            "useSpringBoot3" to "true",
         )
     )
 }
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+tasks.withType<KotlinCompile> {
     dependsOn("openApiGenerate")
 }
 
