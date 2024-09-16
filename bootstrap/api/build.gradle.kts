@@ -12,7 +12,6 @@ dependencies {
     implementation(project(":application"))
     implementation(project(":infrastructure:persistence"))
     implementation(project(":infrastructure:sms"))
-    implementation(project(":bootstrap:api"))
 
     implementation(libs.spring.boot.starter.web)
 
@@ -32,7 +31,6 @@ openApiGenerate {
         mapOf(
             "interfaceOnly" to "true",
             "useTags" to "true",
-            "gradleBuildFile" to "true",
         )
     )
 }
