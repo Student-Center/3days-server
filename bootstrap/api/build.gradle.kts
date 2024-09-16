@@ -23,6 +23,8 @@ dependencies {
     developmentOnly(libs.spring.boot.docker.compose)
 }
 
+val openApiGeneratePath = "${layout.buildDirectory.get()}/generated"
+
 openApiGenerate {
     generatorName.set("kotlin-spring")
     inputSpec.set("$rootDir/openapi/openapi.yaml")
@@ -40,4 +42,10 @@ openApiGenerate {
 
 tasks.withType<KotlinCompile> {
     dependsOn("openApiGenerate")
+}
+
+sourceSets {
+    main {
+        kotlin.srcDir("$openApiGeneratePath/src/main/kotlin")
+    }
 }
