@@ -6,11 +6,9 @@ plugins {
 dependencies {
     apply(plugin = rootProject.libs.plugins.openapi.generator.get().pluginId)
 
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
-    implementation("org.openapitools:jackson-databind-nullable:0.2.6")
-    implementation("io.swagger.core.v3:swagger-annotations:2.2.8")
-    implementation("jakarta.validation:jakarta.validation-api:3.0.2")
-    implementation("jakarta.annotation:jakarta.annotation-api:2.1.1")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${libs.versions.springdoc.openapi.get()}")
+    implementation("io.swagger.core.v3:swagger-annotations:${libs.versions.swagger.annotations.get()}")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation(project(":support:common"))
 

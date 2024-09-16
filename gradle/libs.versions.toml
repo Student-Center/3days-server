@@ -34,6 +34,9 @@ springdoc-openapi = "2.6.0"
 # sms-client module library versions
 cool-sms = "4.3.0"
 
+# swagger core libraray version
+swagger-annotations = "2.2.8"
+
 [libraries]
 # subprojects libraries
 kotlin-logging = { group = "io.github.oshai", name = "kotlin-logging-jvm", version.ref = "kotlin-logging" }
