@@ -12,7 +12,6 @@ import org.springframework.stereotype.Repository
 class LocationQueryPersistenceAdapter : LocationQueryRepository {
     override fun findAll(): List<Location> = LocationEntity
         .selectAll()
-        .toList()
         .map { it.toLocation() }
 
     override fun find(id: LocationId): Location? = LocationEntity
