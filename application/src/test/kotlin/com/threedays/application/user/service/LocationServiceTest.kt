@@ -5,7 +5,6 @@ import com.threedays.domain.user.entity.Location
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 
 @DisplayName("[서비스] - 지역")
 class LocationServiceTest : DescribeSpec({
