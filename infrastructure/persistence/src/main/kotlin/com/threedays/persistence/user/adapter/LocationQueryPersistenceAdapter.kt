@@ -20,10 +20,11 @@ class LocationQueryPersistenceAdapter : LocationQueryRepository {
         .where { LocationEntity.id eq id.value }
         .singleOrNull()
         ?.toLocation()
+
+    private fun ResultRow.toLocation() = Location(
+        id = LocationId(this[LocationEntity.id].value),
+        region = Location.Region(this[LocationEntity.region]),
+        subRegion = Location.SubRegion(this[LocationEntity.subRegion]),
+    )
 }
 
-private fun ResultRow.toLocation() = Location(
-    id = LocationId(this[LocationEntity.id].value),
-    region = Location.Region(this[LocationEntity.region]),
-    subRegion = Location.SubRegion(this[LocationEntity.subRegion]),
-)
