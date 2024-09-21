@@ -7,6 +7,7 @@ spring-boot-dependency-management = "1.1.6"
 kotlin = "2.0.0"
 sonar-cloud = "4.4.1.3373"
 openapi-generator = "7.5.0"
+jib = "3.4.3"
 
 # subprojects library versions
 kotlin-logging = "7.0.0"
@@ -94,3 +95,4 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-noarg = { id = "org.jetbrains.kotlin.plugin.noarg", version.ref = "kotlin" }
 kotlin-allopen = { id = "org.jetbrains.kotlin.plugin.allopen", version.ref = "kotlin" }
 openapi-generator = { id = "org.openapi.generator", version.ref = "openapi-generator" }
+jib = { id = "com.google.cloud.tools.jib", version.ref = "jib" }
