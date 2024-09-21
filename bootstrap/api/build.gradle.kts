@@ -57,4 +57,7 @@ jib {
     from {
         image = originImage
     }
+    container {
+        ports = listOf("8080")
+    }
 }
