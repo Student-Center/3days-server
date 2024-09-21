@@ -1,15 +1,14 @@
 name: Continuous Deployment to Dev
 
 on:
+  repository_dispatch:
+    types: [trigger-cd]
   workflow_dispatch:
     inputs:
       version:
         description: 'Version to deploy (e.g., v1.2.3)'
         required: true
         type: string
-  push:
-    branches:
-      - main
 
 env:
   AWS_REGION: ap-northeast-2
@@ -39,10 +38,13 @@ jobs:
       - name: Determine version to deploy
         id: determine-version
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          if [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "VERSION=${{ github.event.client_payload.version }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_OUTPUT
           else
-            echo "VERSION=latest" >> $GITHUB_OUTPUT
+            echo "Error: Unexpected event type"
+            exit 1
           fi
 
       - name: Check if image exists in ECR
