@@ -2,6 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id(libs.plugins.openapi.generator.get().pluginId) version libs.plugins.openapi.generator.get().version.toString()
+    id(libs.plugins.jib.get().pluginId) version libs.versions.jib
 }
 
 
@@ -47,5 +48,13 @@ tasks.withType<KotlinCompile> {
 sourceSets {
     main {
         kotlin.srcDir("$openApiGeneratePath/src/main/kotlin")
+    }
+}
+
+val originImage = "bellsoft/liberica-openjdk-alpine:21"
+
+jib {
+    from {
+        image = originImage
     }
 }
