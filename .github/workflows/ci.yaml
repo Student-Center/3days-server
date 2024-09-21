@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: threedays
+  ECR_REPOSITORY: threedays-app
 
 jobs:
   build:
