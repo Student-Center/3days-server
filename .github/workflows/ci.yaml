@@ -47,10 +47,10 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           ./gradlew jib \
-            -Djib.to.image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG \
-            -Djib.to.tags=latest \
-            -Djib.to.auth.username=${{ secrets.AWS_ACCESS_KEY_ID }} \
-            -Djib.to.auth.password=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            -Djib.to.image="$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" \
+            -Djib.to.tags="latest" \
+            -Djib.to.auth.username="${{ secrets.AWS_ACCESS_KEY_ID }}" \
+            -Djib.to.auth.password="${{ secrets.AWS_SECRET_ACCESS_KEY }}"
 
       - name: Save image info
         run: |
