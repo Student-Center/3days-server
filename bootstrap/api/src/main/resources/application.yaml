@@ -8,6 +8,9 @@ spring:
       - application
       - persistence
       - sms
+  docker:
+    compose:
+      enabled: false
 ---
 spring:
   config:
@@ -16,3 +19,9 @@ spring:
   docker:
     compose:
       file: ./bootstrap/api/compose.yaml
+      enabled: true
+---
+spring:
+  config:
+    activate:
+      on-profile: dev

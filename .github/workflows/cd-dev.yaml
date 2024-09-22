@@ -19,6 +19,7 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: dev
 
     steps:
       - name: Checkout code
@@ -61,14 +62,19 @@ jobs:
           fi
           echo "Image found in ECR"
 
-      - name: Generate Dockerrun.aws.json
+      - name: Generate Dockerrun.aws.json with environment variables
+        env:
+          VERSION: ${{ steps.determine-version.outputs.VERSION }}
+          REGISTRY_URL: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
+          VARS_CONTEXT: ${{ toJson(vars) }}
+          SECRETS_CONTEXT: ${{ toJson(secrets) }}
         run: |
-          VERSION=${{ steps.determine-version.outputs.VERSION }}
-          cat > Dockerrun.aws.json << EOF
-          {
+          # 시작 부분 작성
+          echo '{
             "AWSEBDockerrunVersion": "1",
             "Image": {
-              "Name": "${{ steps.login-ecr.outputs.registry }}/$ECR_REPOSITORY:$VERSION",
+              "Name": "'"$REGISTRY_URL"'/'"$ECR_REPOSITORY"':'"$VERSION"'",
               "Update": "true"
             },
             "Ports": [
@@ -76,12 +82,45 @@ jobs:
                 "ContainerPort": 8080,
                 "HostPort": 80
               }
+            ],
+            "Environment": [' > Dockerrun.aws.json
+
+          # GitHub Secrets 추가
+          FIRST_VAR=true
+          echo "$SECRETS_CONTEXT" | jq -r 'to_entries[] | select(.key | test("^AWS_") | not) | "\(.key)=\(.value)"' | while IFS='=' read -r SECRET_KEY SECRET_VALUE; do
+            if [ "$FIRST_VAR" = false ]; then
+              echo ',' >> Dockerrun.aws.json
+            fi
+            echo '    {
+                "Name": "'"$SECRET_KEY"'",
+                "Value": "'"$SECRET_VALUE"'"
+              }' >> Dockerrun.aws.json
+            FIRST_VAR=false
+          done
+
+          # GitHub Vars 추가
+          echo "$VARS_CONTEXT" | jq -r 'to_entries[] | "\(.key)=\(.value)"' | while IFS='=' read -r VAR_KEY VAR_VALUE; do
+            if [ "$FIRST_VAR" = false ]; then
+              echo ',' >> Dockerrun.aws.json
+            fi
+            echo '    {
+                "Name": "'"$VAR_KEY"'",
+                "Value": "'"$VAR_VALUE"'"
+              }' >> Dockerrun.aws.json
+            FIRST_VAR=false
+          done
+
+          # JSON 마무리
+          echo '
             ]
-          }
-          EOF
+          }' >> Dockerrun.aws.json
+
+      - name: Create deployment package
+        run: |
+          zip -r deploy.zip Dockerrun.aws.json
 
       - name: Deploy to Elastic Beanstalk
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@v22
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -89,7 +128,7 @@ jobs:
           environment_name: ${{ env.EB_ENVIRONMENT_NAME }}
           version_label: ${{ steps.determine-version.outputs.VERSION }}-${{ github.sha }}
           region: ${{ env.AWS_REGION }}
-          deployment_package: Dockerrun.aws.json
+          deployment_package: deploy.zip
           use_existing_version_if_available: true
 
       - name: Deployment result
