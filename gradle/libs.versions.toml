@@ -30,7 +30,7 @@ flyway = "10.10.0"
 exposed = "0.54.0"
 
 # api module library versions
-springdoc-openapi = "2.6.0"
+springdoc-openapi = "2.0.1"
 
 # sms-client module library versions
 cool-sms = "4.3.0"
