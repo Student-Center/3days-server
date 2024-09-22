@@ -5,21 +5,25 @@ import com.threedays.oas.api.LocationsApi
 import com.threedays.oas.model.Location
 import com.threedays.oas.model.OSType
 import org.springframework.http.ResponseEntity
-import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.RestController
 
-@Controller
+@RestController
 class LocationsController(
     private val queryLocation: QueryLocation,
 ) : LocationsApi {
+
     override fun locationsGet(xOSType: OSType): ResponseEntity<List<Location>> {
-        val locations = queryLocation.findAll().map {
-            Location(
-                id = it.id.value,
-                region = it.region.value,
-                subRegion = it.subRegion.value,
-            )
-        }.toList()
-        return ResponseEntity.ok(locations)
+        return queryLocation
+            .findAll()
+            .map {
+                Location(
+                    id = it.id.value,
+                    region = it.region.value,
+                    subRegion = it.subRegion.value,
+                )
+            }
+            .toList()
+            .let { ResponseEntity.ok(it) }
     }
 
 }
