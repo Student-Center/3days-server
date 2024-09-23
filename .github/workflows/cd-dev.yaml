@@ -1,8 +1,6 @@
 name: Continuous Deployment to Dev
 
 on:
-  repository_dispatch:
-    types: [ trigger-cd ]
   workflow_dispatch:
     inputs:
       version:
@@ -27,44 +25,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Send Deployment Start Webhook
-        run: |
-          curl -H "Content-Type: application/json" -X POST -d '{
-            "content": "배포가 시작되었습니다.",
-            "embeds": [{
-              "title": "배포 시작",
-              "color": 16776960,
-              "fields": [
-                {
-                  "name": "버전",
-                  "value": "${{ github.event.inputs.version || github.event.client_payload.version || 'latest' }}",
-                  "inline": true
-                },
-                {
-                  "name": "환경",
-                  "value": "'"${EB_ENVIRONMENT_NAME}"'",
-                  "inline": true
-                },
-                {
-                  "name": "배포자",
-                  "value": "'"${GITHUB_ACTOR}"'",
-                  "inline": true
-                }
-              ]
-            }]
-          }' ${{ env.DISCORD_WEBHOOK }}
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-
       - name: Determine version to deploy
         id: determine-version
         env:
@@ -80,6 +40,47 @@ jobs:
             echo "Error: Unexpected event type"
             exit 1
           fi
+
+      - name: Send Deployment Start Webhook
+        env:
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          VERSION: ${{ steps.determine-version.outputs.VERSION }}
+        run: |
+          curl -H "Content-Type: application/json" -X POST -d '{
+            "embeds": [{
+              "title": "배포 시작",
+              "color": 16776960,
+              "fields": [
+                {
+                  "name": "버전",
+                  "value": "'"${VERSION}"'",
+                  "inline": true
+                },
+                {
+                  "name": "환경",
+                  "value": "'"${EB_ENVIRONMENT_NAME}"'",
+                  "inline": true
+                },
+                {
+                  "name": "배포자",
+                  "value": "'"${GITHUB_ACTOR}"'",
+                  "inline": true
+                }
+              ],
+              "url": "'"${WORKFLOW_URL}"'"
+            }]
+          }' ${{ env.DISCORD_WEBHOOK }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Check if image exists in ECR
         id: check-image
@@ -161,39 +162,40 @@ jobs:
         if: success()
         env:
           VERSION: ${{ steps.determine-version.outputs.VERSION }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           curl -H "Content-Type: application/json" -X POST -d '{
-            "content": "배포가 성공적으로 완료되었습니다!",
-            "embeds": [{
-              "title": "배포 성공",
-              "color": 65280,
-              "fields": [
-                {
-                  "name": "버전",
-                  "value": "'"${VERSION}"'",
-                  "inline": true
-                },
-                {
-                  "name": "환경",
-                  "value": "'"${EB_ENVIRONMENT_NAME}"'",
-                  "inline": true
-                },
-                {
-                  "name": "배포자",
-                  "value": "'"${GITHUB_ACTOR}"'",
-                  "inline": true
-                }
-              ]
-            }]
+          "embeds": [{
+           "title": "배포 성공",
+           "color": 65280,
+           "fields": [
+             {
+               "name": "버전",
+               "value": "'"${VERSION}"'",
+               "inline": true
+             },
+             {
+               "name": "환경",
+               "value": "'"${EB_ENVIRONMENT_NAME}"'",
+               "inline": true
+             },
+             {
+               "name": "배포자",
+               "value": "'"${GITHUB_ACTOR}"'",
+               "inline": true
+             }
+           ],
+           "url": "'"${WORKFLOW_URL}"'"
+          }]
           }' ${{ env.DISCORD_WEBHOOK }}
 
       - name: Send Deployment Failure Webhook
         if: failure()
         env:
           VERSION: ${{ steps.determine-version.outputs.VERSION }}
+          WORKFLOW_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           curl -H "Content-Type: application/json" -X POST -d '{
-            "content": "배포 중 오류가 발생했습니다.",
             "embeds": [{
               "title": "배포 실패",
               "color": 16711680,
@@ -213,6 +215,7 @@ jobs:
                   "value": "'"${GITHUB_ACTOR}"'",
                   "inline": true
                 }
-              ]
+              ],
+              "url": "'"${WORKFLOW_URL}"'"
             }]
           }' ${{ env.DISCORD_WEBHOOK }}
