@@ -1,4 +1,4 @@
-package com.threedays.bootstrap.api.location
+package com.threedays.bootstrap.api.user
 
 import com.threedays.application.user.port.inbound.QueryLocation
 import com.threedays.oas.api.LocationsApi
