@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":application"))
     implementation(project(":infrastructure:persistence"))
     implementation(project(":infrastructure:sms"))
+    implementation(project(":infrastructure:redis"))
 
     implementation(libs.spring.boot.starter.web)
     implementation(libs.springdoc.openapi.webmvc.ui)

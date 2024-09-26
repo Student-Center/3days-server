@@ -8,6 +8,7 @@ spring:
       - application
       - persistence
       - sms
+      - redis
   docker:
     compose:
       enabled: false

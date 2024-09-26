@@ -75,6 +75,9 @@ spring-exposed = { group = "org.jetbrains.exposed", name = "exposed-spring-boot-
 # sms-client module
 cool-sms = { group = "net.nurigo", name = "sdk", version.ref = "cool-sms" }
 
+# redis module
+spring-data-redis = { group = "org.springframework.boot", name = "spring-boot-starter-data-redis", version.ref = "spring-boot" }
+
 # api module
 spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web", version.ref = "spring-boot" }
 spring-boot-devtools = { group = "org.springframework.boot", name = "spring-boot-devtools", version.ref = "spring-boot" }

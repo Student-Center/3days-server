@@ -25,6 +25,8 @@ project(":infrastructure:persistence").projectDir = file("infrastructure/persist
 include(":infrastructure:sms")
 project(":infrastructure:sms").projectDir = file("infrastructure/sms")
 
+include(":infrastructure:redis")
+project(":infrastructure:redis").projectDir = file("infrastructure/redis")
 
 // bootstrap
 include(":bootstrap:api")

@@ -2,6 +2,7 @@ package com.threedays.bootstrap.api
 
 import com.threedays.application.support.ApplicationConfig
 import com.threedays.persistence.support.PersistenceConfig
+import com.threedays.redis.support.config.RedisConfig
 import com.threedays.sms.support.SmsConfig
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -14,12 +15,14 @@ import java.util.*
     value = [
         SmsConfig::class,
         PersistenceConfig::class,
-        ApplicationConfig::class
+        RedisConfig::class,
+        ApplicationConfig::class,
     ]
 )
 class ThreeDaysApplication {
 
     companion object {
+
         const val SEOUL_TIME_ZONE = "Asia/Seoul"
     }
 
