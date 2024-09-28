@@ -91,6 +91,20 @@ class RegisterTokenTest : DescribeSpec({
                 }
             }
         }
+
+        context("회원 가입 토큰의 secret이 일치하지 않으면") {
+            it("AuthException.InvalidRegisterTokenException 예외가 발생한다") {
+                // arrange
+                val secret = "secret"
+                val registerToken = RegisterToken.generate(secret)
+                val invalidSecret = "invalid"
+
+                // act, assert
+                shouldThrow<AuthException.InvalidRegisterTokenException> {
+                    RegisterToken.verify(registerToken.value, invalidSecret)
+                }
+            }
+        }
     }
 
 })

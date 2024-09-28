@@ -4,6 +4,7 @@ import com.threedays.domain.auth.exception.AuthException
 import com.threedays.support.common.security.jwt.JwtClaims
 import com.threedays.support.common.security.jwt.JwtException
 import com.threedays.support.common.security.jwt.JwtTokenProvider
+import java.time.Instant
 import java.util.*
 
 data class RegisterToken(override val value: String) : AuthToken {
@@ -19,7 +20,10 @@ data class RegisterToken(override val value: String) : AuthToken {
         fun generate(secret: String) = JwtClaims {
             registeredClaims {
                 sub = REGISTER_TOKEN_SUBJECT
-                exp = Date(System.currentTimeMillis() + REGISTER_TOKEN_EXPIRE_MILLIS)
+                exp = Instant
+                    .now()
+                    .plusMillis(REGISTER_TOKEN_EXPIRE_MILLIS)
+                    .let { Date.from(it) }
             }
         }.let {
             JwtTokenProvider.createToken(it, secret)
@@ -41,7 +45,7 @@ data class RegisterToken(override val value: String) : AuthToken {
                     }
                 }
 
-            if (result.sub != REGISTER_TOKEN_SUBJECT) {
+            if (result.sub == null || result.sub != REGISTER_TOKEN_SUBJECT) {
                 throw AuthException.InvalidRegisterTokenException()
             }
 
