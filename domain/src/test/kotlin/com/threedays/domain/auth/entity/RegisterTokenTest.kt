@@ -23,6 +23,11 @@ class RegisterTokenTest : DescribeSpec({
 
             // assert
             registerToken.value.isNotBlank() shouldBe true
+
+            val token: Result<JwtClaims> = JwtTokenProvider.verifyToken(registerToken.value, secret)
+
+            token.isSuccess shouldBe true
+            token.getOrNull()?.sub shouldBe "register"
         }
     }
 
