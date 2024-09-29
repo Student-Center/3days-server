@@ -45,7 +45,7 @@ data class RegisterToken(override val value: String) : AuthToken {
                     }
                 }
 
-            if (result.sub == null || result.sub != REGISTER_TOKEN_SUBJECT) {
+            if (result.sub != REGISTER_TOKEN_SUBJECT) {
                 throw AuthException.InvalidRegisterTokenException()
             }
 

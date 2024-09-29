@@ -16,12 +16,13 @@ class UserService (
             name = command.name,
             userGender = command.userGender,
             userBirthYear = command.userBirthYear,
-            userCompany = command.userCompany,
-            userJob = command.userJob,
             userLocationIds = command.userLocationIds,
+            userCompanyId = command.userCompanyId,
+            userJobId = command.userJobId,
+            partnerJobOccupations = command.partnerJobOccupations,
             partnerBirthYearRange = command.partnerBirthYearRange,
-            partnerJob = command.partnerJob,
             partnerPreferDistance = command.partnerPreferDistance,
+
         ).also {
             userRepository.save(it)
         }

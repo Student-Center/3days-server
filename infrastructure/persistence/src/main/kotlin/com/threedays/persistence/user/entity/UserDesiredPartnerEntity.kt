@@ -5,6 +5,5 @@ import org.jetbrains.exposed.dao.id.UUIDTable
 object UserDesiredPartnerEntity : UUIDTable("user_desired_partners") {
     val birthYearRangeStart = integer("birth_year_range_start")
     val birthYearRangeEnd = integer("birth_year_range_end")
-    val job = varchar("job", 255)
     val preferDistance = varchar("prefer_distance", 50)
 }
