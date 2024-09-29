@@ -22,7 +22,6 @@ class UserService (
             partnerJobOccupations = command.partnerJobOccupations,
             partnerBirthYearRange = command.partnerBirthYearRange,
             partnerPreferDistance = command.partnerPreferDistance,
-
         ).also {
             userRepository.save(it)
         }
