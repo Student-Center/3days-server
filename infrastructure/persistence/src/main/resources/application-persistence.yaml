@@ -7,3 +7,14 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    clean-on-validation-error: true
+    clean-disabled: false

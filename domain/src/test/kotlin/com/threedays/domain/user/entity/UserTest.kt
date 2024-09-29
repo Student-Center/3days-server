@@ -4,9 +4,7 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.giveMe
 import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
-import com.threedays.domain.user.vo.Company
 import com.threedays.domain.user.vo.Gender
-import com.threedays.domain.user.vo.Job
 import com.threedays.domain.user.vo.LocationId
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
@@ -33,7 +31,7 @@ class UserTest : DescribeSpec({
             val userLocations: List<LocationId> = fixtureMonkey.giveMe<LocationId>(3)
             val partnerBirthYearRange: ClosedRange<Year> =
                 fixtureMonkey.giveMeBuilder<ClosedRange<Year>>().sample()
-            val partnerJob: Job = fixtureMonkey.giveMeBuilder<Job>().sample()
+            val partnerJobOccupations: List<Job.Occupation> = fixtureMonkey.giveMeBuilder<Job.Occupation>().sampleList(10)
             val partnerPreferDistance: UserDesiredPartner.PreferDistance =
                 fixtureMonkey.giveMeBuilder<UserDesiredPartner.PreferDistance>().sample()
 
@@ -42,12 +40,12 @@ class UserTest : DescribeSpec({
                 name = name,
                 userGender = userGender,
                 userBirthYear = userBirthYear,
-                userCompany = userCompany,
-                userJob = userJob,
+                userCompanyId = userCompany.id,
+                userJobId = userJob.id,
                 userLocationIds = userLocations,
                 partnerBirthYearRange = partnerBirthYearRange,
-                partnerJob = partnerJob,
-                partnerPreferDistance = partnerPreferDistance
+                partnerJobOccupations = partnerJobOccupations,
+                partnerPreferDistance = partnerPreferDistance,
             )
 
             // assert
@@ -55,11 +53,11 @@ class UserTest : DescribeSpec({
             user.name shouldBe name
             user.profile.gender shouldBe userGender
             user.profile.birthYear shouldBe userBirthYear
-            user.profile.company shouldBe userCompany
-            user.profile.job shouldBe userJob
+            user.profile.companyId shouldBe userCompany.id
+            user.profile.jobId shouldBe userJob.id
             user.profile.locationIds shouldBe userLocations
             user.desiredPartner.birthYearRange shouldBe partnerBirthYearRange
-            user.desiredPartner.job shouldBe partnerJob
+            user.desiredPartner.jobOccupations shouldBe partnerJobOccupations
             user.desiredPartner.preferDistance shouldBe partnerPreferDistance
         }
     }
