@@ -9,7 +9,7 @@ value class PhoneNumber(val value: String) {
     }
 
     init {
-        require(value.matches(regex)) { "휴대폰 번호는 010으로 시작하고 9~10자리 숫자로 구성되어야 합니다." }
+        require(value.matches(regex)) { "휴대폰 번호는 01으로 시작하고 10~11자리 숫자로 구성되어야 합니다." }
     }
 
 }
