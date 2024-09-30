@@ -6,9 +6,9 @@ import com.threedays.domain.auth.vo.AuthCodeId
 import org.springframework.stereotype.Component
 
 @Component
-class AuthCodeRedisAdapter (
+class AuthCodeRedisAdapter(
     private val authCodeRedisRepository: AuthCodeRedisRepository
-): AuthCodeRepository {
+) : AuthCodeRepository {
 
     override fun save(root: AuthCode) {
         AuthCodeRedisHash

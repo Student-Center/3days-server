@@ -4,6 +4,7 @@ package com.threedays.domain.auth.vo
 value class PhoneNumber(val value: String) {
 
     companion object {
+
         private val regex = Regex("^01[0-9]{8,9}\$")
     }
 

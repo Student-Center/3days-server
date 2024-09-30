@@ -70,7 +70,7 @@ spring-boot-core = { group = "org.springframework.boot", name = "spring-boot", v
 flyway-core = { group = "org.flywaydb", name = "flyway-core", version.ref = "flyway" }
 flyway-mysql = { group = "org.flywaydb", name = "flyway-mysql", version.ref = "flyway" }
 mysql-connector-java = { group = "mysql", name = "mysql-connector-java", version.ref = "mysql" }
-spring-exposed = { group = "org.jetbrains.exposed", name = "exposed-spring-boot-starter", version.ref = "exposed" }
+spring-data-jpa = { group = "org.springframework.boot", name = "spring-boot-starter-data-jpa", version.ref = "spring-boot" }
 
 # sms-client module
 cool-sms = { group = "net.nurigo", name = "sdk", version.ref = "cool-sms" }

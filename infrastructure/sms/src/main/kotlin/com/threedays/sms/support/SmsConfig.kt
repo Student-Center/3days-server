@@ -14,9 +14,9 @@ const val BASE_PACKAGE = "com.threedays.sms"
 @ComponentScan(basePackages = [BASE_PACKAGE], lazyInit = true)
 @EnableConfigurationProperties
 @ConfigurationPropertiesScan(basePackages = [BASE_PACKAGE])
-class SmsConfig (
+class SmsConfig(
     private val smsProperties: SmsProperties
-){
+) {
 
     @Bean
     fun coolSmsService(): DefaultMessageService {
