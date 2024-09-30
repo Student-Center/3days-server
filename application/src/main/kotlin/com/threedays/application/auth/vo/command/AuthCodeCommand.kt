@@ -1,6 +1,6 @@
 package com.threedays.application.auth.vo.command
 
-import com.threedays.domain.auth.vo.AuthCodeId
+import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.support.common.ClientOS
 
 sealed class AuthCodeCommand {
@@ -11,7 +11,7 @@ sealed class AuthCodeCommand {
     ) : AuthCodeCommand()
 
     data class Verify(
-        val id: AuthCodeId,
+        val id: AuthCode.Id,
         val code: String,
     )
 

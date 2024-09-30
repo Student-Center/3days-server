@@ -1,21 +1,20 @@
 package com.threedays.domain.auth.repository
 
 import com.threedays.domain.auth.entity.AuthCode
-import com.threedays.domain.auth.vo.AuthCodeId
 
 class AuthCodeRepositorySpy : AuthCodeRepository {
 
-    private val authCodes = mutableMapOf<AuthCodeId, AuthCode>()
+    private val authCodes = mutableMapOf<AuthCode.Id, AuthCode>()
 
     override fun save(root: AuthCode) {
         authCodes[root.id] = root
     }
 
-    override fun find(id: AuthCodeId): AuthCode? {
+    override fun find(id: AuthCode.Id): AuthCode? {
         return authCodes[id]
     }
 
-    override fun delete(id: AuthCodeId) {
+    override fun delete(id: AuthCode.Id) {
         authCodes.remove(id)
     }
 

@@ -2,7 +2,6 @@ package com.threedays.redis.auth
 
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.repository.AuthCodeRepository
-import com.threedays.domain.auth.vo.AuthCodeId
 import org.springframework.stereotype.Component
 
 @Component
@@ -18,14 +17,14 @@ class AuthCodeRedisAdapter(
             }
     }
 
-    override fun find(id: AuthCodeId): AuthCode? {
+    override fun find(id: AuthCode.Id): AuthCode? {
         return authCodeRedisRepository
             .findById(id.value.toString())
             .map { it.toDomain() }
             .orElse(null)
     }
 
-    override fun delete(id: AuthCodeId) {
+    override fun delete(id: AuthCode.Id) {
         authCodeRedisRepository.deleteById(id.value.toString())
     }
 

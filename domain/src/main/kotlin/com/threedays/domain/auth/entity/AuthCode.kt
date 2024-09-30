@@ -1,20 +1,22 @@
 package com.threedays.domain.auth.entity
 
 import com.threedays.domain.auth.exception.AuthException
-import com.threedays.domain.auth.vo.AuthCodeId
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
 import java.time.LocalDateTime
+import java.util.*
 
 data class AuthCode(
-    override val id: AuthCodeId,
+    override val id: Id,
     val clientOS: ClientOS,
     val phoneNumber: PhoneNumber,
     val code: Code,
     val expireAt: LocalDateTime,
-) : AggregateRoot<AuthCode, AuthCodeId>() {
+) : AggregateRoot<AuthCode, AuthCode.Id>() {
+
+    data class Id(override val value: UUID) : UUIDTypeId(value)
 
     @JvmInline
     value class Code(val value: String) {

@@ -1,7 +1,6 @@
 package com.threedays.redis.auth
 
 import com.threedays.domain.auth.entity.AuthCode
-import com.threedays.domain.auth.vo.AuthCodeId
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import org.springframework.data.annotation.Id
@@ -52,7 +51,7 @@ class AuthCodeRedisHash(
 
     fun toDomain(): AuthCode {
         return AuthCode(
-            id = AuthCodeId(UUID.fromString(id)),
+            id = AuthCode.Id(UUID.fromString(id)),
             clientOS = ClientOS.valueOf(clientOS),
             phoneNumber = PhoneNumber(phoneNumber),
             code = code,
