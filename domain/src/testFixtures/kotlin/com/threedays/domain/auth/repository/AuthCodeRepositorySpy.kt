@@ -3,7 +3,7 @@ package com.threedays.domain.auth.repository
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.vo.AuthCodeId
 
-class AuthCodeRepositorySpy: AuthCodeRepository {
+class AuthCodeRepositorySpy : AuthCodeRepository {
 
     private val authCodes = mutableMapOf<AuthCodeId, AuthCode>()
 

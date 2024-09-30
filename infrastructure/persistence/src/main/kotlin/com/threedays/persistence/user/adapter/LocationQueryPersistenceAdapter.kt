@@ -2,28 +2,24 @@ package com.threedays.persistence.user.adapter
 
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.repository.LocationQueryRepository
-import com.threedays.domain.user.vo.LocationId
-import com.threedays.persistence.user.entity.LocationEntity
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.selectAll
-import org.springframework.stereotype.Repository
+import com.threedays.persistence.user.repository.LocationJpaRepository
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 
-@Repository
-class LocationQueryPersistenceAdapter : LocationQueryRepository {
-    override fun findAll(): List<Location> = LocationEntity
-        .selectAll()
-        .map { it.toLocation() }
+@Component
+@Transactional(readOnly = true)
+class LocationQueryPersistenceAdapter(
+    private val locationJpaRepository: LocationJpaRepository
+) : LocationQueryRepository {
 
-    override fun find(id: LocationId): Location? = LocationEntity
-        .selectAll()
-        .where { LocationEntity.id eq id.value }
-        .singleOrNull()
-        ?.toLocation()
+    override fun findAll(): List<Location> =
+        locationJpaRepository
+            .findAll()
+            .map { it.toDomainEntity() }
 
-    private fun ResultRow.toLocation() = Location(
-        id = LocationId(this[LocationEntity.id].value),
-        region = Location.Region(this[LocationEntity.region]),
-        subRegion = Location.SubRegion(this[LocationEntity.subRegion]),
-    )
+    override fun find(id: Location.Id): Location? = locationJpaRepository
+        .findById(id.value)
+        .map { it.toDomainEntity() }
+        .orElse(null)
+
 }
-

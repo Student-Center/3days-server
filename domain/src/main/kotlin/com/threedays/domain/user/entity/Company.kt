@@ -1,7 +1,8 @@
 package com.threedays.domain.user.entity
 
-import com.threedays.domain.user.vo.CompanyId
 import com.threedays.support.common.base.domain.DomainEntity
+import com.threedays.support.common.base.domain.UUIDTypeId
+import java.util.*
 
 /**
  * 회사 엔티티
@@ -9,6 +10,10 @@ import com.threedays.support.common.base.domain.DomainEntity
  * @property name 회사명
  */
 data class Company(
-    override val id: CompanyId,
+    override val id: Id,
     val name: String,
-) : DomainEntity<Company, CompanyId>()
+) : DomainEntity<Company, Company.Id>() {
+
+    data class Id(override val value: UUID) : UUIDTypeId(value)
+
+}

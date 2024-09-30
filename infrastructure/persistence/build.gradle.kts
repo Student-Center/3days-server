@@ -11,7 +11,7 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":application"))
 
-    implementation(libs.spring.exposed)
+    implementation(libs.spring.data.jpa)
     implementation(libs.flyway.core)
     implementation(libs.flyway.mysql)
 

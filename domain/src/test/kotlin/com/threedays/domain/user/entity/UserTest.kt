@@ -4,8 +4,8 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.giveMe
 import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.vo.Gender
-import com.threedays.domain.user.vo.LocationId
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -24,25 +24,28 @@ class UserTest : DescribeSpec({
         it("새로운 유저를 생성한다") {
             // arrange
             val name: User.Name = fixtureMonkey.giveMeBuilder<User.Name>().sample()
+            val phoneNumber: PhoneNumber = PhoneNumber("01012345678")
             val userGender: Gender = fixtureMonkey.giveMeBuilder<Gender>().sample()
             val userBirthYear: Year = fixtureMonkey.giveMeBuilder<Year>().sample()
             val userCompany: Company = fixtureMonkey.giveMeBuilder<Company>().sample()
             val userJob: Job = fixtureMonkey.giveMeBuilder<Job>().sample()
-            val userLocations: List<LocationId> = fixtureMonkey.giveMe<LocationId>(3)
+            val userLocations: List<Location> = fixtureMonkey.giveMeBuilder<Location>().sampleList(3)
             val partnerBirthYearRange: ClosedRange<Year> =
                 fixtureMonkey.giveMeBuilder<ClosedRange<Year>>().sample()
-            val partnerJobOccupations: List<Job.Occupation> = fixtureMonkey.giveMeBuilder<Job.Occupation>().sampleList(10)
+            val partnerJobOccupations: List<Job.Occupation> =
+                fixtureMonkey.giveMeBuilder<Job.Occupation>().sampleList(10)
             val partnerPreferDistance: UserDesiredPartner.PreferDistance =
                 fixtureMonkey.giveMeBuilder<UserDesiredPartner.PreferDistance>().sample()
 
             // act
             val user = User.create(
                 name = name,
+                phoneNumber = phoneNumber,
                 userGender = userGender,
                 userBirthYear = userBirthYear,
-                userCompanyId = userCompany.id,
-                userJobId = userJob.id,
-                userLocationIds = userLocations,
+                userCompany = userCompany,
+                userJob = userJob,
+                userLocations = userLocations,
                 partnerBirthYearRange = partnerBirthYearRange,
                 partnerJobOccupations = partnerJobOccupations,
                 partnerPreferDistance = partnerPreferDistance,
@@ -50,12 +53,13 @@ class UserTest : DescribeSpec({
 
             // assert
             user.id shouldNotBe null
+            user.phoneNumber shouldBe phoneNumber
             user.name shouldBe name
             user.profile.gender shouldBe userGender
             user.profile.birthYear shouldBe userBirthYear
-            user.profile.companyId shouldBe userCompany.id
-            user.profile.jobId shouldBe userJob.id
-            user.profile.locationIds shouldBe userLocations
+            user.profile.company shouldBe userCompany
+            user.profile.job shouldBe userJob
+            user.profile.locations shouldBe userLocations
             user.desiredPartner.birthYearRange shouldBe partnerBirthYearRange
             user.desiredPartner.jobOccupations shouldBe partnerJobOccupations
             user.desiredPartner.preferDistance shouldBe partnerPreferDistance

@@ -1,13 +1,16 @@
 package com.threedays.domain.user.entity
 
-import com.threedays.domain.user.vo.LocationId
 import com.threedays.support.common.base.domain.DomainEntity
+import com.threedays.support.common.base.domain.UUIDTypeId
+import java.util.*
 
 data class Location(
-    override val id: LocationId,
+    override val id: Id,
     val region: Region,
     val subRegion: SubRegion
-) : DomainEntity<Location, LocationId>() {
+) : DomainEntity<Location, Location.Id>() {
+
+    class Id(override val value: UUID) : UUIDTypeId(value)
 
     @JvmInline
     value class Region(val value: String)
@@ -18,7 +21,7 @@ data class Location(
     companion object {
 
         fun of(
-            id: LocationId,
+            id: Location.Id,
             region: String,
             subRegion: String
         ): Location {

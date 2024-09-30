@@ -1,6 +1,7 @@
 package com.threedays.support.common.base.domain
 
 abstract class TypeId<T : Any>(open val value: T) {
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

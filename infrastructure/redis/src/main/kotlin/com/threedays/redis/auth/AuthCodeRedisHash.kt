@@ -9,7 +9,7 @@ import org.springframework.data.redis.core.RedisHash
 import org.springframework.data.redis.core.TimeToLive
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.UUID
+import java.util.*
 
 @RedisHash("auth_code")
 class AuthCodeRedisHash(
@@ -22,7 +22,7 @@ class AuthCodeRedisHash(
 
     @Id
     var id: String = id.toString()
-      private set
+        private set
 
     var clientOS: String = clientOS.name
         private set
@@ -38,6 +38,7 @@ class AuthCodeRedisHash(
         private set
 
     companion object {
+
         fun from(authCode: AuthCode): AuthCodeRedisHash {
             return AuthCodeRedisHash(
                 id = authCode.id.value,
