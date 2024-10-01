@@ -1,7 +1,6 @@
 package com.threedays.application.user.service
 
-import com.threedays.application.user.port.inbound.CommandUser
-import com.threedays.application.user.vo.command.UserCommand
+import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Job
 import com.threedays.domain.user.entity.Location
@@ -19,10 +18,10 @@ class UserService(
     private val locationQueryRepository: LocationQueryRepository,
     private val jobQueryRepository: JobQueryRepository,
     private val companyQueryRepository: CompanyQueryRepository,
-) : CommandUser {
+) : RegisterUser {
 
     @Transactional
-    override fun register(command: UserCommand.Register): User {
+    override fun invoke(command: RegisterUser.Command): User {
         val userCompany: Company = companyQueryRepository.get(command.userCompanyId)
         val userJob: Job = jobQueryRepository.get(command.userJobId)
         val userLocations: List<Location> =

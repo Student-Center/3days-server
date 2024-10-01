@@ -1,9 +1,9 @@
 package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
-import com.threedays.application.auth.port.inbound.CommandAuthCode
+import com.threedays.application.auth.port.inbound.SendAuthCode
+import com.threedays.application.auth.port.inbound.VerifyAuthCode
 import com.threedays.application.auth.port.outbound.AuthCodeSmsSender
-import com.threedays.application.auth.vo.command.AuthCodeCommand
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.entity.RegisterToken
 import com.threedays.domain.auth.repository.AuthCodeRepository
@@ -15,9 +15,10 @@ class AuthCodeService(
     private val authCodeRepository: AuthCodeRepository,
     private val authCodeSmsSender: AuthCodeSmsSender,
     private val authProperties: AuthProperties,
-) : CommandAuthCode {
+) : SendAuthCode,
+    VerifyAuthCode {
 
-    override fun create(command: AuthCodeCommand.Create): AuthCode {
+    override fun invoke(command: SendAuthCode.Command): AuthCode {
         val expireAt: LocalDateTime = LocalDateTime
             .now()
             .plusSeconds(authProperties.authCodeExpirationSeconds)
@@ -32,14 +33,18 @@ class AuthCodeService(
         }
     }
 
-    override fun verify(command: AuthCodeCommand.Verify): RegisterToken {
+    override fun invoke(command: VerifyAuthCode.Command): VerifyAuthCode.Result {
         val inputCode: AuthCode.Code = command.code.let { AuthCode.Code(it) }
 
         authCodeRepository
             .get(command.id)
             .verify(inputCode)
 
-        return RegisterToken.generate(authProperties.tokenSecret)
+        // 기존에 가입한 유저일 경우 분기 처리
+
+        return RegisterToken
+            .generate(authProperties.tokenSecret)
+            .let { VerifyAuthCode.Result.NewUser(it) }
     }
 
 }

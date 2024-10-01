@@ -1,17 +1,20 @@
-package com.threedays.application.user.vo.command
+package com.threedays.application.user.port.inbound
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Job
 import com.threedays.domain.user.entity.Location
+import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.User.Name
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
 import com.threedays.domain.user.vo.Gender
 import java.time.Year
 
-sealed class UserCommand {
+interface RegisterUser {
 
-    data class Register(
+    fun invoke(command: Command): User
+
+    data class Command(
         val name: Name,
         val phoneNumber: PhoneNumber,
         val userGender: Gender,

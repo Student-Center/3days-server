@@ -12,7 +12,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import java.time.LocalDateTime
 
-@DisplayName("[도메인] - 인증 코드")
+@DisplayName("[도메인][인증] - 인증 코드")
 class AuthCodeTest : DescribeSpec({
 
     val fixtureMonkey: FixtureMonkey = FixtureMonkey

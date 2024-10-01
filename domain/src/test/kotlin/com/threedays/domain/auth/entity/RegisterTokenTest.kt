@@ -10,7 +10,7 @@ import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import java.util.*
 
-@DisplayName("[도메인][Auth] - 회원 가입 토큰")
+@DisplayName("[도메인][인증] - 회원 가입 토큰")
 class RegisterTokenTest : DescribeSpec({
 
     describe("회원 가입 토큰 생성 - generate") {

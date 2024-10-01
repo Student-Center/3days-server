@@ -12,7 +12,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import java.time.Year
 
-@DisplayName("[도메인] - 유저")
+@DisplayName("[도메인][유저] - 유저")
 class UserTest : DescribeSpec({
 
     val fixtureMonkey: FixtureMonkey = FixtureMonkey.builder()

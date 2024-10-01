@@ -6,7 +6,7 @@ import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 
-@DisplayName("[서비스] - 지역")
+@DisplayName("[서비스][유저] - 지역")
 class LocationServiceTest : DescribeSpec({
 
     val locationQueryRepository = LocationQueryRepositorySpy()
