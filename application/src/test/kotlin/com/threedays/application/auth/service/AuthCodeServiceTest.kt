@@ -8,14 +8,10 @@ import com.threedays.application.auth.config.AuthProperties
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyAuthCode
 import com.threedays.application.auth.port.outbound.AuthCodeSmsSenderSpy
-import com.threedays.application.auth.vo.command.AuthCodeCommand
 import com.threedays.domain.auth.entity.AuthCode
-import com.threedays.domain.auth.entity.RegisterToken
 import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.repository.AuthCodeRepositorySpy
 import com.threedays.domain.support.common.ClientOS
-import com.threedays.support.common.security.jwt.JwtTokenProvider
-import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
