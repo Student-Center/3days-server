@@ -12,24 +12,24 @@ import java.util.*
 
 @RedisHash("auth_code")
 class AuthCodeRedisHash(
-    id: UUID,
-    clientOS: ClientOS,
+    id: String,
+    clientOS: String,
     phoneNumber: String,
-    code: AuthCode.Code,
+    code: String,
     ttl: Long
 ) {
 
     @Id
-    var id: String = id.toString()
+    var id: String = id
         private set
 
-    var clientOS: String = clientOS.name
+    var clientOS: String = clientOS
         private set
 
     var phoneNumber: String = phoneNumber
         private set
 
-    var code: AuthCode.Code = code
+    var code: String = code
         private set
 
     @TimeToLive
@@ -40,10 +40,10 @@ class AuthCodeRedisHash(
 
         fun from(authCode: AuthCode): AuthCodeRedisHash {
             return AuthCodeRedisHash(
-                id = authCode.id.value,
-                clientOS = authCode.clientOS,
+                id = authCode.id.value.toString(),
+                clientOS = authCode.clientOS.name,
                 phoneNumber = authCode.phoneNumber.value,
-                code = authCode.code,
+                code = authCode.code.value,
                 ttl = LocalDateTime.now().until(authCode.expireAt, ChronoUnit.SECONDS)
             )
         }
@@ -54,7 +54,7 @@ class AuthCodeRedisHash(
             id = AuthCode.Id(UUID.fromString(id)),
             clientOS = ClientOS.valueOf(clientOS),
             phoneNumber = PhoneNumber(phoneNumber),
-            code = code,
+            code = AuthCode.Code(code),
             expireAt = LocalDateTime.now().plusSeconds(ttl)
         )
     }
