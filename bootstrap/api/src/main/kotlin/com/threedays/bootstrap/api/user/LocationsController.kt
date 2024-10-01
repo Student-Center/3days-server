@@ -12,7 +12,7 @@ class LocationsController(
     private val queryLocation: QueryLocation,
 ) : LocationsApi {
 
-    override fun locationsGet(xOSType: OSType): ResponseEntity<List<Location>> {
+    override fun getLocations(): ResponseEntity<List<Location>> {
         return queryLocation
             .findAll()
             .map {
