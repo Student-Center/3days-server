@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 abstract class RepositorySpyBase<AR : AggregateRoot<AR, ARID>, ARID : TypeId<*>> :
     Repository<AR, ARID> {
 
-    open val entities = ConcurrentHashMap<ARID, AR>()
+    protected val entities = ConcurrentHashMap<ARID, AR>()
 
     override fun save(root: AR) {
         entities[root.id] = root

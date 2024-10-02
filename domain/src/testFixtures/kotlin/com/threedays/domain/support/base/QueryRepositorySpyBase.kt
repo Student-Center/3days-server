@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap
 abstract class QueryRepositorySpyBase<E : DomainEntity<E, ID>, ID : TypeId<*>> :
     QueryRepository<E, ID> {
 
-    open val storage: MutableMap<ID, E> = ConcurrentHashMap()
+    protected val storage: MutableMap<ID, E> = ConcurrentHashMap()
 
     override fun find(id: ID): E? = storage[id]
 
