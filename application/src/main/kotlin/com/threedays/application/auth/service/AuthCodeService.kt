@@ -18,7 +18,8 @@ class AuthCodeService(
 ) : SendAuthCode,
     VerifyAuthCode {
 
-    override fun invoke(command: SendAuthCode.Command): AuthCode {
+    override fun invoke(command: SendAuthCode.Command): SendAuthCode.Result {
+        // TODO(김산): 기존 유저일 경우 분기 처리
         val expireAt: LocalDateTime = LocalDateTime
             .now()
             .plusSeconds(authProperties.authCodeExpirationSeconds)
@@ -30,6 +31,8 @@ class AuthCodeService(
         ).also {
             authCodeSmsSender.send(it)
             authCodeRepository.save(it)
+        }.let {
+            SendAuthCode.Result.NewUser(it)
         }
     }
 
@@ -40,7 +43,7 @@ class AuthCodeService(
             .get(command.id)
             .verify(inputCode)
 
-        // 기존에 가입한 유저일 경우 분기 처리
+        // TODO: 기존에 가입한 유저일 경우 분기 처리
 
         return RegisterToken
             .generate(authProperties.tokenSecret)
