@@ -3,6 +3,7 @@ package com.threedays.domain.auth.entity
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.threedays.domain.auth.exception.AuthException
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
@@ -24,7 +25,7 @@ class AuthCodeTest : DescribeSpec({
     describe("인증 코드 생성") {
         it("새로운 인증 코드를 생성한다") {
             // arrange
-            val phoneNumber = "01012345678"
+            val phoneNumber = PhoneNumber("01012345678")
             val expireAt: LocalDateTime = LocalDateTime.now().plusMinutes(5)
             val clientOS: ClientOS = fixtureMonkey.giveMeBuilder(ClientOS::class.java).sample()
 
@@ -43,7 +44,7 @@ class AuthCodeTest : DescribeSpec({
         context("유효한 인증 코드로") {
             it("검증에 성공한다") {
                 // arrange
-                val phoneNumber = "01012345678"
+                val phoneNumber = PhoneNumber("01012345678")
                 val expireAt: LocalDateTime = LocalDateTime.now().plusMinutes(5)
                 val clientOS: ClientOS = fixtureMonkey.giveMeBuilder(ClientOS::class.java).sample()
                 val authCode: AuthCode = AuthCode.create(clientOS, phoneNumber, expireAt)
@@ -59,7 +60,7 @@ class AuthCodeTest : DescribeSpec({
         context("잘못된 인증 코드로") {
             it("InvalidAuthCodeException을 발생시킨다") {
                 // arrange
-                val phoneNumber = "01012345678"
+                val phoneNumber = PhoneNumber("01012345678")
                 val expireAt: LocalDateTime = LocalDateTime.now().plusMinutes(5)
                 val clientOS: ClientOS = fixtureMonkey.giveMeBuilder(ClientOS::class.java).sample()
                 val authCode: AuthCode = AuthCode.create(clientOS, phoneNumber, expireAt)
@@ -75,7 +76,7 @@ class AuthCodeTest : DescribeSpec({
         context("만료된 인증 코드로") {
             it("AuthCodeExpiredException을 발생시킨다") {
                 // arrange
-                val phoneNumber = "01012345678"
+                val phoneNumber = PhoneNumber("01012345678")
                 val expireAt: LocalDateTime = LocalDateTime.now().minusMinutes(5)
                 val clientOS: ClientOS = fixtureMonkey.giveMeBuilder(ClientOS::class.java).sample()
                 val authCode: AuthCode = AuthCode.create(clientOS, phoneNumber, expireAt)

@@ -1,6 +1,7 @@
 package com.threedays.sms.auth.adapter
 
 import com.threedays.domain.auth.entity.AuthCode
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import com.threedays.sms.support.SmsProperties
 import io.kotest.core.annotation.DisplayName
@@ -33,7 +34,7 @@ class AuthCodeSmsSenderCoolSmsAdapterTest : DescribeSpec({
             // arrange
             val authCode = AuthCode.create(
                 clientOS = ClientOS.IOS,
-                phoneNumber = "01012345678", // 실제 번호로 변경
+                phoneNumber = PhoneNumber("01012345678"),
                 expireAt = LocalDateTime.now().plusMinutes(3)
             )
             every { defaultMessageService.sendOne(any()) } returns SingleMessageSentResponse(
