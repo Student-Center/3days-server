@@ -19,25 +19,25 @@ class AuthController(
         xOSType: OSType,
         sendAuthCodeRequest: SendAuthCodeRequest
     ): ResponseEntity<SendAuthCodeResponse> {
-        return SendAuthCode.Command(
+        val command = SendAuthCode.Command(
             clientOS = ClientOS.valueOf(xOSType.name),
             phoneNumber = PhoneNumber(sendAuthCodeRequest.phoneNumber),
-        ).let { command: SendAuthCode.Command ->
-            sendAuthCode.invoke(command)
-        }.let { result: SendAuthCode.Result ->
-            when (result) {
-                is SendAuthCode.Result.ExistingUser -> SendAuthCodeResponse(
-                    authCodeId = result.authCode.id.value,
-                    userStatus = SendAuthCodeResponse.UserStatus.EXISTING
-                )
-                is SendAuthCode.Result.NewUser -> SendAuthCodeResponse(
-                    authCodeId = result.authCode.id.value,
-                    userStatus = SendAuthCodeResponse.UserStatus.NEW
-                )
-            }
-        }.let { response: SendAuthCodeResponse ->
-            ResponseEntity.ok(response)
+        )
+
+        val result: SendAuthCode.Result = sendAuthCode.invoke(command)
+
+        val response: SendAuthCodeResponse = when (result) {
+            is SendAuthCode.Result.ExistingUser -> SendAuthCodeResponse(
+                authCodeId = result.authCode.id.value,
+                userStatus = SendAuthCodeResponse.UserStatus.EXISTING
+            )
+            is SendAuthCode.Result.NewUser -> SendAuthCodeResponse(
+                authCodeId = result.authCode.id.value,
+                userStatus = SendAuthCodeResponse.UserStatus.NEW
+            )
         }
+
+        return ResponseEntity.ok(response)
     }
 
 }
