@@ -6,4 +6,8 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface UserJpaRepository : JpaRepository<UserJpaEntity, UUID>
+interface UserJpaRepository : JpaRepository<UserJpaEntity, UUID> {
+
+    fun findByPhoneNumber(phoneNumber: String): UserJpaEntity?
+
+}

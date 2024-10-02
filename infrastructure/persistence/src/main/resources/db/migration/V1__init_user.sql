@@ -54,5 +54,6 @@ CREATE TABLE users
     phone_number       VARCHAR(255) NOT NULL,
     profile_id         BINARY(16)   NULL,
     desired_partner_id BINARY(16)   NULL,
-    CONSTRAINT pk_users PRIMARY KEY (id)
+    CONSTRAINT pk_users PRIMARY KEY (id),
+    CONSTRAINT uq_users_phone_number UNIQUE (phone_number)
 );

@@ -31,7 +31,7 @@ class UserJpaEntity(
     var name: String = name
         private set
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, unique = true)
     var phoneNumber: String = phoneNumber
         private set
 
