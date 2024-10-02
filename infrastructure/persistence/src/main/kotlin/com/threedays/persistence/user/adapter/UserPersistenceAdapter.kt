@@ -1,5 +1,6 @@
 package com.threedays.persistence.user.adapter
 
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.repository.UserRepository
 import com.threedays.persistence.user.entity.UserJpaEntity.Companion.toJpaEntity
@@ -12,6 +13,12 @@ import org.springframework.transaction.annotation.Transactional
 class UserPersistenceAdapter(
     private val userJpaRepository: UserJpaRepository,
 ) : UserRepository {
+
+    override fun findByPhoneNumber(phoneNumber: PhoneNumber): User? {
+        return userJpaRepository
+            .findByPhoneNumber(phoneNumber.value)
+            ?.toDomainEntity()
+    }
 
     override fun save(root: User) {
         userJpaRepository.save(root.toJpaEntity())

@@ -11,7 +11,10 @@ import com.threedays.application.auth.port.outbound.AuthCodeSmsSenderSpy
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.repository.AuthCodeRepositorySpy
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
+import com.threedays.domain.user.entity.User
+import com.threedays.domain.user.repository.UserRepositorySpy
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
@@ -27,6 +30,7 @@ class AuthCodeServiceTest : DescribeSpec({
 
     val expirationSeconds = 300L
 
+    val userRepository = UserRepositorySpy()
     val authCodeRepository = AuthCodeRepositorySpy()
     val authCodeSmsSender = AuthCodeSmsSenderSpy()
     val authProperties = AuthProperties(
@@ -34,6 +38,7 @@ class AuthCodeServiceTest : DescribeSpec({
         tokenSecret = "tokenSecret"
     )
     val authCodeService = AuthCodeService(
+        userRepository = userRepository,
         authCodeRepository = authCodeRepository,
         authCodeSmsSender = authCodeSmsSender,
         authProperties = authProperties
@@ -45,19 +50,47 @@ class AuthCodeServiceTest : DescribeSpec({
     }
 
     describe("인증 코드 생성 - create") {
-        it("새로운 인증코드를 생성하고, SMS를 발송한다") {
-            // arrange
-            val command: SendAuthCode.Command = fixtureMonkey
-                .giveMeBuilder<SendAuthCode.Command>()
-                .set(SendAuthCode.Command::phoneNumber, "01012345678")
-                .sample()
+        context("해당 번호로 가입된 유저가 없는 경우") {
+            it("인증코드를 생성하고, SMS를 발송한다. 새로운 유저응답을 반환한다") {
+                // arrange
+                val command: SendAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<SendAuthCode.Command>()
+                    .set(SendAuthCode.Command::phoneNumber, PhoneNumber("01012345678"))
+                    .sample()
 
-            // act
-            val authCode: AuthCode = authCodeService.invoke(command)
+                // act
+                val result: SendAuthCode.Result = authCodeService.invoke(command)
 
-            // assert
-            authCodeRepository.find(authCode.id) shouldBe authCode
-            authCodeSmsSender.find(authCode.id) shouldBe authCode
+                // assert
+                authCodeRepository.find(result.authCode.id) shouldBe result.authCode
+                authCodeSmsSender.find(result.authCode.id) shouldBe result.authCode
+                result shouldBe SendAuthCode.Result.NewUser(result.authCode)
+            }
+        }
+
+        context("해당 번호로 가입된 유저가 있는 경우") {
+            it("인증코드를 생성하고, SMS를 발송한다. 기존 유저응답을 반환한다") {
+                // arrange
+                val phoneNumber = PhoneNumber("01012345678")
+                fixtureMonkey
+                    .giveMeBuilder<User>()
+                    .set(User::phoneNumber, phoneNumber)
+                    .sample()
+                    .also { userRepository.save(it) }
+
+                val command: SendAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<SendAuthCode.Command>()
+                    .set(SendAuthCode.Command::phoneNumber, phoneNumber)
+                    .sample()
+
+                // act
+                val result: SendAuthCode.Result = authCodeService.invoke(command)
+
+                // assert
+                authCodeRepository.find(result.authCode.id) shouldBe result.authCode
+                authCodeSmsSender.find(result.authCode.id) shouldBe result.authCode
+                result shouldBe SendAuthCode.Result.ExistingUser(result.authCode)
+            }
         }
     }
 
@@ -68,7 +101,7 @@ class AuthCodeServiceTest : DescribeSpec({
                 // arrange
                 val authCode: AuthCode = AuthCode.create(
                     clientOS = ClientOS.AOS,
-                    phoneNumber = "01012345678",
+                    phoneNumber = PhoneNumber("01012345678"),
                     expireAt = LocalDateTime.now().minusSeconds(1)
                 )
                 authCodeRepository.save(authCode)
@@ -90,7 +123,7 @@ class AuthCodeServiceTest : DescribeSpec({
                 val invalidCodeNumber = "000000"
                 val authCode: AuthCode = AuthCode.create(
                     clientOS = ClientOS.AOS,
-                    phoneNumber = "01012345678",
+                    phoneNumber = PhoneNumber("01012345678"),
                     expireAt = LocalDateTime.now().plusSeconds(expirationSeconds)
                 )
                 authCodeRepository.save(authCode)

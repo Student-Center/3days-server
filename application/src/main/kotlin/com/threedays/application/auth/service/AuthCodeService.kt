@@ -7,11 +7,13 @@ import com.threedays.application.auth.port.outbound.AuthCodeSmsSender
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.entity.RegisterToken
 import com.threedays.domain.auth.repository.AuthCodeRepository
+import com.threedays.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
 class AuthCodeService(
+    private val userRepository: UserRepository,
     private val authCodeRepository: AuthCodeRepository,
     private val authCodeSmsSender: AuthCodeSmsSender,
     private val authProperties: AuthProperties,
@@ -19,20 +21,23 @@ class AuthCodeService(
     VerifyAuthCode {
 
     override fun invoke(command: SendAuthCode.Command): SendAuthCode.Result {
-        // TODO(김산): 기존 유저일 경우 분기 처리
         val expireAt: LocalDateTime = LocalDateTime
             .now()
             .plusSeconds(authProperties.authCodeExpirationSeconds)
 
-        return AuthCode.create(
+        val authCode: AuthCode = AuthCode.create(
             clientOS = command.clientOS,
             phoneNumber = command.phoneNumber,
             expireAt = expireAt
         ).also {
             authCodeSmsSender.send(it)
             authCodeRepository.save(it)
-        }.let {
-            SendAuthCode.Result.NewUser(it)
+        }
+
+        return if (userRepository.findByPhoneNumber(command.phoneNumber) == null) {
+            SendAuthCode.Result.NewUser(authCode)
+        } else {
+            SendAuthCode.Result.ExistingUser(authCode)
         }
     }
 

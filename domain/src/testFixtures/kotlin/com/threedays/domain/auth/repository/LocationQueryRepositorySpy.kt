@@ -1,18 +1,15 @@
 package com.threedays.domain.auth.repository
 
+import com.threedays.domain.support.base.QueryRepositorySpyBase
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.repository.LocationQueryRepository
 import java.util.*
 
 class LocationQueryRepositorySpy : LocationQueryRepository,
-    AbstractTestRepositorySpy<Location.Id, Location>() {
+    QueryRepositorySpyBase<Location, Location.Id>() {
 
     override fun findAll(): List<Location> {
         return storage.values.toList()
-    }
-
-    override fun find(id: Location.Id): Location? {
-        return storage.values.find { it.id == id }
     }
 
     override fun init() = addSeoulRegions()

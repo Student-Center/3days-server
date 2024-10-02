@@ -41,13 +41,13 @@ data class AuthCode(
 
         fun create(
             clientOS: ClientOS,
-            phoneNumber: String,
+            phoneNumber: PhoneNumber,
             expireAt: LocalDateTime
         ): AuthCode {
             return AuthCode(
                 id = UUIDTypeId.random(),
                 clientOS = clientOS,
-                phoneNumber = PhoneNumber(phoneNumber),
+                phoneNumber = phoneNumber,
                 code = Code.generate(),
                 expireAt = expireAt
             )
