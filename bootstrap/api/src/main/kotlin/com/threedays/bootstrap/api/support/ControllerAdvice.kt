@@ -23,28 +23,6 @@ class ControllerAdvice {
 
     }
 
-
-    @ExceptionHandler(IllegalArgumentException::class)
-    fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
-        logger.error(e) { "IllegalArgumentException" }
-
-        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, ILLEGAL_ARGUMENT_ERROR_CODE)
-
-        return createResponseEntity(
-            status = HttpStatus.BAD_REQUEST,
-            response = response
-        )
-    }
-
-    @ExceptionHandler(NotFoundException::class)
-    fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
-        logger.error(e) { "NotFoundException" }
-
-        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, NOT_FOUND_ERROR_CODE)
-
-        return createResponseEntity(HttpStatus.NOT_FOUND, response)
-    }
-
     @ExceptionHandler(CustomException::class)
     fun handleCustomException(e: CustomException): ResponseEntity<ErrorResponse> {
         logger.error(e) { "CustomException" }
@@ -54,13 +32,18 @@ class ControllerAdvice {
         return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, response)
     }
 
-    @ExceptionHandler(RuntimeException::class)
-    fun handleRuntimeException(e: RuntimeException): ResponseEntity<ErrorResponse> {
-        logger.error(e) { "RuntimeException" }
+    @ExceptionHandler(Exception::class)
+    fun handleException(e: Exception): ResponseEntity<ErrorResponse> {
+        logger.error(e) { e::class.simpleName }
 
-        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, INTERNAL_SERVER_ERROR_CODE)
+        val (status: HttpStatus, errorCode: String) = when (e) {
+            is IllegalArgumentException -> HttpStatus.BAD_REQUEST to ILLEGAL_ARGUMENT_ERROR_CODE
+            is NotFoundException -> HttpStatus.NOT_FOUND to NOT_FOUND_ERROR_CODE
+            else -> HttpStatus.INTERNAL_SERVER_ERROR to INTERNAL_SERVER_ERROR_CODE
+        }
 
-        return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, response)
+        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, errorCode)
+        return createResponseEntity(status, response)
     }
 
     private fun createErrorResponse(
