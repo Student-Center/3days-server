@@ -5,7 +5,7 @@ import com.threedays.support.common.base.exception.CustomException
 sealed class AuthException(
     codeNumber: Int,
     override val message: String = DEFAULT_MESSAGE,
-) : CustomException("Auth", codeNumber, message) {
+) : CustomException("AUTH", codeNumber, message) {
 
     data class AuthCodeExpiredException(
         override val message: String = "인증 코드가 만료되었습니다.",

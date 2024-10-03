@@ -1,14 +1,13 @@
 package com.threedays.support.common.base.exception
 
 abstract class CustomException(
-    codePrefix: String = DEFAULT_CODE_PREFIX,
+    val type: String = DEFAULT_CODE_PREFIX,
     codeNumber: Int,
     override val message: String = DEFAULT_MESSAGE,
 ) : RuntimeException(message) {
 
-    val code: String = "$codePrefix-${
+    val code: String =
         codeNumber.toString().padStart(DEFAULT_CODE_NUMBER_LENGTH, DEFAULT_CODE_NUMBER_PAD_CHAR)
-    }"
 
     companion object {
 
