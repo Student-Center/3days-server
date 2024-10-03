@@ -23,21 +23,18 @@ data class AccessToken(
             secret: String,
             userId: User.Id,
             expirationSeconds: Long
-        ) = JwtClaims {
-            registeredClaims {
-                sub = ACCESS_TOKEN_SUBJECT
-                exp = Instant
-                    .now()
-                    .plusSeconds(expirationSeconds)
-                    .let { Date.from(it) }
+        ): AccessToken {
+            val claims = JwtClaims {
+                registeredClaims {
+                    sub = ACCESS_TOKEN_SUBJECT
+                    exp = Date.from(Instant.now().plusSeconds(expirationSeconds))
+                }
+                customClaims {
+                    this[USER_ID_CLAIM] = userId.value.toString()
+                }
             }
-            customClaims {
-                this[USER_ID_CLAIM] = userId.value.toString()
-            }
-        }.let {
-            JwtTokenProvider.createToken(it, secret)
-        }.let {
-            AccessToken(it, userId)
+            val tokenValue: String = JwtTokenProvider.createToken(claims, secret)
+            return AccessToken(tokenValue, userId)
         }
 
         fun verify(
@@ -58,8 +55,10 @@ data class AccessToken(
                 throw AuthException.InvalidAccessTokenException()
             }
 
-            val userId: User.Id = (result.customClaims[USER_ID_CLAIM] as String)
-                .let { UUIDTypeId.from<User.Id>(it) }
+            val userIdClaim: String = result.customClaims[USER_ID_CLAIM] as? String
+                ?: throw AuthException.InvalidAccessTokenException()
+
+            val userId: User.Id = UUIDTypeId.from<User.Id>(userIdClaim)
 
             return AccessToken(
                 value,
