@@ -41,18 +41,18 @@ sealed class AuthException(
 
     data class AccessTokenExpiredException(
         override val message: String = "Access Token이 만료되었습니다.",
-    ) : AuthException(1005, message)
+    ) : AuthException(1007, message)
 
     data class InvalidAccessTokenException(
         override val message: String = "유효하지 않은 Access Token입니다.",
-    ) : AuthException(1006, message)
+    ) : AuthException(1008, message)
 
     data class RefreshTokenExpiredException(
         override val message: String = "Refresh Token이 만료되었습니다.",
-    ) : AuthException(1007, message)
+    ) : AuthException(1009, message)
 
     data class InvalidRefreshTokenException(
         override val message: String = "유효하지 않은 Refresh Token입니다.",
-    ) : AuthException(1008, message)
+    ) : AuthException(1010, message)
 
 }
