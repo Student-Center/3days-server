@@ -4,6 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 
 @ConfigurationProperties(prefix = "auth")
 data class AuthProperties(
-    val authCodeExpirationSeconds: Long,
     val tokenSecret: String,
+    val authCodeExpirationSeconds: Long,
+    val registerTokenExpirationSeconds: Long,
+    val accessTokenExpirationSeconds: Long,
+    val refreshTokenExpirationSeconds: Long,
 )

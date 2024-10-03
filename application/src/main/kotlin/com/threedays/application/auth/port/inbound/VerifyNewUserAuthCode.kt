@@ -3,18 +3,18 @@ package com.threedays.application.auth.port.inbound
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.entity.RegisterToken
 
-interface VerifyAuthCode {
+interface VerifyNewUserAuthCode {
 
     fun invoke(command: Command): Result
 
     data class Command(
         val id: AuthCode.Id,
-        val code: String,
+        val code: AuthCode.Code,
     )
 
-    sealed class Result {
-        data class NewUser(val registerToken: RegisterToken): Result()
-        data object ExistsUser: Result()
-    }
+    data class Result(
+        val registerToken: RegisterToken,
+        val expiresIn: Long
+    )
 
 }

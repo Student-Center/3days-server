@@ -17,9 +17,10 @@ class RegisterTokenTest : DescribeSpec({
         it("회원 가입 토큰을 생성한다") {
             // arrange
             val secret = "secret"
+            val expirationSeconds = 60L
 
             // act
-            val registerToken = RegisterToken.generate(secret)
+            val registerToken = RegisterToken.generate(secret, expirationSeconds)
 
             // assert
             registerToken.value.isNotBlank() shouldBe true
@@ -36,7 +37,8 @@ class RegisterTokenTest : DescribeSpec({
             it("예외가 발생하지 않는다") {
                 // arrange
                 val secret = "secret"
-                val registerToken = RegisterToken.generate(secret)
+                val expirationSeconds = 60L
+                val registerToken = RegisterToken.generate(secret, expirationSeconds)
 
                 // act, assert
                 shouldNotThrowAny { RegisterToken.verify(registerToken.value, secret) }
@@ -101,7 +103,8 @@ class RegisterTokenTest : DescribeSpec({
             it("AuthException.InvalidRegisterTokenException 예외가 발생한다") {
                 // arrange
                 val secret = "secret"
-                val registerToken = RegisterToken.generate(secret)
+                val expirationSeconds = 60L
+                val registerToken = RegisterToken.generate(secret, expirationSeconds)
                 val invalidSecret = "invalid"
 
                 // act, assert

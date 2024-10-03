@@ -2,11 +2,16 @@ package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
 import com.threedays.application.auth.port.inbound.SendAuthCode
-import com.threedays.application.auth.port.inbound.VerifyAuthCode
+import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
+import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
 import com.threedays.application.auth.port.outbound.AuthCodeSmsSender
+import com.threedays.domain.auth.entity.AccessToken
 import com.threedays.domain.auth.entity.AuthCode
+import com.threedays.domain.auth.entity.RefreshToken
 import com.threedays.domain.auth.entity.RegisterToken
+import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.repository.AuthCodeRepository
+import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -18,7 +23,8 @@ class AuthCodeService(
     private val authCodeSmsSender: AuthCodeSmsSender,
     private val authProperties: AuthProperties,
 ) : SendAuthCode,
-    VerifyAuthCode {
+    VerifyNewUserAuthCode,
+    VerifyExistingUserAuthCode {
 
     override fun invoke(command: SendAuthCode.Command): SendAuthCode.Result {
         val expireAt: LocalDateTime = LocalDateTime
@@ -41,18 +47,51 @@ class AuthCodeService(
         }
     }
 
-    override fun invoke(command: VerifyAuthCode.Command): VerifyAuthCode.Result {
-        val inputCode: AuthCode.Code = command.code.let { AuthCode.Code(it) }
-
-        authCodeRepository
+    override fun invoke(command: VerifyNewUserAuthCode.Command): VerifyNewUserAuthCode.Result {
+        val authCode: AuthCode = authCodeRepository
             .get(command.id)
-            .verify(inputCode)
+            .verify(command.code)
 
-        // TODO: 기존에 가입한 유저일 경우 분기 처리
+        userRepository
+            .findByPhoneNumber(authCode.phoneNumber)
+            ?.let { throw AuthException.UserExistsException() }
 
-        return RegisterToken
-            .generate(authProperties.tokenSecret)
-            .let { VerifyAuthCode.Result.NewUser(it) }
+        val registerToken: RegisterToken = RegisterToken.generate(
+            secret = authProperties.tokenSecret,
+            expirationSeconds = authProperties.registerTokenExpirationSeconds
+        )
+
+        return VerifyNewUserAuthCode.Result(
+            registerToken = registerToken,
+            expiresIn = authProperties.registerTokenExpirationSeconds
+        )
+    }
+
+    override fun invoke(command: VerifyExistingUserAuthCode.Command): VerifyExistingUserAuthCode.Result {
+        val authCode: AuthCode = authCodeRepository
+            .get(command.id)
+            .verify(command.code)
+
+        val user: User = userRepository.getByPhoneNumber(authCode.phoneNumber)
+
+        val accessToken: AccessToken = AccessToken.generate(
+            secret = authProperties.tokenSecret,
+            expirationSeconds = authProperties.accessTokenExpirationSeconds,
+            userId = user.id
+        )
+
+        val refreshToken: RefreshToken = RefreshToken.generate(
+            secret = authProperties.tokenSecret,
+            expirationSeconds = authProperties.refreshTokenExpirationSeconds,
+            userId = user.id
+        )
+
+        return VerifyExistingUserAuthCode.Result(
+            accessToken = accessToken,
+            refreshToken = refreshToken,
+            accessTokenExpiresIn = authProperties.accessTokenExpirationSeconds,
+            refreshTokenExpiresIn = authProperties.refreshTokenExpirationSeconds
+        )
     }
 
 }

@@ -6,7 +6,8 @@ import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitra
 import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.application.auth.config.AuthProperties
 import com.threedays.application.auth.port.inbound.SendAuthCode
-import com.threedays.application.auth.port.inbound.VerifyAuthCode
+import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
+import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
 import com.threedays.application.auth.port.outbound.AuthCodeSmsSenderSpy
 import com.threedays.domain.auth.entity.AuthCode
 import com.threedays.domain.auth.exception.AuthException
@@ -15,6 +16,7 @@ import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.repository.UserRepositorySpy
+import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
@@ -28,14 +30,18 @@ class AuthCodeServiceTest : DescribeSpec({
         .objectIntrospector(PrimaryConstructorArbitraryIntrospector.INSTANCE)
         .build()
 
-    val expirationSeconds = 300L
+    val tokenSecret = "secret"
+    val expirationSeconds = 60L
 
     val userRepository = UserRepositorySpy()
     val authCodeRepository = AuthCodeRepositorySpy()
     val authCodeSmsSender = AuthCodeSmsSenderSpy()
     val authProperties = AuthProperties(
+        tokenSecret = tokenSecret,
         authCodeExpirationSeconds = expirationSeconds,
-        tokenSecret = "tokenSecret"
+        registerTokenExpirationSeconds = expirationSeconds,
+        accessTokenExpirationSeconds = expirationSeconds,
+        refreshTokenExpirationSeconds = expirationSeconds,
     )
     val authCodeService = AuthCodeService(
         userRepository = userRepository,
@@ -47,9 +53,10 @@ class AuthCodeServiceTest : DescribeSpec({
     afterEach {
         authCodeRepository.clear()
         authCodeSmsSender.clear()
+        userRepository.clear()
     }
 
-    describe("인증 코드 생성 - create") {
+    describe("SendAuthCode : 인증 코드 발송") {
         context("해당 번호로 가입된 유저가 없는 경우") {
             it("인증코드를 생성하고, SMS를 발송한다. 새로운 유저응답을 반환한다") {
                 // arrange
@@ -94,7 +101,7 @@ class AuthCodeServiceTest : DescribeSpec({
         }
     }
 
-    describe("인증 코드 검증 - verify") {
+    describe("VerifyNewUserAuthCode : 새로운 유저 인증 코드 검증") {
 
         context("인증코드가 만료되어 존재하지 않으면") {
             it("인증 코드 검증 시, AuthException.AuthCodeExpiredException 예외를 발생시킨다") {
@@ -106,10 +113,10 @@ class AuthCodeServiceTest : DescribeSpec({
                 )
                 authCodeRepository.save(authCode)
 
-                val command: VerifyAuthCode.Command = fixtureMonkey
-                    .giveMeBuilder<VerifyAuthCode.Command>()
-                    .set(VerifyAuthCode.Command::code, authCode.code.value)
-                    .set(VerifyAuthCode.Command::id, authCode.id)
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, authCode.code)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
                     .sample()
 
                 // act, assert
@@ -120,7 +127,7 @@ class AuthCodeServiceTest : DescribeSpec({
         context("인증코드가 유효하지 않으면") {
             it("인증 코드 검증 시, AuthException.InvalidAuthCodeException 예외를 발생시킨다") {
                 // arrange
-                val invalidCodeNumber = "000000"
+                val invalidCodeNumber = AuthCode.Code("000000")
                 val authCode: AuthCode = AuthCode.create(
                     clientOS = ClientOS.AOS,
                     phoneNumber = PhoneNumber("01012345678"),
@@ -128,16 +135,147 @@ class AuthCodeServiceTest : DescribeSpec({
                 )
                 authCodeRepository.save(authCode)
 
-                val command: VerifyAuthCode.Command = fixtureMonkey
-                    .giveMeBuilder<VerifyAuthCode.Command>()
-                    .set(VerifyAuthCode.Command::code, invalidCodeNumber)
-                    .set(VerifyAuthCode.Command::id, authCode.id)
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, invalidCodeNumber)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
                     .sample()
 
                 // act, assert
                 shouldThrow<AuthException.InvalidAuthCodeException> { authCodeService.invoke(command) }
             }
         }
+
+        context("이미 해당 번호로 가입된 사용자가 있으면") {
+            it("인증 코드 검증 시, AuthException.UserExistsException 예외를 발생시킨다") {
+                // arrange
+                val phoneNumber = PhoneNumber("01012345678")
+                fixtureMonkey
+                    .giveMeBuilder<User>()
+                    .set(User::phoneNumber, phoneNumber)
+                    .sample()
+                    .also { userRepository.save(it) }
+
+                val authCode: AuthCode = AuthCode.create(
+                    clientOS = ClientOS.AOS,
+                    phoneNumber = phoneNumber,
+                    expireAt = LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
+                authCodeRepository.save(authCode)
+
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, authCode.code)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
+                    .sample()
+
+                // act, assert
+                shouldThrow<AuthException.UserExistsException> { authCodeService.invoke(command) }
+            }
+        }
+
+        context("인증코드가 유효하면") {
+            it("인증 코드 검증 후, RegisterToken을 생성하여 반환한다") {
+                // arrange
+                val authCode: AuthCode = AuthCode.create(
+                    clientOS = ClientOS.AOS,
+                    phoneNumber = PhoneNumber("01012345678"),
+                    expireAt = LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
+                authCodeRepository.save(authCode)
+
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, authCode.code)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
+                    .sample()
+
+                // act
+                val result: VerifyNewUserAuthCode.Result = authCodeService.invoke(command)
+
+                // assert
+                JwtTokenProvider.verifyToken(result.registerToken.value, tokenSecret).isSuccess shouldBe true
+            }
+        }
     }
+
+    describe("VerifyExistingUserAuthCode : 기존 유저 인증 코드 검증") {
+        context("인증코드가 만료되어 존재하지 않으면") {
+            it("인증 코드 검증 시, AuthException.AuthCodeExpiredException 예외를 발생시킨다") {
+                // arrange
+                val authCode: AuthCode = AuthCode.create(
+                    clientOS = ClientOS.AOS,
+                    phoneNumber = PhoneNumber("01012345678"),
+                    expireAt = LocalDateTime.now().minusSeconds(1)
+                )
+                authCodeRepository.save(authCode)
+
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, authCode.code)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
+                    .sample()
+
+                // act, assert
+                shouldThrow<AuthException.AuthCodeExpiredException> { authCodeService.invoke(command) }
+            }
+        }
+
+        context("인증코드가 유효하지 않으면") {
+            it("인증 코드 검증 시, AuthException.InvalidAuthCodeException 예외를 발생시킨다") {
+                // arrange
+                val invalidCodeNumber = AuthCode.Code("000000")
+                val authCode: AuthCode = AuthCode.create(
+                    clientOS = ClientOS.AOS,
+                    phoneNumber = PhoneNumber("01012345678"),
+                    expireAt = LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
+                authCodeRepository.save(authCode)
+
+                val command: VerifyNewUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyNewUserAuthCode.Command>()
+                    .set(VerifyNewUserAuthCode.Command::code, invalidCodeNumber)
+                    .set(VerifyNewUserAuthCode.Command::id, authCode.id)
+                    .sample()
+
+                // act, assert
+                shouldThrow<AuthException.InvalidAuthCodeException> { authCodeService.invoke(command) }
+            }
+        }
+
+        context("인증코드가 유효하면") {
+            it("인증 코드 검증 후, AccessToken과 RefreshToken을 생성하여 반환한다") {
+                // arrange
+                val phoneNumber = PhoneNumber("01012345678")
+                val user: User = fixtureMonkey
+                    .giveMeBuilder<User>()
+                    .set(User::phoneNumber, phoneNumber)
+                    .sample()
+                    .also { userRepository.save(it) }
+
+                val authCode: AuthCode = AuthCode.create(
+                    clientOS = ClientOS.AOS,
+                    phoneNumber = phoneNumber,
+                    expireAt = LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
+
+                authCodeRepository.save(authCode)
+
+                val command: VerifyExistingUserAuthCode.Command = fixtureMonkey
+                    .giveMeBuilder<VerifyExistingUserAuthCode.Command>()
+                    .set(VerifyExistingUserAuthCode.Command::code, authCode.code)
+                    .set(VerifyExistingUserAuthCode.Command::id, authCode.id)
+                    .sample()
+
+                // act
+                val result: VerifyExistingUserAuthCode.Result = authCodeService.invoke(command)
+
+                // assert
+                JwtTokenProvider.verifyToken(result.accessToken.value, tokenSecret).isSuccess shouldBe true
+                JwtTokenProvider.verifyToken(result.refreshToken.value, tokenSecret).isSuccess shouldBe true
+            }
+        }
+    }
+
 
 })
