@@ -13,16 +13,15 @@ data class RegisterToken(override val value: String) : AuthToken {
 
         private const val REGISTER_TOKEN_SUBJECT = "register"
 
-        // 회원 가입 토큰 만료 시간(분)
-        private const val REGISTER_TOKEN_EXPIRE_MINUTES = 5L
-        private const val REGISTER_TOKEN_EXPIRE_MILLIS = REGISTER_TOKEN_EXPIRE_MINUTES * 60 * 1000
-
-        fun generate(secret: String) = JwtClaims {
+        fun generate(
+            secret: String,
+            expirationSeconds: Long
+        ) = JwtClaims {
             registeredClaims {
                 sub = REGISTER_TOKEN_SUBJECT
                 exp = Instant
                     .now()
-                    .plusMillis(REGISTER_TOKEN_EXPIRE_MILLIS)
+                    .plusSeconds(expirationSeconds)
                     .let { Date.from(it) }
             }
         }.let {

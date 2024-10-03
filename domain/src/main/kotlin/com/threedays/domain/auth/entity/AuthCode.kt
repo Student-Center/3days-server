@@ -54,7 +54,7 @@ data class AuthCode(
         }
     }
 
-    fun verify(code: Code) {
+    fun verify(code: Code): AuthCode {
         if (this.code != code) {
             throw AuthException.InvalidAuthCodeException()
         }
@@ -62,6 +62,8 @@ data class AuthCode(
         if (LocalDateTime.now() > expireAt) {
             throw AuthException.AuthCodeExpiredException()
         }
+
+        return this
     }
 
     fun getSmsMessage(): String = when (clientOS) {
