@@ -16,6 +16,10 @@ class ControllerAdvice {
     companion object {
 
         private val logger = KotlinLogging.logger {}
+        private const val COMMON_ERROR_TYPE = "COMMON"
+        private const val ILLEGAL_ARGUMENT_ERROR_CODE = "1001"
+        private const val NOT_FOUND_ERROR_CODE = "1002"
+        private const val INTERNAL_SERVER_ERROR_CODE = "1003"
 
     }
 
@@ -24,7 +28,7 @@ class ControllerAdvice {
     fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ErrorResponse> {
         logger.error(e) { "IllegalArgumentException" }
 
-        val response: ErrorResponse = createErrorResponse("COMMON", "1001")
+        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, ILLEGAL_ARGUMENT_ERROR_CODE)
 
         return createResponseEntity(
             status = HttpStatus.BAD_REQUEST,
@@ -36,7 +40,7 @@ class ControllerAdvice {
     fun handleNotFoundException(e: NotFoundException): ResponseEntity<ErrorResponse> {
         logger.error(e) { "NotFoundException" }
 
-        val response: ErrorResponse = createErrorResponse("COMMON", "1002")
+        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, NOT_FOUND_ERROR_CODE)
 
         return createResponseEntity(HttpStatus.NOT_FOUND, response)
     }
@@ -54,7 +58,7 @@ class ControllerAdvice {
     fun handleRuntimeException(e: RuntimeException): ResponseEntity<ErrorResponse> {
         logger.error(e) { "RuntimeException" }
 
-        val response: ErrorResponse = createErrorResponse("COMMON", "1003")
+        val response: ErrorResponse = createErrorResponse(COMMON_ERROR_TYPE, INTERNAL_SERVER_ERROR_CODE)
 
         return createResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, response)
     }
