@@ -58,6 +58,8 @@ subprojects {
         testImplementation(rootProject.libs.fixture.monkey)
 
         testImplementation(kotlin("test"))
+
+        testFixturesImplementation(rootProject.libs.fixture.monkey)
     }
 
     java {

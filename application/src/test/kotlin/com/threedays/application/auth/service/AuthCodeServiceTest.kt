@@ -43,11 +43,13 @@ class AuthCodeServiceTest : DescribeSpec({
         accessTokenExpirationSeconds = expirationSeconds,
         refreshTokenExpirationSeconds = expirationSeconds,
     )
+    val issueLoginTokens = IssueLoginTokensStub(authProperties)
     val authCodeService = AuthCodeService(
         userRepository = userRepository,
         authCodeRepository = authCodeRepository,
         authCodeSmsSender = authCodeSmsSender,
-        authProperties = authProperties
+        issueLoginTokens = issueLoginTokens,
+        authProperties = authProperties,
     )
 
     beforeEach {

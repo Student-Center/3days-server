@@ -1,8 +1,8 @@
 package com.threedays.persistence.user.entity
 
 import com.threedays.domain.user.entity.Job
-import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
+import com.threedays.support.common.base.domain.UUIDTypeId
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.ElementCollection
@@ -20,8 +20,8 @@ import java.util.*
 @Table(name = "user_desired_partners")
 class UserDesiredPartnerJpaEntity(
     id: UUID,
-    birthYearRangeStart: Int,
-    birthYearRangeEnd: Int,
+    birthYearRangeStart: Int?,
+    birthYearRangeEnd: Int?,
     jobOccupations: List<Job.Occupation>,
     preferDistance: UserDesiredPartner.PreferDistance,
 ) {
@@ -30,12 +30,20 @@ class UserDesiredPartnerJpaEntity(
     var id: UUID = id
         private set
 
-    @Column(name = "birth_year_range_start", nullable = false, updatable = false)
-    var birthYearRangeStart: Int = birthYearRangeStart
+    @Column(
+        name = "birth_year_range_start",
+        nullable = true,
+        updatable = false
+    )
+    var birthYearRangeStart: Int? = birthYearRangeStart
         private set
 
-    @Column(name = "birth_year_range_end", nullable = false, updatable = false)
-    var birthYearRangeEnd: Int = birthYearRangeEnd
+    @Column(
+        name = "birth_year_range_end",
+        nullable = true,
+        updatable = false
+    )
+    var birthYearRangeEnd: Int? = birthYearRangeEnd
         private set
 
     @ElementCollection(
@@ -63,19 +71,27 @@ class UserDesiredPartnerJpaEntity(
 
         fun UserDesiredPartner.toJpaEntity() = UserDesiredPartnerJpaEntity(
             id = id.value,
-            birthYearRangeStart = birthYearRange.start.value,
-            birthYearRangeEnd = birthYearRange.endInclusive.value,
+            birthYearRangeStart = birthYearRange?.start?.value,
+            birthYearRangeEnd = birthYearRange?.endInclusive?.value,
             jobOccupations = jobOccupations,
             preferDistance = preferDistance,
         )
 
     }
 
-    fun toDomainEntity() = UserDesiredPartner(
-        id = User.Id(id),
-        birthYearRange = Year.of(birthYearRangeStart)..Year.of(birthYearRangeEnd),
-        jobOccupations = jobOccupations,
-        preferDistance = preferDistance,
-    )
+    fun toDomainEntity(): UserDesiredPartner {
+        val birthYearRange: ClosedRange<Year>? = birthYearRangeStart
+            ?.let { start ->
+                birthYearRangeEnd?.let { end ->
+                    Year.of(start)..Year.of(end)
+                }
+            }
 
+        return UserDesiredPartner(
+            id = UUIDTypeId.from(id),
+            birthYearRange = birthYearRange,
+            jobOccupations = jobOccupations,
+            preferDistance = preferDistance
+        )
+    }
 }
