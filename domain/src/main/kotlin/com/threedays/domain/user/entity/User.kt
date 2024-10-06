@@ -32,7 +32,7 @@ data class User(
             userCompany: Company,
             userJob: Job,
             userLocations: List<Location>,
-            partnerBirthYearRange: ClosedRange<Year>,
+            partnerBirthYearRange: ClosedRange<Year>?,
             partnerJobOccupations: List<Job.Occupation>,
             partnerPreferDistance: PreferDistance
         ): User {

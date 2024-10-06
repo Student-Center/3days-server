@@ -1,6 +1,7 @@
 package com.threedays.domain.auth.entity
 
 import com.threedays.domain.auth.exception.AuthException
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.support.common.security.jwt.JwtClaims
 import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldNotThrowAny
@@ -18,9 +19,14 @@ class RegisterTokenTest : DescribeSpec({
             // arrange
             val secret = "secret"
             val expirationSeconds = 60L
+            val phoneNumber = PhoneNumber("01012345678")
 
             // act
-            val registerToken = RegisterToken.generate(secret, expirationSeconds)
+            val registerToken = RegisterToken.generate(
+                secret = secret,
+                expirationSeconds = expirationSeconds,
+                phoneNumber = phoneNumber
+            )
 
             // assert
             registerToken.value.isNotBlank() shouldBe true
@@ -38,7 +44,12 @@ class RegisterTokenTest : DescribeSpec({
                 // arrange
                 val secret = "secret"
                 val expirationSeconds = 60L
-                val registerToken = RegisterToken.generate(secret, expirationSeconds)
+                val phoneNumber = PhoneNumber("01012345678")
+                val registerToken = RegisterToken.generate(
+                    secret = secret,
+                    expirationSeconds = expirationSeconds,
+                    phoneNumber = phoneNumber
+                )
 
                 // act, assert
                 shouldNotThrowAny { RegisterToken.verify(registerToken.value, secret) }
@@ -104,7 +115,12 @@ class RegisterTokenTest : DescribeSpec({
                 // arrange
                 val secret = "secret"
                 val expirationSeconds = 60L
-                val registerToken = RegisterToken.generate(secret, expirationSeconds)
+                val phoneNumber = PhoneNumber("01012345678")
+                val registerToken: RegisterToken = RegisterToken.generate(
+                    secret = secret,
+                    expirationSeconds = expirationSeconds,
+                    phoneNumber = phoneNumber
+                )
                 val invalidSecret = "invalid"
 
                 // act, assert

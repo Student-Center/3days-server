@@ -31,8 +31,8 @@ CREATE TABLE user_desired_partner_job_occupations
 CREATE TABLE user_desired_partners
 (
     id                     BINARY(16)   NOT NULL,
-    birth_year_range_start INT          NOT NULL,
-    birth_year_range_end   INT          NOT NULL,
+    birth_year_range_start INT,
+    birth_year_range_end   INT,
     prefer_distance        VARCHAR(255) NOT NULL,
     CONSTRAINT pk_user_desired_partners PRIMARY KEY (id)
 );

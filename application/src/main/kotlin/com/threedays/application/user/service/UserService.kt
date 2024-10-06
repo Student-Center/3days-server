@@ -1,5 +1,7 @@
 package com.threedays.application.user.service
 
+import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Job
@@ -18,16 +20,18 @@ class UserService(
     private val locationQueryRepository: LocationQueryRepository,
     private val jobQueryRepository: JobQueryRepository,
     private val companyQueryRepository: CompanyQueryRepository,
+    private val issueLoginTokens: IssueLoginTokens,
+    private val authProperties: AuthProperties,
 ) : RegisterUser {
 
     @Transactional
-    override fun invoke(command: RegisterUser.Command): User {
+    override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
         val userCompany: Company = companyQueryRepository.get(command.userCompanyId)
         val userJob: Job = jobQueryRepository.get(command.userJobId)
         val userLocations: List<Location> =
             command.userLocationIds.map { locationQueryRepository.get(it) }
 
-        return User.create(
+        val user: User = User.create(
             name = command.name,
             phoneNumber = command.phoneNumber,
             userGender = command.userGender,
@@ -41,6 +45,15 @@ class UserService(
         ).also {
             userRepository.save(it)
         }
+
+        val result: IssueLoginTokens.Result = IssueLoginTokens.Command(user)
+            .let { issueLoginTokens.invoke(it) }
+
+        return RegisterUser.Result(
+            accessToken = result.accessToken,
+            refreshToken = result.refreshToken,
+            expiresIn = authProperties.accessTokenExpirationSeconds,
+        )
     }
 
 }

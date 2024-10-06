@@ -1,6 +1,7 @@
 package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
 import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
@@ -21,7 +22,8 @@ class AuthCodeService(
     private val userRepository: UserRepository,
     private val authCodeRepository: AuthCodeRepository,
     private val authCodeSmsSender: AuthCodeSmsSender,
-    private val authProperties: AuthProperties,
+    private val issueLoginTokens: IssueLoginTokens,
+    private val authProperties: AuthProperties
 ) : SendAuthCode,
     VerifyNewUserAuthCode,
     VerifyExistingUserAuthCode {
@@ -58,6 +60,7 @@ class AuthCodeService(
 
         val registerToken: RegisterToken = RegisterToken.generate(
             secret = authProperties.tokenSecret,
+            phoneNumber = authCode.phoneNumber,
             expirationSeconds = authProperties.registerTokenExpirationSeconds
         )
 
@@ -74,17 +77,8 @@ class AuthCodeService(
 
         val user: User = userRepository.getByPhoneNumber(authCode.phoneNumber)
 
-        val accessToken: AccessToken = AccessToken.generate(
-            secret = authProperties.tokenSecret,
-            expirationSeconds = authProperties.accessTokenExpirationSeconds,
-            userId = user.id
-        )
-
-        val refreshToken: RefreshToken = RefreshToken.generate(
-            secret = authProperties.tokenSecret,
-            expirationSeconds = authProperties.refreshTokenExpirationSeconds,
-            userId = user.id
-        )
+        val (accessToken: AccessToken, refreshToken: RefreshToken) =
+            issueLoginTokens.invoke(IssueLoginTokens.Command(user))
 
         return VerifyExistingUserAuthCode.Result(
             accessToken = accessToken,

@@ -5,7 +5,7 @@ import java.time.Year
 
 data class UserDesiredPartner(
     override val id: User.Id,
-    val birthYearRange: ClosedRange<Year>,
+    val birthYearRange: ClosedRange<Year>? = null,
     val jobOccupations: List<Job.Occupation>,
     val preferDistance: PreferDistance
 ) : DomainEntity<UserDesiredPartner, User.Id>() {
