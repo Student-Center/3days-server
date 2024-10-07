@@ -153,7 +153,7 @@ jobs:
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: ${{ env.EB_APPLICATION_NAME }}
           environment_name: ${{ env.EB_ENVIRONMENT_NAME }}
-          version_label: ${{ steps.determine-version.outputs.VERSION }}-${{ github.sha }}
+          version_label: ${{ steps.determine-version.outputs.VERSION }}-${{ steps.current-time.outputs.time }}
           region: ${{ env.AWS_REGION }}
           deployment_package: deploy.zip
           use_existing_version_if_available: false
