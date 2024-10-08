@@ -39,11 +39,11 @@ CREATE TABLE user_desired_partners
 
 CREATE TABLE user_profiles
 (
-    id         BINARY(16)   NOT NULL,
-    gender     VARCHAR(255) NULL,
-    birth_year INT          NULL,
-    company    BINARY(16)   NULL,
-    job        BINARY(16)   NULL,
+    id             BINARY(16)   NOT NULL,
+    gender         VARCHAR(255) NULL,
+    birth_year     INT          NULL,
+    company        BINARY(16)   NULL,
+    job_occupation VARCHAR(255) NOT NULL,
     CONSTRAINT pk_user_profiles PRIMARY KEY (id)
 );
 

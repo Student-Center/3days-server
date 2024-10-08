@@ -1,13 +1,15 @@
 package com.threedays.persistence.user.entity
 
+import com.threedays.domain.user.entity.JobOccupation
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.vo.Gender
 import com.threedays.persistence.user.entity.CompanyJpaEntity.Companion.toJpaEntity
-import com.threedays.persistence.user.entity.JobJpaEntity.Companion.toJpaEntity
 import com.threedays.persistence.user.entity.LocationJpaEntity.Companion.toJpaEntity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -24,7 +26,7 @@ class UserProfileJpaEntity(
     gender: Gender,
     birthYear: Int,
     company: CompanyJpaEntity,
-    job: JobJpaEntity,
+    jobOccupation: JobOccupation,
     locations: List<LocationJpaEntity>,
 ) {
 
@@ -45,9 +47,10 @@ class UserProfileJpaEntity(
     var company: CompanyJpaEntity = company
         private set
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "job")
-    var job: JobJpaEntity = job
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "job_occupation")
+    var jobOccupation: JobOccupation = jobOccupation
         private set
 
     @OneToMany(fetch = FetchType.EAGER)
@@ -62,7 +65,7 @@ class UserProfileJpaEntity(
             gender = gender,
             birthYear = birthYear.value,
             company = company.toJpaEntity(),
-            job = job.toJpaEntity(),
+            jobOccupation = jobOccupation,
             locations = locations.map { it.toJpaEntity() },
         )
 
@@ -73,7 +76,7 @@ class UserProfileJpaEntity(
         gender = Gender.valueOf(gender),
         birthYear = Year.of(birthYear),
         company = company.toDomainEntity(),
-        job = job.toDomainEntity(),
+        jobOccupation = jobOccupation,
         locations = locations.map { it.toDomainEntity() },
     )
 

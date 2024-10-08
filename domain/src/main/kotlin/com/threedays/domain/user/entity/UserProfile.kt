@@ -9,6 +9,6 @@ data class UserProfile(
     val gender: Gender,
     val birthYear: Year,
     val company: Company,
-    val job: Job,
+    val jobOccupation: JobOccupation,
     val locations: List<Location>
 ) : DomainEntity<UserProfile, User.Id>()

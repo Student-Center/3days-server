@@ -4,7 +4,7 @@ import com.threedays.domain.auth.entity.AccessToken
 import com.threedays.domain.auth.entity.RefreshToken
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.Company
-import com.threedays.domain.user.entity.Job
+import com.threedays.domain.user.entity.JobOccupation
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.entity.User.Name
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
@@ -22,10 +22,10 @@ interface RegisterUser {
      * @param userGender 성별
      * @param userBirthYear 출생년도
      * @param userCompanyId 회사 ID
-     * @param userJobId 직업 ID
+     * @param userJobOccupation 직업군
      * @param userLocationIds 지역 ID 목록
      * @param partnerBirthYearRange 파트너 출생년도 범위, null이면 제한 없음
-     * @param partnerJobOccupations 파트너 직업 목록
+     * @param partnerJobOccupations 파트너 직업군
      * @param partnerPreferDistance 파트너 선호 거리
      * @return 회원
      */
@@ -35,10 +35,10 @@ interface RegisterUser {
         val userGender: Gender,
         val userBirthYear: Year,
         val userCompanyId: Company.Id,
-        val userJobId: Job.Id,
+        val userJobOccupation: JobOccupation,
         val userLocationIds: List<Location.Id>,
         val partnerBirthYearRange: ClosedRange<Year>? = null,
-        val partnerJobOccupations: List<Job.Occupation>,
+        val partnerJobOccupations: List<JobOccupation>,
         val partnerPreferDistance: PreferDistance
     )
 

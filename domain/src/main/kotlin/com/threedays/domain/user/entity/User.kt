@@ -30,10 +30,10 @@ data class User(
             userGender: Gender,
             userBirthYear: Year,
             userCompany: Company,
-            userJob: Job,
+            userJobOccupation: JobOccupation,
             userLocations: List<Location>,
             partnerBirthYearRange: ClosedRange<Year>?,
-            partnerJobOccupations: List<Job.Occupation>,
+            partnerJobOccupations: List<JobOccupation>,
             partnerPreferDistance: PreferDistance
         ): User {
             val id: Id = UUIDTypeId.random<Id>()
@@ -43,7 +43,7 @@ data class User(
                 gender = userGender,
                 birthYear = userBirthYear,
                 company = userCompany,
-                job = userJob,
+                jobOccupation = userJobOccupation,
                 locations = userLocations,
             )
 
