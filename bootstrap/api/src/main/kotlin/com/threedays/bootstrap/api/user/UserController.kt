@@ -10,6 +10,7 @@ import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.support.common.base.domain.UUIDTypeId
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.time.Year
@@ -47,7 +48,9 @@ class UserController(
             result.refreshToken.value,
             result.expiresIn.toInt()
         ).let {
-            ResponseEntity.ok(it)
+            ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(it)
         }
     }
 

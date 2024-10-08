@@ -14,6 +14,7 @@ import com.threedays.oas.model.SendAuthCodeRequest
 import com.threedays.oas.model.SendAuthCodeResponse
 import com.threedays.oas.model.VerifyCodeRequest
 import com.threedays.support.common.base.domain.UUIDTypeId
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
@@ -48,7 +49,9 @@ class AuthController(
             )
         }
 
-        return ResponseEntity.ok(response)
+        return ResponseEntity
+            .status(HttpStatus.CREATED)
+            .body(response)
     }
 
     override fun newUserVerifyCode(
