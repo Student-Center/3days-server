@@ -31,9 +31,7 @@ class CompanyQueryPersistenceAdapter(
             ).from(
                 entity(CompanyJpaEntity::class)
             ).whereAnd(
-                or(
-                    path(CompanyJpaEntity::name).like("%$name%")
-                ),
+                path(CompanyJpaEntity::name).like("%$name%"),
                 next?.let { path(CompanyJpaEntity::id).gt(it.value) }
             )
         }
