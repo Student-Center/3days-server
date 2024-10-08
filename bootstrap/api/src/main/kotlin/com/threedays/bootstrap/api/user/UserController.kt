@@ -2,7 +2,7 @@ package com.threedays.bootstrap.api.user
 
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.domain.auth.vo.PhoneNumber
-import com.threedays.domain.user.entity.Job
+import com.threedays.domain.user.entity.JobOccupation
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.vo.Gender
@@ -29,10 +29,10 @@ class UserController(
             userGender = Gender.valueOf(registerUserRequest.profile.gender.name),
             userBirthYear = Year.of(registerUserRequest.profile.birthYear),
             userCompanyId = UUIDTypeId.from(registerUserRequest.profile.companyId),
-            userJobId = UUIDTypeId.from(registerUserRequest.profile.jobId),
+            userJobOccupation = JobOccupation.valueOf(registerUserRequest.profile.jobOccupation.name),
             userLocationIds = registerUserRequest.profile.locationIds.map(UUIDTypeId::from),
             partnerJobOccupations = registerUserRequest.desiredPartner.jobOccupations
-                .let { requestData -> requestData.map { Job.Occupation.valueOf(it.name) } },
+                .let { requestData -> requestData.map { JobOccupation.valueOf(it.name) } },
             partnerBirthYearRange = registerUserRequest.desiredPartner.birthYearRange
                 ?.let { Year.of(it.start)..Year.of(it.end) },
             partnerPreferDistance = UserDesiredPartner
