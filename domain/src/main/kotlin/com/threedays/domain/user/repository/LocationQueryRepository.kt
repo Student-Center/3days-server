@@ -5,6 +5,10 @@ import com.threedays.support.common.base.domain.QueryRepository
 
 interface LocationQueryRepository : QueryRepository<Location, Location.Id> {
 
-    fun findAll(): List<Location>
+    fun searchLocations(
+        name: String,
+        next: Location.Id?,
+        limit: Int
+    ): Pair<List<Location>, Location.Id?>
 
 }
