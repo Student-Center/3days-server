@@ -6,6 +6,7 @@ import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.vo.Gender
 import com.threedays.persistence.user.entity.CompanyJpaEntity.Companion.toJpaEntity
 import com.threedays.persistence.user.entity.LocationJpaEntity.Companion.toJpaEntity
+import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
@@ -54,7 +55,10 @@ class UserProfileJpaEntity(
         private set
 
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_profile")
+    @CollectionTable(
+        name = "user_profile_locations",
+        joinColumns = [JoinColumn(name = "user_profile_id")],
+    )
     var locations: List<LocationJpaEntity> = locations
         private set
 

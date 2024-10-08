@@ -4,11 +4,18 @@ import com.threedays.domain.user.entity.Location
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.Index
 import jakarta.persistence.Table
 import java.util.*
 
 @Entity
-@Table(name = "locations")
+@Table(
+    name = "locations",
+    indexes = [
+        Index(name = "idx_region", columnList = "region"),
+        Index(name = "idx_sub_region", columnList = "sub_region")
+    ]
+)
 class LocationJpaEntity(
     id: UUID,
     region: String,

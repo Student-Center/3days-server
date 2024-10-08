@@ -5,27 +5,21 @@ CREATE TABLE companies
     CONSTRAINT pk_companies PRIMARY KEY (id)
 );
 
-CREATE TABLE jobs
-(
-    id         BINARY(16)   NOT NULL,
-    occupation VARCHAR(255) NOT NULL,
-    name       VARCHAR(255) NOT NULL,
-    CONSTRAINT pk_jobs PRIMARY KEY (id)
-);
-
 CREATE TABLE locations
 (
-    id           BINARY(16)   NOT NULL,
-    region       VARCHAR(255) NOT NULL,
-    sub_region   VARCHAR(255) NOT NULL,
-    user_profile BINARY(16)   NULL,
-    CONSTRAINT pk_locations PRIMARY KEY (id)
+    id         BINARY(16)   NOT NULL,
+    region     VARCHAR(255) NOT NULL,
+    sub_region VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_locations PRIMARY KEY (id),
+    INDEX idx_locations_region (region),
+    INDEX idx_locations_sub_region (sub_region)
 );
 
 CREATE TABLE user_desired_partner_job_occupations
 (
     user_desired_partner_id BINARY(16)   NOT NULL,
-    job_occupations         VARCHAR(255) NULL
+    job_occupations         VARCHAR(255) NULL,
+    CONSTRAINT pk_user_desired_partner_job_occupations PRIMARY KEY (user_desired_partner_id)
 );
 
 CREATE TABLE user_desired_partners
@@ -35,6 +29,13 @@ CREATE TABLE user_desired_partners
     birth_year_range_end   INT,
     prefer_distance        VARCHAR(255) NOT NULL,
     CONSTRAINT pk_user_desired_partners PRIMARY KEY (id)
+);
+
+CREATE TABLE user_profile_locations
+(
+    user_profile_id BINARY(16) NOT NULL,
+    locations_id    BINARY(16) NOT NULL,
+    CONSTRAINT pk_user_profile_locations PRIMARY KEY (user_profile_id)
 );
 
 CREATE TABLE user_profiles
