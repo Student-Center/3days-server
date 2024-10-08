@@ -1,7 +1,6 @@
 package com.threedays.domain.user.entity
 
 import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.kotlin.giveMe
 import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.threedays.domain.auth.vo.PhoneNumber
@@ -28,12 +27,14 @@ class UserTest : DescribeSpec({
             val userGender: Gender = fixtureMonkey.giveMeBuilder<Gender>().sample()
             val userBirthYear: Year = fixtureMonkey.giveMeBuilder<Year>().sample()
             val userCompany: Company = fixtureMonkey.giveMeBuilder<Company>().sample()
-            val userJob: Job = fixtureMonkey.giveMeBuilder<Job>().sample()
-            val userLocations: List<Location> = fixtureMonkey.giveMeBuilder<Location>().sampleList(3)
+            val userJobOccupation: JobOccupation =
+                fixtureMonkey.giveMeBuilder<JobOccupation>().sample()
+            val userLocations: List<Location> =
+                fixtureMonkey.giveMeBuilder<Location>().sampleList(3)
             val partnerBirthYearRange: ClosedRange<Year> =
                 fixtureMonkey.giveMeBuilder<ClosedRange<Year>>().sample()
-            val partnerJobOccupations: List<Job.Occupation> =
-                fixtureMonkey.giveMeBuilder<Job.Occupation>().sampleList(10)
+            val partnerJobOccupations: List<JobOccupation> =
+                fixtureMonkey.giveMeBuilder<JobOccupation>().sampleList(10)
             val partnerPreferDistance: UserDesiredPartner.PreferDistance =
                 fixtureMonkey.giveMeBuilder<UserDesiredPartner.PreferDistance>().sample()
 
@@ -44,7 +45,7 @@ class UserTest : DescribeSpec({
                 userGender = userGender,
                 userBirthYear = userBirthYear,
                 userCompany = userCompany,
-                userJob = userJob,
+                userJobOccupation = userJobOccupation,
                 userLocations = userLocations,
                 partnerBirthYearRange = partnerBirthYearRange,
                 partnerJobOccupations = partnerJobOccupations,
@@ -58,7 +59,7 @@ class UserTest : DescribeSpec({
             user.profile.gender shouldBe userGender
             user.profile.birthYear shouldBe userBirthYear
             user.profile.company shouldBe userCompany
-            user.profile.job shouldBe userJob
+            user.profile.jobOccupation shouldBe userJobOccupation
             user.profile.locations shouldBe userLocations
             user.desiredPartner.birthYearRange shouldBe partnerBirthYearRange
             user.desiredPartner.jobOccupations shouldBe partnerJobOccupations
