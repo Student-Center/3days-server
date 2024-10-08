@@ -22,10 +22,10 @@ interface RegisterUser {
      * @param userGender 성별
      * @param userBirthYear 출생년도
      * @param userCompanyId 회사 ID
-     * @param userJobOccupation 직업 ID
+     * @param userJobOccupation 직업군
      * @param userLocationIds 지역 ID 목록
      * @param partnerBirthYearRange 파트너 출생년도 범위, null이면 제한 없음
-     * @param partnerJobOccupations 파트너 직업 목록
+     * @param partnerJobOccupations 파트너 직업군
      * @param partnerPreferDistance 파트너 선호 거리
      * @return 회원
      */
