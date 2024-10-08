@@ -145,6 +145,10 @@ jobs:
         run: |
           zip -r deploy.zip Dockerrun.aws.json .ebextensions
 
+      - name: Get current time
+        id: current-time
+        run: echo "::set-output name=time::$(date +'%Y%m%d%H%M%S')"
+
       - name: Deploy to Elastic Beanstalk
         id: deploy
         uses: einaregilsson/beanstalk-deploy@v22
