@@ -64,6 +64,7 @@ class UserDesiredPartnerJpaEntity(
         updatable = false,
         columnDefinition = "varchar(255)"
     )
+    @Enumerated(EnumType.STRING)
     var preferDistance: UserDesiredPartner.PreferDistance = preferDistance
         private set
 
