@@ -1,5 +1,6 @@
 package com.threedays.bootstrap.api.auth
 
+import com.threedays.application.auth.port.inbound.RefreshLoginTokens
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
 import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
@@ -10,8 +11,10 @@ import com.threedays.oas.api.AuthApi
 import com.threedays.oas.model.ExistingUserVerifyCodeResponse
 import com.threedays.oas.model.NewUserVerifyCodeResponse
 import com.threedays.oas.model.OSType
+import com.threedays.oas.model.RefreshTokenRequest
 import com.threedays.oas.model.SendAuthCodeRequest
 import com.threedays.oas.model.SendAuthCodeResponse
+import com.threedays.oas.model.TokenResponse
 import com.threedays.oas.model.VerifyCodeRequest
 import com.threedays.support.common.base.domain.UUIDTypeId
 import org.springframework.http.HttpStatus
@@ -24,6 +27,7 @@ class AuthController(
     private val sendAuthCode: SendAuthCode,
     private val verifyNewUserAuthCode: VerifyNewUserAuthCode,
     private val verifyExistingUserAuthCode: VerifyExistingUserAuthCode,
+    private val refreshLoginTokens: RefreshLoginTokens,
 ) : AuthApi {
 
     override fun requestVerification(
@@ -92,5 +96,21 @@ class AuthController(
         )
 
         return ResponseEntity.ok(response)
+    }
+
+    override fun refreshToken(refreshTokenRequest: RefreshTokenRequest): ResponseEntity<TokenResponse> {
+        return RefreshLoginTokens.Command(
+            refreshToken = refreshTokenRequest.refreshToken
+        ).let {
+            refreshLoginTokens.invoke(it)
+        }.let { result ->
+            TokenResponse(
+                result.accessToken,
+                result.refreshToken,
+                result.expiresIn.toInt()
+            )
+        }.let {
+            ResponseEntity.ok(it)
+        }
     }
 }
