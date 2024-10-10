@@ -32,7 +32,7 @@ class CompanyQueryPersistenceAdapter(
                 entity(CompanyJpaEntity::class)
             ).whereAnd(
                 path(CompanyJpaEntity::name).like("%$name%"),
-                next?.let { path(CompanyJpaEntity::id).gt(it.value) }
+                next?.let { path(CompanyJpaEntity::id).greaterThanOrEqualTo(it.value) }
             )
         }
 
@@ -42,7 +42,12 @@ class CompanyQueryPersistenceAdapter(
             .resultList
             .map { it.toDomainEntity() }
 
-        val nextId: Company.Id? = result.getOrNull(limit)?.id ?: next
+        val hasNextPage: Boolean = result.size > limit
+        val nextId: Company.Id? = if (hasNextPage) {
+            result[limit].id
+        } else {
+            null
+        }
 
         return result.take(limit) to nextId
     }

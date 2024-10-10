@@ -22,6 +22,8 @@ spring:
       - classpath:db/scripts
     clean-on-validation-error: true
     clean-disabled: false
+  jpa:
+    show-sql: true
 ---
 spring:
   config:

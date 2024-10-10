@@ -25,7 +25,6 @@ class LocationQueryPersistenceAdapter(
         next: Location.Id?,
         limit: Int
     ): Pair<List<Location>, Location.Id?> {
-
         val query: SelectQuery<LocationJpaEntity> = jpql {
             select(
                 entity(LocationJpaEntity::class)
@@ -36,7 +35,7 @@ class LocationQueryPersistenceAdapter(
                     path(LocationJpaEntity::region).like("%$name%"),
                     path(LocationJpaEntity::subRegion).like("%$name%")
                 ),
-                next?.let { path(LocationJpaEntity::id).gt(it.value) }
+                next?.let { path(LocationJpaEntity::id).greaterThanOrEqualTo(it.value) }
             )
         }
 
@@ -46,8 +45,12 @@ class LocationQueryPersistenceAdapter(
             .resultList
             .map { it.toDomainEntity() }
 
-        val nextId = result.getOrNull(limit)?.id ?: next
-
+        val hasNextPage = result.size > limit
+        val nextId: Location.Id? = if (hasNextPage) {
+            result[limit].id
+        } else {
+            null
+        }
         return result.take(limit) to nextId
     }
 
