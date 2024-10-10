@@ -7,4 +7,8 @@ import org.springframework.stereotype.Repository
 import java.util.*
 
 @Repository
-interface LocationJpaRepository : JpaRepository<LocationJpaEntity, UUID>, KotlinJdslJpqlExecutor
+interface LocationJpaRepository : JpaRepository<LocationJpaEntity, UUID>, KotlinJdslJpqlExecutor {
+
+    fun findAllByRegion(region: String): List<LocationJpaEntity>
+
+}
