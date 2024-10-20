@@ -2,14 +2,18 @@ package com.threedays.bootstrap.api.user
 
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.domain.auth.vo.PhoneNumber
+import com.threedays.domain.auth.vo.UserAuthentication
 import com.threedays.domain.user.entity.JobOccupation
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.vo.Gender
 import com.threedays.oas.api.UsersApi
+import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.support.common.base.domain.UUIDTypeId
+import com.threedays.support.common.security.SecurityContext
+import com.threedays.support.common.security.SecurityContextHolder
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -17,7 +21,7 @@ import java.time.Year
 
 @RestController
 class UserController(
-    private val registerUser: RegisterUser
+    private val registerUser: RegisterUser,
 ) : UsersApi {
 
     override fun registerUser(
@@ -54,4 +58,13 @@ class UserController(
         }
     }
 
+    override fun getMyUserInfo(): ResponseEntity<GetMyUserInfoResponse> {
+        val securityContext: SecurityContext<UserAuthentication>? =
+            SecurityContextHolder.getContext()
+
+        println("securityContext: ${securityContext?.authentication?.userId}")
+        // TODO: Implement this method
+
+        throw NotImplementedError()
+    }
 }
