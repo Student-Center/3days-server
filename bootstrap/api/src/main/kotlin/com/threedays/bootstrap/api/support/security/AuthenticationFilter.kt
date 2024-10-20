@@ -2,7 +2,6 @@ package com.threedays.bootstrap.api.support.security
 
 import com.threedays.application.auth.config.AuthProperties
 import com.threedays.domain.auth.entity.AccessToken
-import com.threedays.domain.auth.vo.UserAuthentication
 import com.threedays.support.common.security.SecurityContext
 import com.threedays.support.common.security.SecurityContextHolder
 import jakarta.servlet.FilterChain
