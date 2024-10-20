@@ -27,9 +27,12 @@ class AuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        extractToken(request)?.let { setSecurityContext(it) }
-        filterChain.doFilter(request, response)
-        SecurityContextHolder.clearContext()
+        try {
+            extractToken(request)?.let { setSecurityContext(it) }
+            filterChain.doFilter(request, response)
+        } finally {
+            SecurityContextHolder.clearContext()
+        }
     }
 
     private fun setSecurityContext(token: String) {
@@ -41,13 +44,11 @@ class AuthenticationFilter(
     }
 
     private fun extractToken(request: HttpServletRequest): String? {
-        val bearerToken: String? = request.getHeader(AUTH_TOKEN_HEADER)
-
-        return if (bearerToken != null && bearerToken.startsWith(BEARER_PREFIX)) {
-            bearerToken.substring(BEARER_PREFIX.length)
-        } else {
-            null
-        }
+        return request
+            .getHeader(AUTH_TOKEN_HEADER)
+            ?.takeIf { it.startsWith(BEARER_PREFIX) }
+            ?.substring(BEARER_PREFIX.length)
+            ?.takeIf { it.isNotBlank() }
     }
 
 }
