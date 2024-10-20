@@ -7,6 +7,7 @@ import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.vo.Gender
 import com.threedays.oas.api.UsersApi
+import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.support.common.base.domain.UUIDTypeId
@@ -17,7 +18,7 @@ import java.time.Year
 
 @RestController
 class UserController(
-    private val registerUser: RegisterUser
+    private val registerUser: RegisterUser,
 ) : UsersApi {
 
     override fun registerUser(
@@ -54,4 +55,8 @@ class UserController(
         }
     }
 
+    override fun getMyUserInfo(): ResponseEntity<GetMyUserInfoResponse> {
+        // TODO: Implement this method
+        throw NotImplementedError()
+    }
 }

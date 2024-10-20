@@ -1,4 +1,4 @@
-package com.threedays.bootstrap.api.support
+package com.threedays.bootstrap.api.support.exception
 
 import com.threedays.oas.model.ErrorResponse
 import com.threedays.support.common.base.exception.CustomException
