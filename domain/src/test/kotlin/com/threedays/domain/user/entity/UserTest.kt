@@ -4,7 +4,9 @@ import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.threedays.domain.auth.vo.PhoneNumber
+import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
+import com.threedays.domain.user.vo.JobOccupation
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
@@ -31,8 +33,8 @@ class UserTest : DescribeSpec({
                 fixtureMonkey.giveMeBuilder<JobOccupation>().sample()
             val userLocations: List<Location> =
                 fixtureMonkey.giveMeBuilder<Location>().sampleList(3)
-            val partnerBirthYearRange: ClosedRange<Year> =
-                fixtureMonkey.giveMeBuilder<ClosedRange<Year>>().sample()
+            val partnerBirthYearRange: BirthYearRange =
+                fixtureMonkey.giveMeBuilder<BirthYearRange>().sample()
             val partnerJobOccupations: List<JobOccupation> =
                 fixtureMonkey.giveMeBuilder<JobOccupation>().sampleList(10)
             val partnerPreferDistance: UserDesiredPartner.PreferDistance =

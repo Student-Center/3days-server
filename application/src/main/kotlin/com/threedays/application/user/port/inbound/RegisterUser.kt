@@ -4,10 +4,11 @@ import com.threedays.domain.auth.entity.AccessToken
 import com.threedays.domain.auth.entity.RefreshToken
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.Company
-import com.threedays.domain.user.entity.JobOccupation
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.entity.User.Name
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
+import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import java.time.Year
 
@@ -37,7 +38,7 @@ interface RegisterUser {
         val userCompanyId: Company.Id,
         val userJobOccupation: JobOccupation,
         val userLocationIds: List<Location.Id>,
-        val partnerBirthYearRange: ClosedRange<Year>? = null,
+        val partnerBirthYearRange: BirthYearRange,
         val partnerJobOccupations: List<JobOccupation>,
         val partnerPreferDistance: PreferDistance
     )

@@ -1,7 +1,8 @@
 package com.threedays.persistence.user.entity
 
-import com.threedays.domain.user.entity.JobOccupation
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.domain.user.entity.UserDesiredPartner
+import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.support.common.base.domain.UUIDTypeId
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
@@ -72,8 +73,8 @@ class UserDesiredPartnerJpaEntity(
 
         fun UserDesiredPartner.toJpaEntity() = UserDesiredPartnerJpaEntity(
             id = id.value,
-            birthYearRangeStart = birthYearRange?.start?.value,
-            birthYearRangeEnd = birthYearRange?.endInclusive?.value,
+            birthYearRangeStart = birthYearRange.start?.value,
+            birthYearRangeEnd = birthYearRange.end?.value,
             jobOccupations = jobOccupations,
             preferDistance = preferDistance,
         )
@@ -81,12 +82,10 @@ class UserDesiredPartnerJpaEntity(
     }
 
     fun toDomainEntity(): UserDesiredPartner {
-        val birthYearRange: ClosedRange<Year>? = birthYearRangeStart
-            ?.let { start ->
-                birthYearRangeEnd?.let { end ->
-                    Year.of(start)..Year.of(end)
-                }
-            }
+        val birthYearRange = BirthYearRange(
+            start = birthYearRangeStart?.let { Year.of(it) },
+            end = birthYearRangeEnd?.let { Year.of(it) }
+        )
 
         return UserDesiredPartner(
             id = UUIDTypeId.from(id),

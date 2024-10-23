@@ -1,6 +1,6 @@
 package com.threedays.persistence.user.entity
 
-import com.threedays.domain.user.entity.JobOccupation
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.vo.Gender

@@ -1,6 +1,7 @@
 package com.threedays.domain.user.entity
 
 import com.threedays.domain.user.vo.Gender
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.support.common.base.domain.DomainEntity
 import java.time.Year
 

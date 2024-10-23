@@ -2,7 +2,9 @@ package com.threedays.domain.user.entity
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
+import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
 import java.time.Year
@@ -32,7 +34,7 @@ data class User(
             userCompany: Company,
             userJobOccupation: JobOccupation,
             userLocations: List<Location>,
-            partnerBirthYearRange: ClosedRange<Year>?,
+            partnerBirthYearRange: BirthYearRange,
             partnerJobOccupations: List<JobOccupation>,
             partnerPreferDistance: PreferDistance
         ): User {

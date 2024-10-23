@@ -1,4 +1,4 @@
-package com.threedays.domain.user.entity
+package com.threedays.domain.user.vo
 
 /**
  * 직업군

@@ -3,11 +3,12 @@ package com.threedays.bootstrap.api.user
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.bootstrap.api.support.security.withUserAuthentication
 import com.threedays.domain.auth.vo.PhoneNumber
-import com.threedays.domain.user.entity.JobOccupation
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.repository.UserRepository
+import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
+import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.RegisterUserRequest
@@ -41,7 +42,12 @@ class UserController(
             partnerJobOccupations = registerUserRequest.desiredPartner.jobOccupations
                 .let { requestData -> requestData.map { JobOccupation.valueOf(it.name) } },
             partnerBirthYearRange = registerUserRequest.desiredPartner.birthYearRange
-                ?.let { Year.of(it.start)..Year.of(it.end) },
+                .let { requestData ->
+                    BirthYearRange(
+                        start = requestData.start?.let { Year.of(it) },
+                        end = requestData.end?.let { Year.of(it) }
+                    )
+                },
             partnerPreferDistance = UserDesiredPartner
                 .PreferDistance
                 .valueOf(registerUserRequest.desiredPartner.preferDistance.name),
@@ -87,10 +93,10 @@ class UserController(
                             it.name
                         )
                     },
-                    birthYearRange = user.desiredPartner.birthYearRange?.let {
+                    birthYearRange = user.desiredPartner.birthYearRange.let {
                         com.threedays.oas.model.BirthYearRange(
-                            it.start.value,
-                            it.endInclusive.value
+                            it.start?.value,
+                            it.end?.value,
                         )
                     },
                     preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
