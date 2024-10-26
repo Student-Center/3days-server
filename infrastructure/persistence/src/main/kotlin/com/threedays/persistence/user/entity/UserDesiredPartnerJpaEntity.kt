@@ -25,6 +25,7 @@ class UserDesiredPartnerJpaEntity(
     birthYearRangeEnd: Int?,
     jobOccupations: List<JobOccupation>,
     preferDistance: UserDesiredPartner.PreferDistance,
+    allowSameCompany: Boolean?,
 ) {
 
     @Id
@@ -69,6 +70,14 @@ class UserDesiredPartnerJpaEntity(
     var preferDistance: UserDesiredPartner.PreferDistance = preferDistance
         private set
 
+    @Column(
+        name = "allow_same_company",
+        nullable = true,
+        updatable = false
+    )
+    var allowSameCompany: Boolean? = allowSameCompany
+        private set
+
     companion object {
 
         fun UserDesiredPartner.toJpaEntity() = UserDesiredPartnerJpaEntity(
@@ -77,6 +86,7 @@ class UserDesiredPartnerJpaEntity(
             birthYearRangeEnd = birthYearRange.end?.value,
             jobOccupations = jobOccupations,
             preferDistance = preferDistance,
+            allowSameCompany = allowSameCompany,
         )
 
     }
@@ -91,7 +101,8 @@ class UserDesiredPartnerJpaEntity(
             id = UUIDTypeId.from(id),
             birthYearRange = birthYearRange,
             jobOccupations = jobOccupations,
-            preferDistance = preferDistance
+            preferDistance = preferDistance,
+            allowSameCompany = allowSameCompany,
         )
     }
 }

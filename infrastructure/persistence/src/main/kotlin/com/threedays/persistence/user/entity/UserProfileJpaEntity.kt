@@ -26,7 +26,7 @@ class UserProfileJpaEntity(
     id: UUID,
     gender: Gender,
     birthYear: Int,
-    company: CompanyJpaEntity,
+    company: CompanyJpaEntity?,
     jobOccupation: JobOccupation,
     locations: List<LocationJpaEntity>,
 ) {
@@ -44,8 +44,8 @@ class UserProfileJpaEntity(
         private set
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "company")
-    var company: CompanyJpaEntity = company
+    @JoinColumn(name = "company", nullable = true)
+    var company: CompanyJpaEntity? = company
         private set
 
 
@@ -68,7 +68,7 @@ class UserProfileJpaEntity(
             id = id.value,
             gender = gender,
             birthYear = birthYear.value,
-            company = company.toJpaEntity(),
+            company = company?.toJpaEntity(),
             jobOccupation = jobOccupation,
             locations = locations.map { it.toJpaEntity() },
         )
@@ -79,7 +79,7 @@ class UserProfileJpaEntity(
         id = User.Id(id),
         gender = Gender.valueOf(gender),
         birthYear = Year.of(birthYear),
-        company = company.toDomainEntity(),
+        company = company?.toDomainEntity(),
         jobOccupation = jobOccupation,
         locations = locations.map { it.toDomainEntity() },
     )

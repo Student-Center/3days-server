@@ -18,8 +18,8 @@ CREATE TABLE locations
 CREATE TABLE user_desired_partner_job_occupations
 (
     user_desired_partner_id BINARY(16)   NOT NULL,
-    job_occupations         VARCHAR(255) NULL,
-    CONSTRAINT pk_user_desired_partner_job_occupations PRIMARY KEY (user_desired_partner_id)
+    job_occupations         VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_desired_partner_id, job_occupations) -- Composite key로 변경
 );
 
 CREATE TABLE user_desired_partners
@@ -28,6 +28,7 @@ CREATE TABLE user_desired_partners
     birth_year_range_start INT,
     birth_year_range_end   INT,
     prefer_distance        VARCHAR(255) NOT NULL,
+    allow_same_company     BOOLEAN,
     CONSTRAINT pk_user_desired_partners PRIMARY KEY (id)
 );
 

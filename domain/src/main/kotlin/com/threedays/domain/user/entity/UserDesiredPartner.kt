@@ -8,7 +8,8 @@ data class UserDesiredPartner(
     override val id: User.Id,
     val birthYearRange: BirthYearRange,
     val jobOccupations: List<JobOccupation>,
-    val preferDistance: PreferDistance
+    val preferDistance: PreferDistance,
+    val allowSameCompany: Boolean?,
 ) : DomainEntity<UserDesiredPartner, User.Id>() {
 
     enum class PreferDistance {

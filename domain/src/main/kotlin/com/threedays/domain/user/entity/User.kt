@@ -24,6 +24,20 @@ data class User(
     @JvmInline
     value class Name(val value: String)
 
+    init {
+        if (profile.company == null) {
+            require(desiredPartner.allowSameCompany == null) {
+                "회사를 선택하지 않았다면 동일 회사 허용 여부를 선택할 수 없습니다."
+            }
+        }
+
+        if (desiredPartner.allowSameCompany != null) {
+            require(profile.company != null) {
+                "동일 회사 허용 여부를 선택했다면 회사를 선택해야 합니다."
+            }
+        }
+    }
+
     companion object {
 
         fun create(
@@ -31,12 +45,13 @@ data class User(
             phoneNumber: PhoneNumber,
             userGender: Gender,
             userBirthYear: Year,
-            userCompany: Company,
+            userCompany: Company?,
             userJobOccupation: JobOccupation,
             userLocations: List<Location>,
             partnerBirthYearRange: BirthYearRange,
             partnerJobOccupations: List<JobOccupation>,
-            partnerPreferDistance: PreferDistance
+            partnerPreferDistance: PreferDistance,
+            allowSameCompany: Boolean?,
         ): User {
             val id: Id = UUIDTypeId.random<Id>()
 
@@ -54,6 +69,7 @@ data class User(
                 birthYearRange = partnerBirthYearRange,
                 jobOccupations = partnerJobOccupations,
                 preferDistance = partnerPreferDistance,
+                allowSameCompany = allowSameCompany,
             )
 
             return User(

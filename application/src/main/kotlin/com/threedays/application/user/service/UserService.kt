@@ -23,7 +23,7 @@ class UserService(
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
-        val userCompany: Company = companyQueryRepository.get(command.userCompanyId)
+        val userCompany: Company? = command.userCompanyId?.let { companyQueryRepository.get(it) }
         val userLocations: List<Location> =
             command.userLocationIds.map { locationQueryRepository.get(it) }
 
@@ -38,6 +38,7 @@ class UserService(
             partnerJobOccupations = command.partnerJobOccupations,
             partnerBirthYearRange = command.partnerBirthYearRange,
             partnerPreferDistance = command.partnerPreferDistance,
+            allowSameCompany = command.allowSameCompany,
         ).also {
             userRepository.save(it)
         }

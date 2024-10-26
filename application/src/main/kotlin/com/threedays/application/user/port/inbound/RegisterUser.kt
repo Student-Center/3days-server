@@ -28,6 +28,7 @@ interface RegisterUser {
      * @param partnerBirthYearRange 파트너 출생년도 범위, null이면 제한 없음
      * @param partnerJobOccupations 파트너 직업군
      * @param partnerPreferDistance 파트너 선호 거리
+     * @param allowSameCompany 동일 회사 허용 여부
      * @return 회원
      */
     data class Command(
@@ -35,12 +36,13 @@ interface RegisterUser {
         val phoneNumber: PhoneNumber,
         val userGender: Gender,
         val userBirthYear: Year,
-        val userCompanyId: Company.Id,
+        val userCompanyId: Company.Id?,
         val userJobOccupation: JobOccupation,
         val userLocationIds: List<Location.Id>,
         val partnerBirthYearRange: BirthYearRange,
         val partnerJobOccupations: List<JobOccupation>,
-        val partnerPreferDistance: PreferDistance
+        val partnerPreferDistance: PreferDistance,
+        val allowSameCompany: Boolean?,
     )
 
     /**

@@ -36,7 +36,7 @@ class UserController(
             phoneNumber = PhoneNumber(registerUserRequest.phoneNumber),
             userGender = Gender.valueOf(registerUserRequest.profile.gender.name),
             userBirthYear = Year.of(registerUserRequest.profile.birthYear),
-            userCompanyId = UUIDTypeId.from(registerUserRequest.profile.companyId),
+            userCompanyId = registerUserRequest.profile.companyId?.let { UUIDTypeId.from(it) },
             userJobOccupation = JobOccupation.valueOf(registerUserRequest.profile.jobOccupation.name),
             userLocationIds = registerUserRequest.profile.locationIds.map(UUIDTypeId::from),
             partnerJobOccupations = registerUserRequest.desiredPartner.jobOccupations
@@ -51,6 +51,7 @@ class UserController(
             partnerPreferDistance = UserDesiredPartner
                 .PreferDistance
                 .valueOf(registerUserRequest.desiredPartner.preferDistance.name),
+            allowSameCompany = registerUserRequest.desiredPartner.allowSameCompany,
         ).let {
             registerUser.invoke(it)
         }
@@ -79,7 +80,7 @@ class UserController(
                 profile = UserProfile(
                     gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
                     birthYear = user.profile.birthYear.value,
-                    companyId = user.profile.company.id.value,
+                    companyId = user.profile.company?.id?.value,
                     jobOccupation = user.profile.jobOccupation.name.let {
                         com.threedays.oas.model.JobOccupation.valueOf(
                             it
