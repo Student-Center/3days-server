@@ -9,7 +9,7 @@ data class UserProfile(
     override val id: User.Id,
     val gender: Gender,
     val birthYear: Year,
-    val company: Company?,
+    val company: Company? = null,
     val jobOccupation: JobOccupation,
     val locations: List<Location>
 ) : DomainEntity<UserProfile, User.Id>()
