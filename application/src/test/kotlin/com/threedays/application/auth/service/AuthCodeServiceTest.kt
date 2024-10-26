@@ -15,6 +15,8 @@ import com.threedays.domain.auth.repository.AuthCodeRepositorySpy
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.support.common.ClientOS
 import com.threedays.domain.user.entity.User
+import com.threedays.domain.user.entity.UserDesiredPartner
+import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.repository.UserRepositorySpy
 import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldThrow
@@ -81,9 +83,21 @@ class AuthCodeServiceTest : DescribeSpec({
             it("인증코드를 생성하고, SMS를 발송한다. 기존 유저응답을 반환한다") {
                 // arrange
                 val phoneNumber = PhoneNumber("01012345678")
+                val userProfile = fixtureMonkey
+                    .giveMeBuilder<UserProfile>()
+                    .set(UserProfile::company, null)
+                    .sample()
+
+                val userDesiredPartner = fixtureMonkey
+                    .giveMeBuilder<UserDesiredPartner>()
+                    .set(UserDesiredPartner::allowSameCompany, null)
+                    .sample()
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::phoneNumber, phoneNumber)
+                    .set(User::profile, userProfile)
+                    .set(User::desiredPartner, userDesiredPartner)
                     .sample()
                     .also { userRepository.save(it) }
 
