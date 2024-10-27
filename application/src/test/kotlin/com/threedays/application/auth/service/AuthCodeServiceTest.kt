@@ -166,9 +166,21 @@ class AuthCodeServiceTest : DescribeSpec({
             it("인증 코드 검증 시, AuthException.UserExistsException 예외를 발생시킨다") {
                 // arrange
                 val phoneNumber = PhoneNumber("01012345678")
+                val userProfile = fixtureMonkey
+                    .giveMeBuilder<UserProfile>()
+                    .set(UserProfile::company, null)
+                    .sample()
+
+                val userDesiredPartner = fixtureMonkey
+                    .giveMeBuilder<UserDesiredPartner>()
+                    .set(UserDesiredPartner::allowSameCompany, null)
+                    .sample()
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::phoneNumber, phoneNumber)
+                    .set(User::profile, userProfile)
+                    .set(User::desiredPartner, userDesiredPartner)
                     .sample()
                     .also { userRepository.save(it) }
 
@@ -267,9 +279,21 @@ class AuthCodeServiceTest : DescribeSpec({
             it("AccessToken과 RefreshToken을 생성하여 반환한다") {
                 // arrange
                 val phoneNumber = PhoneNumber("01012345678")
+                val userProfile = fixtureMonkey
+                    .giveMeBuilder<UserProfile>()
+                    .set(UserProfile::company, null)
+                    .sample()
+
+                val userDesiredPartner = fixtureMonkey
+                    .giveMeBuilder<UserDesiredPartner>()
+                    .set(UserDesiredPartner::allowSameCompany, null)
+                    .sample()
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::phoneNumber, phoneNumber)
+                    .set(User::profile, userProfile)
+
                     .sample()
                     .also { userRepository.save(it) }
 
