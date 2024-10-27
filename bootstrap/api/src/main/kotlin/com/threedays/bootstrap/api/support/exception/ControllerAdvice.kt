@@ -1,5 +1,6 @@
 package com.threedays.bootstrap.api.support.exception
 
+import com.threedays.domain.auth.exception.AuthException
 import com.threedays.oas.model.ErrorResponse
 import com.threedays.support.common.base.exception.CustomException
 import com.threedays.support.common.exception.NotFoundException
@@ -21,6 +22,15 @@ class ControllerAdvice {
         private const val NOT_FOUND_ERROR_CODE = "1002"
         private const val INTERNAL_SERVER_ERROR_CODE = "1003"
 
+    }
+
+    @ExceptionHandler(AuthException.RefreshTokenExpiredException::class)
+    fun handleRefreshTokenExpiredException(e: AuthException.RefreshTokenExpiredException): ResponseEntity<ErrorResponse> {
+        logger.error(e) { "RefreshTokenExpiredException" }
+
+        val response: ErrorResponse = createErrorResponse(e.type, e.code)
+
+        return createResponseEntity(HttpStatus.UNAUTHORIZED, response)
     }
 
     @ExceptionHandler(CustomException::class)
