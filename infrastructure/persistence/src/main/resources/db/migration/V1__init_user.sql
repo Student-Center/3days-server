@@ -36,7 +36,7 @@ CREATE TABLE user_profile_locations
 (
     user_profile_id BINARY(16) NOT NULL,
     locations_id    BINARY(16) NOT NULL,
-    CONSTRAINT pk_user_profile_locations PRIMARY KEY (user_profile_id)
+    PRIMARY KEY (user_profile_id, locations_id) -- Composite key로 변경
 );
 
 CREATE TABLE user_profiles
