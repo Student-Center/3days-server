@@ -12,6 +12,8 @@ import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.repository.RefreshTokenRepositorySpy
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
+import com.threedays.domain.user.entity.UserDesiredPartner
+import com.threedays.domain.user.entity.UserProfile
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldThrow
@@ -50,9 +52,23 @@ class AuthTokenServiceTest : DescribeSpec({
         it("로그인 토큰을 발급하고, RefreshToken을 저장한다") {
             // arrange
             val userId = UUIDTypeId.random<User.Id>()
+            val userProfile = fixtureMonkey
+                .giveMeBuilder<UserProfile>()
+                .set(UserProfile::id, userId)
+                .set(UserProfile::company, null)
+                .sample()
+
+            val userDesiredPartner = fixtureMonkey
+                .giveMeBuilder<UserDesiredPartner>()
+                .set(UserDesiredPartner::id, userId)
+                .set(UserDesiredPartner::allowSameCompany, null)
+                .sample()
+
             val user = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::id, userId)
+                .set(User::profile, userProfile)
+                .set(User::desiredPartner, userDesiredPartner)
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
                 .sample()
 

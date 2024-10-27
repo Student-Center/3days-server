@@ -293,7 +293,7 @@ class AuthCodeServiceTest : DescribeSpec({
                     .giveMeBuilder<User>()
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
-
+                    .set(User::desiredPartner, userDesiredPartner)
                     .sample()
                     .also { userRepository.save(it) }
 
