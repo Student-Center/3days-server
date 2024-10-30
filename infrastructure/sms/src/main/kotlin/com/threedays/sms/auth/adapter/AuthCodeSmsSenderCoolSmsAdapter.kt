@@ -7,9 +7,11 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import net.nurigo.sdk.message.model.Message
 import net.nurigo.sdk.message.request.SingleMessageSendingRequest
 import net.nurigo.sdk.message.service.DefaultMessageService
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
+@Profile("!dev")
 class AuthCodeSmsSenderCoolSmsAdapter(
     private val smsProperties: SmsProperties,
     private val defaultMessageService: DefaultMessageService,
