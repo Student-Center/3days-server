@@ -3,6 +3,7 @@ package com.threedays.bootstrap.api
 import com.threedays.application.support.ApplicationConfig
 import com.threedays.persistence.support.PersistenceConfig
 import com.threedays.redis.support.config.RedisConfig
+import com.threedays.rest.support.config.RestConfig
 import com.threedays.sms.support.SmsConfig
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
@@ -13,6 +14,7 @@ import java.util.*
 @SpringBootApplication
 @Import(
     value = [
+        RestConfig::class,
         SmsConfig::class,
         PersistenceConfig::class,
         RedisConfig::class,

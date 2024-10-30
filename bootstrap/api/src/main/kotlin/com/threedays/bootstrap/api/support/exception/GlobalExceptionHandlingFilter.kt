@@ -50,7 +50,7 @@ class GlobalExceptionHandlingFilter(
             time = OffsetDateTime.now(),
             type = exception.type,
         )
-        response.status = HttpStatus.UNAUTHORIZED.value()
+        response.status = HttpStatus.FORBIDDEN.value()
         response.contentType =
             "${MediaType.APPLICATION_JSON_VALUE};charset=${Charsets.UTF_8.name()}"
         response.writer.write(objectMapper.writeValueAsString(errorResponse))

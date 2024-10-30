@@ -28,6 +28,9 @@ project(":infrastructure:sms").projectDir = file("infrastructure/sms")
 include(":infrastructure:redis")
 project(":infrastructure:redis").projectDir = file("infrastructure/redis")
 
+include(":infrastructure:rest")
+project(":infrastructure:rest").projectDir = file("infrastructure/rest")
+
 // bootstrap
 include(":bootstrap:api")
 project(":bootstrap:api").projectDir = file("bootstrap/api")

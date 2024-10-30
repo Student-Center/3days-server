@@ -9,6 +9,7 @@ spring:
       - persistence
       - sms
       - redis
+      - rest
   docker:
     compose:
       enabled: false
