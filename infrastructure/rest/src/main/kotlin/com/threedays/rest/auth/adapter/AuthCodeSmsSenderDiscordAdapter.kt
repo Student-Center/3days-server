@@ -21,7 +21,12 @@ class AuthCodeSmsSenderDiscordAdapter(
     override fun send(authCode: AuthCode) {
         logger.info { "[Auth Code SMS(DEV)] Sending to : ${authCode.phoneNumber.value}" }
 
-        val request = SendDiscordMessageRequest(authCode.getSmsMessage())
+        val content = """
+            Phone Number: ${authCode.phoneNumber.value}
+            Message: ${authCode.getSmsMessage()}
+        """.trimIndent()
+
+        val request = SendDiscordMessageRequest(content)
         discordClient.send(request)
     }
 
