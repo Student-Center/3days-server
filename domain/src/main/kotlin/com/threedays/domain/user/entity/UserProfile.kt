@@ -11,5 +11,6 @@ data class UserProfile(
     val birthYear: Year,
     val company: Company? = null,
     val jobOccupation: JobOccupation,
-    val locations: List<Location>
+    val locations: List<Location>,
+    val profileWidgets: List<ProfileWidget> = emptyList(),
 ) : DomainEntity<UserProfile, User.Id>()
