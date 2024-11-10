@@ -149,6 +149,18 @@ class UserTest : DescribeSpec({
                 }
             }
         }
+
+        context("이름이 공백일 경우") {
+            it("예외가 발생한다") {
+                // arrange
+                val name = ""
+
+                // act & assert
+                shouldThrow<IllegalArgumentException> {
+                    User.Name(name)
+                }
+            }
+        }
     }
 
 

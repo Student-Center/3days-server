@@ -22,7 +22,11 @@ data class User(
     data class Id(override val value: UUID) : UUIDTypeId(value)
 
     @JvmInline
-    value class Name(val value: String)
+    value class Name(val value: String) {
+        init {
+            require(value.isNotBlank()) { "이름은 공백일 수 없습니다." }
+        }
+    }
 
     init {
         if (profile.company == null) {
