@@ -2,7 +2,7 @@ package com.threedays.domain.user.entity
 
 data class ProfileWidget(
     val type: Type,
-    val comment: String,
+    val content: String,
 ) {
 
     enum class Type {

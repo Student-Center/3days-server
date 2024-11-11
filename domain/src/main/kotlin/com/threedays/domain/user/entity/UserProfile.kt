@@ -13,4 +13,17 @@ data class UserProfile(
     val jobOccupation: JobOccupation,
     val locations: List<Location>,
     val profileWidgets: List<ProfileWidget> = emptyList(),
-) : DomainEntity<UserProfile, User.Id>()
+) : DomainEntity<UserProfile, User.Id>() {
+
+    fun putProfileWidget(profileWidget: ProfileWidget): UserProfile {
+        val existingProfileWidget: ProfileWidget? =
+            profileWidgets.find { it.type == profileWidget.type }
+
+        return if (existingProfileWidget == null) {
+            copy(profileWidgets = profileWidgets + profileWidget)
+        } else {
+            copy(profileWidgets = profileWidgets.map { if (it.type == profileWidget.type) profileWidget else it })
+        }
+    }
+
+}

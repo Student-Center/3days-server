@@ -3,6 +3,7 @@ package com.threedays.domain.user.entity
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
+import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
@@ -163,5 +164,65 @@ class UserTest : DescribeSpec({
         }
     }
 
+    describe("putProfileWidget - 프로필 위젯 추가") {
+        it("프로필 위젯을 추가한다") {
+            // arrange
+            val profileWidget: ProfileWidget = fixtureMonkey
+                .giveMeBuilder<ProfileWidget>()
+                .sample()
+
+            val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                .giveMeBuilder<UserDesiredPartner>()
+                .set(UserDesiredPartner::allowSameCompany, null)
+                .sample()
+
+            val user: User = fixtureMonkey
+                .giveMeBuilder<User>()
+                .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::desiredPartner, userDesiredPartner)
+                .sample()
+
+            // act
+            val result: User = user.putProfileWidget(profileWidget)
+
+            // assert
+            result.profile.profileWidgets.find { it == profileWidget } shouldBe profileWidget
+        }
+
+        ProfileWidget.Type.entries.forEach { widgetType ->
+        context("동일한 타입($widgetType)의 위젯이 이미 있는 경우") {
+                it("$widgetType 타입의 위젯 내용을 수정한다") {
+                    // arrange
+                    val profileWidget: ProfileWidget = fixtureMonkey
+                        .giveMeBuilder<ProfileWidget>()
+                        .set(ProfileWidget::type, widgetType)
+                        .sample()
+
+                    val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                        .giveMeBuilder<UserDesiredPartner>()
+                        .set(UserDesiredPartner::allowSameCompany, null)
+                        .sample()
+
+                    val user: User = fixtureMonkey
+                        .giveMeBuilder<User>()
+                        .set(User::phoneNumber, PhoneNumber("01012345678"))
+                        .set(User::desiredPartner, userDesiredPartner)
+                        .sample()
+                        .putProfileWidget(profileWidget)
+
+                    val updatedProfileWidget: ProfileWidget = fixtureMonkey
+                        .giveMeBuilder<ProfileWidget>()
+                        .set(ProfileWidget::type, widgetType)
+                        .sample()
+
+                    // act
+                    val result: User = user.putProfileWidget(updatedProfileWidget)
+
+                    // assert
+                    result.profile.profileWidgets.find { it == updatedProfileWidget } shouldBe updatedProfileWidget
+                }
+            }
+        }
+    }
 
 })
