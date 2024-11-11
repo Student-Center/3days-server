@@ -6,8 +6,10 @@ import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.vo.Gender
 import com.threedays.persistence.user.entity.CompanyJpaEntity.Companion.toJpaEntity
 import com.threedays.persistence.user.entity.LocationJpaEntity.Companion.toJpaEntity
+import com.threedays.persistence.user.entity.ProfileWidgetJpaEmbeddable.Companion.toJpaEmbeddable
 import jakarta.persistence.CollectionTable
 import jakarta.persistence.Column
+import jakarta.persistence.ElementCollection
 import jakarta.persistence.Entity
 import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
@@ -29,6 +31,7 @@ class UserProfileJpaEntity(
     company: CompanyJpaEntity?,
     jobOccupation: JobOccupation,
     locations: List<LocationJpaEntity>,
+    profileWidgets: List<ProfileWidgetJpaEmbeddable>,
 ) {
 
     @Id
@@ -62,6 +65,14 @@ class UserProfileJpaEntity(
     var locations: List<LocationJpaEntity> = locations
         private set
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(
+        name = "user_profile_widgets",
+        joinColumns = [JoinColumn(name = "user_profile_id")],
+    )
+    var profileWidgets: List<ProfileWidgetJpaEmbeddable> = profileWidgets
+        private set
+
     companion object {
 
         fun UserProfile.toJpaEntity() = UserProfileJpaEntity(
@@ -71,6 +82,7 @@ class UserProfileJpaEntity(
             company = company?.toJpaEntity(),
             jobOccupation = jobOccupation,
             locations = locations.map { it.toJpaEntity() },
+            profileWidgets = profileWidgets.map { it.toJpaEmbeddable() }
         )
 
     }
@@ -82,6 +94,7 @@ class UserProfileJpaEntity(
         company = company?.toDomainEntity(),
         jobOccupation = jobOccupation,
         locations = locations.map { it.toDomainEntity() },
+        profileWidgets = profileWidgets.map { it.toValueObject() }
     )
 
 }

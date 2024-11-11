@@ -2,6 +2,7 @@ package com.threedays.application.user.service
 
 import com.threedays.application.auth.config.AuthProperties
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
+import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Location
@@ -19,7 +20,7 @@ class UserService(
     private val companyQueryRepository: CompanyQueryRepository,
     private val issueLoginTokens: IssueLoginTokens,
     private val authProperties: AuthProperties,
-) : RegisterUser {
+) : RegisterUser, PutProfileWidget {
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -51,6 +52,14 @@ class UserService(
             refreshToken = result.refreshToken,
             expiresIn = authProperties.accessTokenExpirationSeconds,
         )
+    }
+
+    @Transactional
+    override fun invoke(command: PutProfileWidget.Command) {
+        userRepository
+            .get(command.userId)
+            .putProfileWidget(command.profileWidget)
+            .also { userRepository.save(it) }
     }
 
 }

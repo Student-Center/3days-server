@@ -86,4 +86,8 @@ data class User(
         }
     }
 
+    fun putProfileWidget(widget: ProfileWidget): User {
+        return copy(profile = profile.putProfileWidget(widget))
+    }
+
 }

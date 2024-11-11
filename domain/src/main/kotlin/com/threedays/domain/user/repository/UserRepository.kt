@@ -7,6 +7,9 @@ import com.threedays.support.common.exception.NotFoundException
 
 interface UserRepository : Repository<User, User.Id> {
 
+    fun get(id: User.Id): User = find(id)
+        ?: throw NotFoundException("User not found by id: $id")
+
     fun findByPhoneNumber(phoneNumber: PhoneNumber): User?
     fun getByPhoneNumber(phoneNumber: PhoneNumber): User = findByPhoneNumber(phoneNumber)
         ?: throw NotFoundException("User not found by phone number: $phoneNumber")

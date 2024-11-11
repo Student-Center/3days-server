@@ -1,6 +1,8 @@
 package com.threedays.bootstrap.api.user
 
+import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.bootstrap.api.support.security.UserAuthentication
 import com.threedays.bootstrap.api.support.security.withUserAuthentication
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
@@ -11,6 +13,7 @@ import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.GetMyUserInfoResponse
+import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.oas.model.UserProfile
@@ -24,6 +27,7 @@ import java.time.Year
 @RestController
 class UserController(
     private val registerUser: RegisterUser,
+    private val putProfileWidget: PutProfileWidget,
     private val userRepository: UserRepository,
 ) : UsersApi {
 
@@ -101,7 +105,28 @@ class UserController(
                         )
                     },
                     preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
-                )
+                ),
+                profileWidgets = user.profile.profileWidgets.map {
+                    ProfileWidget(
+                        type = com.threedays.oas.model.ProfileWidgetType.valueOf(it.type.name),
+                        content = it.content,
+                    )
+                }
             ).let { ResponseEntity.ok(it) }
+        }
+
+    override fun putProfileWidget(body: ProfileWidget): ResponseEntity<ProfileWidget> =
+        withUserAuthentication { userAuthentication: UserAuthentication ->
+            val command = PutProfileWidget.Command(
+                userId = userAuthentication.userId,
+                profileWidget = com.threedays.domain.user.entity.ProfileWidget(
+                    type = com.threedays.domain.user.entity.ProfileWidget.Type.valueOf(body.type.name),
+                    content = body.content
+                )
+            )
+
+            putProfileWidget
+                .invoke(command)
+                .let { ResponseEntity.ok(body) }
         }
 }

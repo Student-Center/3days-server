@@ -59,3 +59,12 @@ CREATE TABLE users
     CONSTRAINT pk_users PRIMARY KEY (id),
     CONSTRAINT uq_users_phone_number UNIQUE (phone_number)
 );
+
+CREATE TABLE user_profile_widgets
+(
+    user_profile_id BINARY(16)   NOT NULL,
+    type            VARCHAR(255) NOT NULL,
+    content         VARCHAR(255) NOT NULL,
+    PRIMARY KEY (user_profile_id, type),
+    FOREIGN KEY (user_profile_id) REFERENCES user_profiles (id) ON DELETE CASCADE
+);
