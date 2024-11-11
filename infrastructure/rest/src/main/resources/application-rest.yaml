@@ -2,6 +2,8 @@ spring:
   config:
     activate:
       on-profile: local
+discord:
+  auth-sms-hook-url: ${DISCORD_AUTH_SMS_HOOK_URL}
 ---
 spring:
   config:

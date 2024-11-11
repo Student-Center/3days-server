@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
     name = "discord",
     url = "\${discord.auth-sms-hook-url}"
 )
-@Profile("dev")
+@Profile("dev", "local")
 interface DiscordClient {
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])

@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("!dev")
+@Profile("prod")
 class AuthCodeSmsSenderCoolSmsAdapter(
     private val smsProperties: SmsProperties,
     private val defaultMessageService: DefaultMessageService,
