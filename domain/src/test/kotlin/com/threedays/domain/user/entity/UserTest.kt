@@ -171,9 +171,15 @@ class UserTest : DescribeSpec({
                 .giveMeBuilder<ProfileWidget>()
                 .sample()
 
+            val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                .giveMeBuilder<UserDesiredPartner>()
+                .set(UserDesiredPartner::allowSameCompany, null)
+                .sample()
+
             val user: User = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::desiredPartner, userDesiredPartner)
                 .sample()
 
             // act
@@ -183,31 +189,38 @@ class UserTest : DescribeSpec({
             result.profile.profileWidgets.find { it == profileWidget } shouldBe profileWidget
         }
 
-        context("동일한 타입의 위젯이 이미 있는 경우") {
-            it("내용을 수정한다") {
-                // arrange
-                val type = ProfileWidget.Type.BODY_TYPE
-                val profileWidget: ProfileWidget = fixtureMonkey
-                    .giveMeBuilder<ProfileWidget>()
-                    .set(ProfileWidget::type, type)
-                    .sample()
+        ProfileWidget.Type.entries.forEach { widgetType ->
+        context("동일한 타입($widgetType)의 위젯이 이미 있는 경우") {
+                it("$widgetType 타입의 위젯 내용을 수정한다") {
+                    // arrange
+                    val profileWidget: ProfileWidget = fixtureMonkey
+                        .giveMeBuilder<ProfileWidget>()
+                        .set(ProfileWidget::type, widgetType)
+                        .sample()
 
-                val user: User = fixtureMonkey
-                    .giveMeBuilder<User>()
-                    .set(User::phoneNumber, PhoneNumber("01012345678"))
-                    .sample()
-                    .putProfileWidget(profileWidget)
+                    val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                        .giveMeBuilder<UserDesiredPartner>()
+                        .set(UserDesiredPartner::allowSameCompany, null)
+                        .sample()
 
-                val updatedProfileWidget: ProfileWidget = fixtureMonkey
-                    .giveMeBuilder<ProfileWidget>()
-                    .set(ProfileWidget::type, type)
-                    .sample()
+                    val user: User = fixtureMonkey
+                        .giveMeBuilder<User>()
+                        .set(User::phoneNumber, PhoneNumber("01012345678"))
+                        .set(User::desiredPartner, userDesiredPartner)
+                        .sample()
+                        .putProfileWidget(profileWidget)
 
-                // act
-                val result: User = user.putProfileWidget(updatedProfileWidget)
+                    val updatedProfileWidget: ProfileWidget = fixtureMonkey
+                        .giveMeBuilder<ProfileWidget>()
+                        .set(ProfileWidget::type, widgetType)
+                        .sample()
 
-                // assert
-                result.profile.profileWidgets.find { it == updatedProfileWidget } shouldBe updatedProfileWidget
+                    // act
+                    val result: User = user.putProfileWidget(updatedProfileWidget)
+
+                    // assert
+                    result.profile.profileWidgets.find { it == updatedProfileWidget } shouldBe updatedProfileWidget
+                }
             }
         }
     }
