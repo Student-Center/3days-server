@@ -16,6 +16,7 @@ data class ProfileWidget(
         RELIGION,
         SMOKING,
         DRINKING,
+        FOOD,
     }
 
 }
