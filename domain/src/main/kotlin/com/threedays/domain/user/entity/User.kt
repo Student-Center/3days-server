@@ -90,4 +90,8 @@ data class User(
         return copy(profile = profile.putProfileWidget(widget))
     }
 
+    fun deleteProfileWidget(type: ProfileWidget.Type): User {
+        return copy(profile = profile.deleteProfileWidget(type))
+    }
+
 }

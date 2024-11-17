@@ -1,5 +1,6 @@
 package com.threedays.bootstrap.api.user
 
+import com.threedays.application.user.port.inbound.DeleteProfileWidget
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.bootstrap.api.support.security.UserAuthentication
@@ -16,9 +17,9 @@ import com.threedays.oas.model.CompanyDisplayInfo
 import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.JobOccupationDisplayInfo
 import com.threedays.oas.model.ProfileWidget
+import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
-import com.threedays.oas.model.UserProfile
 import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.exception.NotFoundException
@@ -32,6 +33,7 @@ class UserController(
     private val registerUser: RegisterUser,
     private val putProfileWidget: PutProfileWidget,
     private val userRepository: UserRepository,
+    private val deleteProfileWidget: DeleteProfileWidget,
 ) : UsersApi {
 
     override fun registerUser(
@@ -141,4 +143,15 @@ class UserController(
                 .invoke(command)
                 .let { ResponseEntity.ok(body) }
         }
+
+    override fun deleteProfileWidget(type: ProfileWidgetType): ResponseEntity<Unit> = withUserAuthentication { authentication ->
+        val command = DeleteProfileWidget.Command(
+            userId = authentication.userId,
+            type = com.threedays.domain.user.entity.ProfileWidget.Type.valueOf(type.name)
+        )
+
+        deleteProfileWidget.invoke(command)
+
+        ResponseEntity.noContent().build()
+    }
 }

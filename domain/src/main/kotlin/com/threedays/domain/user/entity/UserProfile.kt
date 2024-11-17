@@ -26,4 +26,8 @@ data class UserProfile(
         }
     }
 
+    fun deleteProfileWidget(type: ProfileWidget.Type): UserProfile {
+        return copy(profileWidgets = profileWidgets.filter { it.type != type })
+    }
+
 }
