@@ -30,5 +30,8 @@ data class Location(
 
     }
 
+    val display: String
+        get() = subRegion.value
+
 
 }

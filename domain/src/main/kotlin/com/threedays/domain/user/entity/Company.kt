@@ -16,4 +16,7 @@ data class Company(
 
     data class Id(override val value: UUID) : UUIDTypeId(value)
 
+    val display: String
+        get() = name
+
 }

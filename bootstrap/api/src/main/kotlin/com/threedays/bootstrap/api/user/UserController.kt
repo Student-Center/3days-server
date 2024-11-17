@@ -12,11 +12,14 @@ import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
+import com.threedays.oas.model.CompanyDisplayInfo
 import com.threedays.oas.model.GetMyUserInfoResponse
+import com.threedays.oas.model.JobOccupationDisplayInfo
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.oas.model.UserProfile
+import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.exception.NotFoundException
 import org.springframework.http.HttpStatus
@@ -81,16 +84,25 @@ class UserController(
                 id = user.id.value,
                 name = user.name.value,
                 phoneNumber = user.phoneNumber.value,
-                profile = UserProfile(
+                profile = UserProfileDisplayInfo(
                     gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
                     birthYear = user.profile.birthYear.value,
-                    companyId = user.profile.company?.id?.value,
-                    jobOccupation = user.profile.jobOccupation.name.let {
-                        com.threedays.oas.model.JobOccupation.valueOf(
-                            it
+                    jobOccupation = JobOccupationDisplayInfo(
+                        code = com.threedays.oas.model.JobOccupation.valueOf(user.profile.jobOccupation.name),
+                        display = "test"
+                    ),
+                    locations = user.profile.locations.map {
+                        com.threedays.oas.model.LocationDisplayInfo(
+                            id = it.id.value,
+                            display = it.display,
                         )
                     },
-                    locationIds = user.profile.locations.map { it.id.value },
+                    company = user.profile.company?.let {
+                        CompanyDisplayInfo(
+                            id = it.id.value,
+                            display = it.display,
+                        )
+                    },
                 ),
                 desiredPartner = com.threedays.oas.model.UserDesiredPartner(
                     jobOccupations = user.desiredPartner.jobOccupations.map {
