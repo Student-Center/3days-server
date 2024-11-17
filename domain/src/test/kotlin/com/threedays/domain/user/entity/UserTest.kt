@@ -178,6 +178,7 @@ class UserTest : DescribeSpec({
 
             val user: User = fixtureMonkey
                 .giveMeBuilder<User>()
+                .set(User::name, User.Name("홍길동"))
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
                 .set(User::desiredPartner, userDesiredPartner)
                 .sample()
@@ -205,6 +206,7 @@ class UserTest : DescribeSpec({
 
                     val user: User = fixtureMonkey
                         .giveMeBuilder<User>()
+                        .set(User::name, User.Name("홍길동"))
                         .set(User::phoneNumber, PhoneNumber("01012345678"))
                         .set(User::desiredPartner, userDesiredPartner)
                         .sample()

@@ -66,6 +66,7 @@ class AuthTokenServiceTest : DescribeSpec({
 
             val user = fixtureMonkey
                 .giveMeBuilder<User>()
+                .set(User::name, User.Name("홍길동"))
                 .set(User::id, userId)
                 .set(User::profile, userProfile)
                 .set(User::desiredPartner, userDesiredPartner)

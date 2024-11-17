@@ -95,6 +95,7 @@ class AuthCodeServiceTest : DescribeSpec({
 
                 fixtureMonkey
                     .giveMeBuilder<User>()
+                    .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
                     .set(User::desiredPartner, userDesiredPartner)
@@ -178,6 +179,7 @@ class AuthCodeServiceTest : DescribeSpec({
 
                 fixtureMonkey
                     .giveMeBuilder<User>()
+                    .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
                     .set(User::desiredPartner, userDesiredPartner)
@@ -291,6 +293,7 @@ class AuthCodeServiceTest : DescribeSpec({
 
                 fixtureMonkey
                     .giveMeBuilder<User>()
+                    .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
                     .set(User::desiredPartner, userDesiredPartner)
