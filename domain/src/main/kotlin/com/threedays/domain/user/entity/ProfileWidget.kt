@@ -8,15 +8,18 @@ data class ProfileWidget(
     enum class Type {
         HOBBY,
         STYLE,
-        BODY_TYPE,
-        MUSIC,
-        DRAMA_MOVIE,
-        BOOK,
         MBTI,
+        MUSIC,
+        BODY_TYPE,
+        FOOD,
+        MOVIE,
+        DRAMA,
+        BOOK,
+        TRAVEL,
+        DRINKING,
+        MARRIAGE,
         RELIGION,
         SMOKING,
-        DRINKING,
-        FOOD,
     }
 
 }
