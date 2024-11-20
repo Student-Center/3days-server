@@ -3,6 +3,7 @@ package com.threedays.bootstrap.api.user
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.application.user.port.inbound.UpdateUserInfo
 import com.threedays.bootstrap.api.support.security.UserAuthentication
 import com.threedays.bootstrap.api.support.security.withUserAuthentication
 import com.threedays.domain.auth.vo.PhoneNumber
@@ -20,6 +21,9 @@ import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
+import com.threedays.oas.model.UpdateMyUserInfoRequest
+import com.threedays.oas.model.UpdateMyUserInfoResponse
+import com.threedays.oas.model.UserProfile
 import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.exception.NotFoundException
@@ -34,6 +38,7 @@ class UserController(
     private val putProfileWidget: PutProfileWidget,
     private val userRepository: UserRepository,
     private val deleteProfileWidget: DeleteProfileWidget,
+    private val updateUserInfo: UpdateUserInfo,
 ) : UsersApi {
 
     override fun registerUser(
@@ -144,14 +149,60 @@ class UserController(
                 .let { ResponseEntity.ok(body) }
         }
 
-    override fun deleteProfileWidget(type: ProfileWidgetType): ResponseEntity<Unit> = withUserAuthentication { authentication ->
-        val command = DeleteProfileWidget.Command(
-            userId = authentication.userId,
-            type = com.threedays.domain.user.entity.ProfileWidget.Type.valueOf(type.name)
-        )
+    override fun deleteProfileWidget(type: ProfileWidgetType): ResponseEntity<Unit> =
+        withUserAuthentication { authentication ->
+            val command = DeleteProfileWidget.Command(
+                userId = authentication.userId,
+                type = com.threedays.domain.user.entity.ProfileWidget.Type.valueOf(type.name)
+            )
 
-        deleteProfileWidget.invoke(command)
+            deleteProfileWidget.invoke(command)
 
-        ResponseEntity.noContent().build()
-    }
+            ResponseEntity.noContent().build()
+        }
+
+    override fun updateMyUserInfo(updateMyUserInfoRequest: UpdateMyUserInfoRequest): ResponseEntity<UpdateMyUserInfoResponse> =
+        withUserAuthentication { authentication ->
+            val command = UpdateUserInfo.Command(
+                userId = authentication.userId,
+                name = updateMyUserInfoRequest.name?.let { User.Name(it) },
+                jobOccupation = updateMyUserInfoRequest.jobOccupation?.let {
+                    JobOccupation.valueOf(
+                        it.name
+                    )
+                },
+                locationIds = updateMyUserInfoRequest.locationIds?.map(UUIDTypeId::from),
+            )
+
+            val user: User = updateUserInfo.invoke(command)
+
+            UpdateMyUserInfoResponse(
+                id = user.id.value,
+                name = user.name.value,
+                phoneNumber = user.phoneNumber.value,
+                profile = UserProfile(
+                    gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
+                    birthYear = user.profile.birthYear.value,
+                    jobOccupation = com.threedays.oas.model.JobOccupation.valueOf(user.profile.jobOccupation.name),
+                    locationIds = user.profile.locations.map { it.id.value },
+                    companyId = user.profile.company?.id?.value,
+                ),
+                desiredPartner = com.threedays.oas.model.UserDesiredPartner(
+                    jobOccupations = user.desiredPartner.jobOccupations.map {
+                        com.threedays.oas.model.JobOccupation.valueOf(
+                            it.name
+                        )
+                    },
+                    birthYearRange = user.desiredPartner.birthYearRange.let {
+                        com.threedays.oas.model.BirthYearRange(
+                            it.start?.value,
+                            it.end?.value,
+                        )
+                    },
+                    preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+                )
+            ).let { ResponseEntity.ok(it) }
+
+
+        }
 }

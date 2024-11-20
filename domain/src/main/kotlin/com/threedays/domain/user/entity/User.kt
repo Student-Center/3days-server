@@ -2,6 +2,7 @@ package com.threedays.domain.user.entity
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
+import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
@@ -92,6 +93,23 @@ data class User(
 
     fun deleteProfileWidget(type: ProfileWidget.Type): User {
         return copy(profile = profile.deleteProfileWidget(type))
+    }
+
+    fun updateUserInfo(
+        name: Name?,
+        jobOccupation: JobOccupation?,
+        locationIds: List<Location.Id>?,
+        locationQueryRepository: LocationQueryRepository
+    ): User {
+        val locations: List<Location> = locationIds?.map { locationQueryRepository.get(it) } ?: emptyList()
+
+        return copy(
+            name = name ?: this.name,
+            profile = profile.copy(
+                jobOccupation = jobOccupation ?: profile.jobOccupation,
+                locations = locations.ifEmpty { profile.locations }
+            )
+        )
     }
 
 }
