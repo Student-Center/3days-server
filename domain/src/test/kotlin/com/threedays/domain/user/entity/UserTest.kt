@@ -5,6 +5,9 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.domain.auth.vo.PhoneNumber
+import com.threedays.domain.user.reposiotry.CompanyQueryRepositorySpy
+import com.threedays.domain.user.reposiotry.LocationQueryRepositorySpy
+import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
@@ -22,6 +25,13 @@ class UserTest : DescribeSpec({
         .objectIntrospector(PrimaryConstructorArbitraryIntrospector.INSTANCE)
         .build()
 
+    val locationQueryRepository = LocationQueryRepositorySpy()
+    val companyQueryRepository = CompanyQueryRepositorySpy()
+
+    afterTest {
+        locationQueryRepository.clear()
+        companyQueryRepository.clear()
+    }
 
     describe("유저 생성") {
         it("새로운 유저를 생성한다") {
@@ -224,6 +234,49 @@ class UserTest : DescribeSpec({
                     result.profile.profileWidgets.find { it == updatedProfileWidget } shouldBe updatedProfileWidget
                 }
             }
+        }
+    }
+
+    describe("updateUserInfo - 유저 정보 수정") {
+        it("유저 정보를 수정한다") {
+            // arrange
+            val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                .giveMeBuilder<UserDesiredPartner>()
+                .set(UserDesiredPartner::allowSameCompany, null)
+                .sample()
+
+            val user: User = fixtureMonkey
+                .giveMeBuilder<User>()
+                .set(User::name, User.Name("홍길동"))
+                .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::desiredPartner, userDesiredPartner)
+                .sample()
+
+            val name: User.Name = fixtureMonkey.giveMeBuilder<User.Name>().sample()
+            val jobOccupation: JobOccupation = fixtureMonkey.giveMeBuilder<JobOccupation>().sample()
+            val locations = fixtureMonkey.giveMeBuilder<Location>().sampleList(3)
+            val company = fixtureMonkey.giveMeBuilder<Company>().sample()
+            val allowSameCompany: Boolean = fixtureMonkey.giveMeBuilder<Boolean>().sample()
+
+            companyQueryRepository.save(company)
+            locations.forEach { locationQueryRepository.save(it) }
+
+            // act
+            val result: User = user.updateUserInfo(
+                name = name,
+                jobOccupation = jobOccupation,
+                locationIds = locations.map { it.id },
+                locationQueryRepository = locationQueryRepository,
+                companyId = company.id,
+                companyQueryRepository = companyQueryRepository,
+                allowSameCompany = allowSameCompany,
+            )
+
+            // assert
+            result.name shouldBe name
+            result.profile.jobOccupation shouldBe jobOccupation
+            result.profile.locations shouldBe locations
+            result.profile.company shouldBe company
         }
     }
 

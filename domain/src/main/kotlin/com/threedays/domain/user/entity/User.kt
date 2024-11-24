@@ -2,6 +2,7 @@ package com.threedays.domain.user.entity
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
+import com.threedays.domain.user.repository.CompanyQueryRepository
 import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
@@ -97,17 +98,25 @@ data class User(
 
     fun updateUserInfo(
         name: Name?,
-        jobOccupation: JobOccupation?,
-        locationIds: List<Location.Id>?,
-        locationQueryRepository: LocationQueryRepository
+        jobOccupation: JobOccupation,
+        locationIds: List<Location.Id>,
+        locationQueryRepository: LocationQueryRepository,
+        companyId: Company.Id?,
+        companyQueryRepository: CompanyQueryRepository,
+        allowSameCompany: Boolean?,
     ): User {
-        val locations: List<Location> = locationIds?.map { locationQueryRepository.get(it) } ?: emptyList()
+        val locations: List<Location> = locationIds.map { locationQueryRepository.get(it) }
+        val company: Company? = companyId?.let { companyQueryRepository.get(it) }
 
         return copy(
             name = name ?: this.name,
             profile = profile.copy(
-                jobOccupation = jobOccupation ?: profile.jobOccupation,
-                locations = locations.ifEmpty { profile.locations }
+                jobOccupation = jobOccupation,
+                locations = locations,
+                company = company,
+            ),
+            desiredPartner = desiredPartner.copy(
+                allowSameCompany = allowSameCompany ?: desiredPartner.allowSameCompany,
             )
         )
     }

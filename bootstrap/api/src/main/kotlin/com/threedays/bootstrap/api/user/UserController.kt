@@ -165,13 +165,15 @@ class UserController(
         withUserAuthentication { authentication ->
             val command = UpdateUserInfo.Command(
                 userId = authentication.userId,
-                name = updateMyUserInfoRequest.name?.let { User.Name(it) },
-                jobOccupation = updateMyUserInfoRequest.jobOccupation?.let {
+                name = updateMyUserInfoRequest.name.let { User.Name(it) },
+                jobOccupation = updateMyUserInfoRequest.jobOccupation.let {
                     JobOccupation.valueOf(
                         it.name
                     )
                 },
-                locationIds = updateMyUserInfoRequest.locationIds?.map(UUIDTypeId::from),
+                locationIds = updateMyUserInfoRequest.locationIds.map(UUIDTypeId::from),
+                companyId = updateMyUserInfoRequest.companyId?.let { UUIDTypeId.from(it) },
+                allowSameCompany = updateMyUserInfoRequest.allowSameCompany,
             )
 
             val user: User = updateUserInfo.invoke(command)
@@ -202,7 +204,6 @@ class UserController(
                     preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
                 )
             ).let { ResponseEntity.ok(it) }
-
-
         }
+
 }

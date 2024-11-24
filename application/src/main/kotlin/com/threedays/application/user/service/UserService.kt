@@ -80,7 +80,10 @@ class UserService(
                 name = command.name,
                 jobOccupation = command.jobOccupation,
                 locationIds = command.locationIds,
-                locationQueryRepository = locationQueryRepository
+                locationQueryRepository = locationQueryRepository,
+                companyId = command.companyId,
+                companyQueryRepository = companyQueryRepository,
+                allowSameCompany = command.allowSameCompany,
             )
             .also { userRepository.save(it) }
     }
