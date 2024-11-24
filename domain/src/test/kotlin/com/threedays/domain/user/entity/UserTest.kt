@@ -124,7 +124,6 @@ class UserTest : DescribeSpec({
         context("동일 회사 허용 여부를 선택하지 않은 경우") {
             it("회사를 선택하면 예외가 발생한다") {
                 // arrange
-                val name: User.Name = fixtureMonkey.giveMeBuilder<User.Name>().sample()
                 val phoneNumber: PhoneNumber = PhoneNumber("01012345678")
                 val userGender: Gender = fixtureMonkey.giveMeBuilder<Gender>().sample()
                 val userBirthYear: Year = fixtureMonkey.giveMeBuilder<Year>().sample()
@@ -145,7 +144,7 @@ class UserTest : DescribeSpec({
                 // act & assert
                 shouldThrow<IllegalArgumentException> {
                     User.create(
-                        name = name,
+                        name = User.Name("홍길동"),
                         phoneNumber = phoneNumber,
                         userGender = userGender,
                         userBirthYear = userBirthYear,
