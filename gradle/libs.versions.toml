@@ -2,7 +2,7 @@
 # plugin versions
 java = "21"
 spring = "6.1.10"
-spring-boot = "3.3.0"
+spring-boot = "3.3.6"
 spring-boot-dependency-management = "1.1.6"
 kotlin = "2.0.0"
 sonar-cloud = "4.4.1.3373"
