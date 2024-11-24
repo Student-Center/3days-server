@@ -1,6 +1,7 @@
 package com.threedays.bootstrap.api
 
 import com.threedays.application.support.ApplicationConfig
+import com.threedays.aws.support.AwsConfig
 import com.threedays.persistence.support.PersistenceConfig
 import com.threedays.redis.support.config.RedisConfig
 import com.threedays.rest.support.config.RestConfig
@@ -18,6 +19,7 @@ import java.util.*
         SmsConfig::class,
         PersistenceConfig::class,
         RedisConfig::class,
+        AwsConfig::class,
         ApplicationConfig::class,
     ]
 )

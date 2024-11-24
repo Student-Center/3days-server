@@ -10,6 +10,7 @@ spring:
       - sms
       - redis
       - rest
+      - aws
   docker:
     compose:
       enabled: false
