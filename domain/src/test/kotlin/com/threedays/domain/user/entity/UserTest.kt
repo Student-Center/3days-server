@@ -7,7 +7,6 @@ import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.reposiotry.CompanyQueryRepositorySpy
 import com.threedays.domain.user.reposiotry.LocationQueryRepositorySpy
-import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
@@ -276,6 +275,40 @@ class UserTest : DescribeSpec({
             result.profile.jobOccupation shouldBe jobOccupation
             result.profile.locations shouldBe locations
             result.profile.company shouldBe company
+        }
+    }
+
+    describe("updateDesiredPartner - 이상형 프로필 수정") {
+        it("이상형 프로필을 수정한다") {
+            // arrange
+            val userDesiredPartner: UserDesiredPartner = fixtureMonkey
+                .giveMeBuilder<UserDesiredPartner>()
+                .set(UserDesiredPartner::allowSameCompany, null)
+                .sample()
+
+            val user: User = fixtureMonkey
+                .giveMeBuilder<User>()
+                .set(User::name, User.Name("홍길동"))
+                .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::desiredPartner, userDesiredPartner)
+                .sample()
+
+            val birthYearRange: BirthYearRange = fixtureMonkey.giveMeBuilder<BirthYearRange>().sample()
+            val jobOccupations: List<JobOccupation> = fixtureMonkey.giveMeBuilder<JobOccupation>().sampleList(10)
+            val preferDistance: UserDesiredPartner.PreferDistance =
+                fixtureMonkey.giveMeBuilder<UserDesiredPartner.PreferDistance>().sample()
+
+            // act
+            val result: User = user.updateDesiredPartner(
+                birthYearRange = birthYearRange,
+                jobOccupations = jobOccupations,
+                preferDistance = preferDistance,
+            )
+
+            // assert
+            result.desiredPartner.birthYearRange shouldBe birthYearRange
+            result.desiredPartner.jobOccupations shouldBe jobOccupations
+            result.desiredPartner.preferDistance shouldBe preferDistance
         }
     }
 
