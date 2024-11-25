@@ -3,6 +3,7 @@ package com.threedays.bootstrap.api.user
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.application.user.port.inbound.UpdateDesiredPartner
 import com.threedays.application.user.port.inbound.UpdateUserInfo
 import com.threedays.bootstrap.api.support.security.UserAuthentication
 import com.threedays.bootstrap.api.support.security.withUserAuthentication
@@ -17,12 +18,16 @@ import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.CompanyDisplayInfo
 import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.JobOccupationDisplayInfo
+import com.threedays.oas.model.LocationDisplayInfo
+import com.threedays.oas.model.PreferDistance
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
 import com.threedays.oas.model.UpdateMyUserInfoRequest
 import com.threedays.oas.model.UpdateMyUserInfoResponse
+import com.threedays.oas.model.UpdateUserDesiredPartnerRequest
+import com.threedays.oas.model.UpdateUserDesiredPartnerResponse
 import com.threedays.oas.model.UserProfile
 import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
@@ -39,6 +44,7 @@ class UserController(
     private val userRepository: UserRepository,
     private val deleteProfileWidget: DeleteProfileWidget,
     private val updateUserInfo: UpdateUserInfo,
+    private val updateDesiredPartner: UpdateDesiredPartner,
 ) : UsersApi {
 
     override fun registerUser(
@@ -99,7 +105,7 @@ class UserController(
                         display = "test"
                     ),
                     locations = user.profile.locations.map {
-                        com.threedays.oas.model.LocationDisplayInfo(
+                        LocationDisplayInfo(
                             id = it.id.value,
                             display = it.display,
                         )
@@ -123,11 +129,11 @@ class UserController(
                             it.end?.value,
                         )
                     },
-                    preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
                 ),
                 profileWidgets = user.profile.profileWidgets.map {
                     ProfileWidget(
-                        type = com.threedays.oas.model.ProfileWidgetType.valueOf(it.type.name),
+                        type = ProfileWidgetType.valueOf(it.type.name),
                         content = it.content,
                     )
                 }
@@ -201,9 +207,42 @@ class UserController(
                             it.end?.value,
                         )
                     },
-                    preferDistance = com.threedays.oas.model.PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
                 )
             ).let { ResponseEntity.ok(it) }
         }
 
+    override fun updateMyDesiredPartner(updateUserDesiredPartnerRequest: UpdateUserDesiredPartnerRequest): ResponseEntity<UpdateUserDesiredPartnerResponse> = withUserAuthentication { authentication ->
+        val command = UpdateDesiredPartner.Command(
+            userId = authentication.userId,
+            jobOccupations = updateUserDesiredPartnerRequest.jobOccupations.map {
+                JobOccupation.valueOf(it.name)
+            },
+            birthYearRange = updateUserDesiredPartnerRequest.birthYearRange.let {
+                BirthYearRange(
+                    start = it.start?.let { Year.of(it) },
+                    end = it.end?.let { Year.of(it) }
+                )
+            },
+            preferDistance = UserDesiredPartner.PreferDistance.valueOf(updateUserDesiredPartnerRequest.preferDistance.name),
+        )
+
+        val user: User = updateDesiredPartner.invoke(command)
+
+        UpdateUserDesiredPartnerResponse(
+            desiredPartner = com.threedays.oas.model.UserDesiredPartner(
+                birthYearRange = user.desiredPartner.birthYearRange.let {
+                    com.threedays.oas.model.BirthYearRange(
+                        it.start?.value,
+                        it.end?.value,
+                    )
+                },
+                jobOccupations = user.desiredPartner.jobOccupations.map {
+                    com.threedays.oas.model.JobOccupation.valueOf(it.name)
+                },
+                preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+            )
+        ).let { ResponseEntity.ok(it) }
+
+    }
 }

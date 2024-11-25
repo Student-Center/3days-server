@@ -14,7 +14,6 @@ interface UpdateDesiredPartner {
         val birthYearRange: BirthYearRange,
         val jobOccupations: List<JobOccupation>,
         val preferDistance: UserDesiredPartner.PreferDistance,
-        val allowSameCompany: Boolean?,
     )
 
 }
