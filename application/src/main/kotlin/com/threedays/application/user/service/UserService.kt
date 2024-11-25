@@ -5,6 +5,7 @@ import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.application.user.port.inbound.UpdateDesiredPartner
 import com.threedays.application.user.port.inbound.UpdateUserInfo
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Location
@@ -22,7 +23,11 @@ class UserService(
     private val companyQueryRepository: CompanyQueryRepository,
     private val issueLoginTokens: IssueLoginTokens,
     private val authProperties: AuthProperties,
-) : RegisterUser, PutProfileWidget, DeleteProfileWidget, UpdateUserInfo {
+) : RegisterUser,
+    PutProfileWidget,
+    DeleteProfileWidget,
+    UpdateUserInfo,
+    UpdateDesiredPartner {
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -84,6 +89,18 @@ class UserService(
                 companyId = command.companyId,
                 companyQueryRepository = companyQueryRepository,
                 allowSameCompany = command.allowSameCompany,
+            )
+            .also { userRepository.save(it) }
+    }
+
+    @Transactional
+    override fun invoke(command: UpdateDesiredPartner.Command): User {
+        return userRepository
+            .get(command.userId)
+            .updateDesiredPartner(
+                birthYearRange = command.birthYearRange,
+                jobOccupations = command.jobOccupations,
+                preferDistance = command.preferDistance,
             )
             .also { userRepository.save(it) }
     }

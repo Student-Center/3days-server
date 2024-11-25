@@ -121,4 +121,18 @@ data class User(
         )
     }
 
+    fun updateDesiredPartner(
+        birthYearRange: BirthYearRange,
+        jobOccupations: List<JobOccupation>,
+        preferDistance: PreferDistance,
+    ): User {
+        return copy(
+            desiredPartner = desiredPartner.copy(
+                birthYearRange = birthYearRange,
+                jobOccupations = jobOccupations,
+                preferDistance = preferDistance,
+            )
+        )
+    }
+
 }
