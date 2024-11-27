@@ -34,16 +34,14 @@ class UserDesiredPartnerJpaEntity(
 
     @Column(
         name = "birth_year_range_start",
-        nullable = true,
-        updatable = false
+        nullable = true
     )
     var birthYearRangeStart: Int? = birthYearRangeStart
         private set
 
     @Column(
         name = "birth_year_range_end",
-        nullable = true,
-        updatable = false
+        nullable = true
     )
     var birthYearRangeEnd: Int? = birthYearRangeEnd
         private set
@@ -63,7 +61,6 @@ class UserDesiredPartnerJpaEntity(
     @Column(
         name = "prefer_distance",
         nullable = false,
-        updatable = false,
         columnDefinition = "varchar(255)"
     )
     @Enumerated(EnumType.STRING)
