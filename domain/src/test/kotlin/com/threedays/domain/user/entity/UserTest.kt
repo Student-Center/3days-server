@@ -15,6 +15,7 @@ import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import java.net.URL
 import java.time.Year
 
 @DisplayName("[도메인][유저] 유저")
@@ -184,10 +185,17 @@ class UserTest : DescribeSpec({
                 .set(UserDesiredPartner::allowSameCompany, null)
                 .sample()
 
+            val userProfileImageUrl: URL = URL("http://example.com")
+            val userProfileImage = fixtureMonkey
+                .giveMeBuilder<UserProfileImage>()
+                .set(UserProfileImage::url, userProfileImageUrl)
+                .sampleList(1)
+
             val user: User = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::name, User.Name("홍길동"))
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::profileImages, userProfileImage)
                 .set(User::desiredPartner, userDesiredPartner)
                 .sample()
 
@@ -212,11 +220,18 @@ class UserTest : DescribeSpec({
                         .set(UserDesiredPartner::allowSameCompany, null)
                         .sample()
 
+                    val userProfileImageUrl: URL = URL("http://example.com")
+                    val userProfileImage = fixtureMonkey
+                        .giveMeBuilder<UserProfileImage>()
+                        .set(UserProfileImage::url, userProfileImageUrl)
+                        .sampleList(1)
+
                     val user: User = fixtureMonkey
                         .giveMeBuilder<User>()
                         .set(User::name, User.Name("홍길동"))
                         .set(User::phoneNumber, PhoneNumber("01012345678"))
                         .set(User::desiredPartner, userDesiredPartner)
+                        .set(User::profileImages, userProfileImage)
                         .sample()
                         .putProfileWidget(profileWidget)
 
@@ -243,10 +258,17 @@ class UserTest : DescribeSpec({
                 .set(UserDesiredPartner::allowSameCompany, null)
                 .sample()
 
+            val userProfileImageUrl: URL = URL("http://example.com")
+            val userProfileImage = fixtureMonkey
+                .giveMeBuilder<UserProfileImage>()
+                .set(UserProfileImage::url, userProfileImageUrl)
+                .sampleList(1)
+
             val user: User = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::name, User.Name("홍길동"))
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
+                .set(User::profileImages, userProfileImage)
                 .set(User::desiredPartner, userDesiredPartner)
                 .sample()
 
@@ -286,9 +308,16 @@ class UserTest : DescribeSpec({
                 .set(UserDesiredPartner::allowSameCompany, null)
                 .sample()
 
+            val userProfileImageUrl: URL = URL("http://example.com")
+            val userProfileImage = fixtureMonkey
+                .giveMeBuilder<UserProfileImage>()
+                .set(UserProfileImage::url, userProfileImageUrl)
+                .sampleList(1)
+
             val user: User = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::name, User.Name("홍길동"))
+                .set(User::profileImages, userProfileImage)
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
                 .set(User::desiredPartner, userDesiredPartner)
                 .sample()
