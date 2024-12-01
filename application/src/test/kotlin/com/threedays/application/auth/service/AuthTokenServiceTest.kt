@@ -14,12 +14,14 @@ import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.entity.UserProfile
+import com.threedays.domain.user.entity.UserProfileImage
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import java.net.URL
 
 @DisplayName("[서비스][인증] - AuthToken(인증 토큰)")
 class AuthTokenServiceTest : DescribeSpec({
@@ -64,11 +66,20 @@ class AuthTokenServiceTest : DescribeSpec({
                 .set(UserDesiredPartner::allowSameCompany, null)
                 .sample()
 
+
+            val userProfileImageUrl: URL = URL("http://example.com")
+            val userProfileImage = fixtureMonkey
+                .giveMeBuilder<UserProfileImage>()
+                .set(UserProfileImage::url, userProfileImageUrl)
+                .sampleList(1)
+
+
             val user = fixtureMonkey
                 .giveMeBuilder<User>()
                 .set(User::name, User.Name("홍길동"))
                 .set(User::id, userId)
                 .set(User::profile, userProfile)
+                .set(User::profileImages, userProfileImage)
                 .set(User::desiredPartner, userDesiredPartner)
                 .set(User::phoneNumber, PhoneNumber("01012345678"))
                 .sample()

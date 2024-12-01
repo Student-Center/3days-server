@@ -17,12 +17,14 @@ import com.threedays.domain.support.common.ClientOS
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
 import com.threedays.domain.user.entity.UserProfile
+import com.threedays.domain.user.entity.UserProfileImage
 import com.threedays.domain.user.repository.UserRepositorySpy
 import com.threedays.support.common.security.jwt.JwtTokenProvider
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
+import java.net.URL
 import java.time.LocalDateTime
 
 @DisplayName("[서비스][인증] - AuthCode(인증 코드)")
@@ -93,11 +95,20 @@ class AuthCodeServiceTest : DescribeSpec({
                     .set(UserDesiredPartner::allowSameCompany, null)
                     .sample()
 
+
+                val userProfileImageUrl: URL = URL("http://example.com")
+                val userProfileImage = fixtureMonkey
+                    .giveMeBuilder<UserProfileImage>()
+                    .set(UserProfileImage::url, userProfileImageUrl)
+                    .sampleList(1)
+
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
+                    .set(User::profileImages, userProfileImage)
                     .set(User::desiredPartner, userDesiredPartner)
                     .sample()
                     .also { userRepository.save(it) }
@@ -177,10 +188,17 @@ class AuthCodeServiceTest : DescribeSpec({
                     .set(UserDesiredPartner::allowSameCompany, null)
                     .sample()
 
+                val userProfileImageUrl: URL = URL("http://example.com")
+                val userProfileImage = fixtureMonkey
+                    .giveMeBuilder<UserProfileImage>()
+                    .set(UserProfileImage::url, userProfileImageUrl)
+                    .sampleList(1)
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
+                    .set(User::profileImages, userProfileImage)
                     .set(User::profile, userProfile)
                     .set(User::desiredPartner, userDesiredPartner)
                     .sample()
@@ -291,11 +309,19 @@ class AuthCodeServiceTest : DescribeSpec({
                     .set(UserDesiredPartner::allowSameCompany, null)
                     .sample()
 
+
+                val userProfileImageUrl: URL = URL("http://example.com")
+                val userProfileImage = fixtureMonkey
+                    .giveMeBuilder<UserProfileImage>()
+                    .set(UserProfileImage::url, userProfileImageUrl)
+                    .sampleList(1)
+
                 fixtureMonkey
                     .giveMeBuilder<User>()
                     .set(User::name, User.Name("홍길동"))
                     .set(User::phoneNumber, phoneNumber)
                     .set(User::profile, userProfile)
+                    .set(User::profileImages, userProfileImage)
                     .set(User::desiredPartner, userDesiredPartner)
                     .sample()
                     .also { userRepository.save(it) }
