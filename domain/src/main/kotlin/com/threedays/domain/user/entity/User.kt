@@ -2,6 +2,7 @@ package com.threedays.domain.user.entity
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.UserDesiredPartner.PreferDistance
+import com.threedays.domain.user.entity.UserProfileImage.Extension
 import com.threedays.domain.user.repository.CompanyQueryRepository
 import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.vo.BirthYearRange
@@ -9,6 +10,7 @@ import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
+import java.net.URL
 import java.time.Year
 import java.util.*
 
@@ -17,6 +19,7 @@ data class User(
     override val id: Id,
     val name: Name,
     val phoneNumber: PhoneNumber,
+    val profileImages: List<UserProfileImage> = emptyList(),
     val profile: UserProfile,
     val desiredPartner: UserDesiredPartner,
 ) : AggregateRoot<User, User.Id>() {
@@ -25,6 +28,7 @@ data class User(
 
     @JvmInline
     value class Name(val value: String) {
+
         init {
             require(value.isNotBlank()) { "이름은 공백일 수 없습니다." }
         }
@@ -133,6 +137,15 @@ data class User(
                 preferDistance = preferDistance,
             )
         )
+    }
+
+    // TODO: 이미지 여러개 업로드 가능하도록 수정 필요
+    fun updateUserProfileImage(
+        extension: Extension,
+        getProfileImageUrlAction: (UserProfileImage.Id, Extension) -> URL,
+    ): User {
+        val newProfileImage = UserProfileImage.create(extension, getProfileImageUrlAction)
+        return copy(profileImages = listOf(newProfileImage))
     }
 
 }

@@ -27,7 +27,7 @@ class UserProfileImage(
             extension: Extension,
             getProfileImageUrlAction: (Id, Extension) -> URL,
         ): UserProfileImage {
-            val imageId = Id(UUID.randomUUID())
+            val imageId: Id = UUIDTypeId.random<Id>()
             val imageUrl: URL = try {
                 getProfileImageUrlAction(imageId, extension)
             } catch (e: Exception) {

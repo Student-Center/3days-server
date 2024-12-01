@@ -1,6 +1,8 @@
 package com.threedays.bootstrap.api.user
 
+import com.threedays.application.user.port.inbound.CompleteUserProfileImageUpload
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
+import com.threedays.application.user.port.inbound.GetUserProfileImageUploadUrl
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.application.user.port.inbound.UpdateDesiredPartner
@@ -10,16 +12,20 @@ import com.threedays.bootstrap.api.support.security.withUserAuthentication
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.entity.UserDesiredPartner
+import com.threedays.domain.user.entity.UserProfileImage
 import com.threedays.domain.user.repository.UserRepository
 import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.CompanyDisplayInfo
+import com.threedays.oas.model.CompleteProfileImageUploadRequest
 import com.threedays.oas.model.GetMyUserInfoResponse
+import com.threedays.oas.model.GetProfileImageUploadUrlResponse
 import com.threedays.oas.model.JobOccupationDisplayInfo
 import com.threedays.oas.model.LocationDisplayInfo
 import com.threedays.oas.model.PreferDistance
+import com.threedays.oas.model.ProfileImageExtension
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.RegisterUserRequest
@@ -45,6 +51,8 @@ class UserController(
     private val deleteProfileWidget: DeleteProfileWidget,
     private val updateUserInfo: UpdateUserInfo,
     private val updateDesiredPartner: UpdateDesiredPartner,
+    private val getUserProfileImageUploadUrl: GetUserProfileImageUploadUrl,
+    private val completeUserProfileImageUpload: CompleteUserProfileImageUpload,
 ) : UsersApi {
 
     override fun registerUser(
@@ -244,5 +252,32 @@ class UserController(
             )
         ).let { ResponseEntity.ok(it) }
 
+    }
+
+    override fun completeProfileImageUpload(completeProfileImageUploadRequest: CompleteProfileImageUploadRequest): ResponseEntity<Unit> = withUserAuthentication { authentication ->
+        val command = CompleteUserProfileImageUpload.Command(
+            userId = authentication.userId,
+            imageId = UUIDTypeId.from(completeProfileImageUploadRequest.imageId),
+            extension = UserProfileImage.Extension.valueOf(completeProfileImageUploadRequest.extension.name)
+        )
+        completeUserProfileImageUpload.invoke(command)
+        ResponseEntity.ok().build()
+    }
+
+    override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> {
+        val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
+            extension = UserProfileImage.Extension.valueOf(extension.name)
+        )
+
+        val result: GetUserProfileImageUploadUrl.Result = getUserProfileImageUploadUrl.invoke(command)
+
+        return GetProfileImageUploadUrlResponse(
+            imageId = result.imageId,
+            url = result.url.toString(),
+            extension = ProfileImageExtension.valueOf(result.extension.name),
+            uploadExpiresIn = result.uploadExpiresIn.toInt(),
+        ).let {
+            ResponseEntity.ok(it)
+        }
     }
 }

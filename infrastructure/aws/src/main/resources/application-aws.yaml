@@ -1,0 +1,33 @@
+spring:
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_ACCESS_KEY}
+        secret-key: ${AWS_SECRET_KEY}
+      region:
+        static: ${AWS_REGION:ap-northeast-2}
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+aws:
+  s3:
+    user-profile-image:
+      bucket-name: user-profile-image
+      key-prefix: user-profile-image/
+---
+spring:
+  config:
+    activate:
+      on-profile: dev
+aws:
+  s3:
+    user-profile-image:
+      bucket-name: user-profile-image
+      key-prefix: user-profile-image/
+---
+spring:
+  config:
+    activate:
+      on-profile: prod

@@ -68,3 +68,13 @@ CREATE TABLE user_profile_widgets
     PRIMARY KEY (user_profile_id, type),
     FOREIGN KEY (user_profile_id) REFERENCES user_profiles (id) ON DELETE CASCADE
 );
+
+CREATE TABLE user_profile_images
+(
+    id          BINARY(16)   NOT NULL,
+    user_id     BINARY(16)   NOT NULL,
+    image_order INT          NOT NULL,
+    extension   VARCHAR(255) NULL,
+    url         VARCHAR(255) NULL,
+    PRIMARY KEY (id)
+);
