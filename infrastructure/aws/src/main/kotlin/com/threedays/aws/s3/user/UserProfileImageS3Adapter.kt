@@ -6,6 +6,7 @@ import com.threedays.domain.user.entity.UserProfileImage
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.GetUrlRequest
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
@@ -32,6 +33,7 @@ class UserProfileImageS3Adapter(
                 bucket(s3Properties.userProfileImage.bucketName)
                 key(getObjectKey(id, extension))
                 contentLength(maxContentLength)
+                acl(ObjectCannedACL.PUBLIC_READ)
             }.build()
 
 
