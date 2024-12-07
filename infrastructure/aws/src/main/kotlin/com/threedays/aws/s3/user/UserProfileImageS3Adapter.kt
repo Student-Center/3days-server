@@ -3,6 +3,7 @@ package com.threedays.aws.s3.user
 import com.threedays.application.user.port.outbound.UserProfileImagePort
 import com.threedays.aws.s3.config.S3Properties
 import com.threedays.domain.user.entity.UserProfileImage
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.GetUrlRequest
@@ -20,6 +21,12 @@ class UserProfileImageS3Adapter(
     private val s3Presigner: S3Presigner,
     private val s3Properties: S3Properties,
 ) : UserProfileImagePort {
+
+    companion object {
+
+        private val logger = KotlinLogging.logger { }
+    }
+
 
     override fun getUploadUrl(
         id: UUID,
@@ -51,8 +58,7 @@ class UserProfileImageS3Adapter(
 
     override fun findImageUrlByIdAndExtension(
         id: UserProfileImage.Id,
-        extension: UserProfileImage.Extension
-
+        extension: UserProfileImage.Extension,
     ): URL {
         val getObjectRequest = GetUrlRequest
             .builder()
@@ -63,6 +69,23 @@ class UserProfileImageS3Adapter(
         return s3Client
             .utilities()
             .getUrl(getObjectRequest)
+    }
+
+    override fun deleteImageById(id: UserProfileImage.Id) {
+        val bucketName = s3Properties.userProfileImage.bucketName
+        val objectKey = getObjectKey(id.value, UserProfileImage.Extension.PNG)
+
+        try {
+            logger.debug { "[S3] Deleting object from bucket: $bucketName, key: $objectKey" }
+            val response = s3Client.deleteObject { builder ->
+                builder.bucket(bucketName)
+                builder.key(objectKey)
+            }
+            logger.debug { "[S3] Delete response: $response" }
+        } catch (e: Exception) {
+            logger.error { "[S3] Error deleting object: ${e.message}" }
+            throw e
+        }
     }
 
     private fun getObjectKey(

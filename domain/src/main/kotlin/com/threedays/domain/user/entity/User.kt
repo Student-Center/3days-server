@@ -10,11 +10,14 @@ import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.UUIDTypeId
+import com.threedays.support.common.exception.NotFoundException
 import java.net.URL
 import java.time.Year
 import java.util.*
 
-
+/**
+ * User Entity
+ */
 data class User(
     override val id: Id,
     val name: Name,
@@ -141,11 +144,30 @@ data class User(
 
     // TODO: 이미지 여러개 업로드 가능하도록 수정 필요
     fun updateUserProfileImage(
+        id: UserProfileImage.Id,
         extension: Extension,
         getProfileImageUrlAction: (UserProfileImage.Id, Extension) -> URL,
     ): User {
-        val newProfileImage = UserProfileImage.create(extension, getProfileImageUrlAction)
+        val newProfileImage = UserProfileImage(
+            id = id,
+            extension = extension,
+            url = getProfileImageUrlAction(id, extension),
+        )
         return copy(profileImages = listOf(newProfileImage))
+    }
+
+    fun deleteUserProfileImage(
+        imageId: UserProfileImage.Id,
+        deleteProfileImageAction: (UserProfileImage.Id) -> Unit,
+    ): User {
+        val targetProfileImage: UserProfileImage = profileImages.find { it.id == imageId }
+            ?: throw NotFoundException("해당 프로필 이미지를 찾을 수 없습니다.")
+
+        deleteProfileImageAction(targetProfileImage.id)
+
+        val updatedProfileImages: List<UserProfileImage> = profileImages.filter { it.id != imageId }
+
+        return copy(profileImages = updatedProfileImages)
     }
 
 }

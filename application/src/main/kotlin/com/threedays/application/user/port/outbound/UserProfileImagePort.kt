@@ -18,4 +18,8 @@ interface UserProfileImagePort {
         extension: UserProfileImage.Extension,
     ): URL
 
+    fun deleteImageById(
+        id: UserProfileImage.Id,
+    )
+
 }

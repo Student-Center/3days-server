@@ -40,8 +40,12 @@ class UserJpaEntity(
     var phoneNumber: String = phoneNumber
         private set
 
-    @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @OneToMany(
+        fetch = FetchType.EAGER,
+        cascade = [CascadeType.ALL],
+        orphanRemoval = true
+    )
+    @JoinColumn(name = "user_id", nullable = false)
     @OrderColumn(name = "image_order")
     var profileImages: List<UserProfileImageJpaEntity> = profileImages
         private set
@@ -62,14 +66,17 @@ class UserJpaEntity(
 
     companion object {
 
-        fun User.toJpaEntity() = UserJpaEntity(
-            id = id.value,
-            name = name.value,
-            phoneNumber = phoneNumber.value,
-            profileImages = profileImages.map { it.toJpaEntity() },
-            profile = profile.toJpaEntity(),
-            desiredPartner = desiredPartner.toJpaEntity(),
-        )
+        fun User.toJpaEntity(): UserJpaEntity {
+            val entity = UserJpaEntity(
+                id = id.value,
+                name = name.value,
+                phoneNumber = phoneNumber.value,
+                profileImages = profileImages.map { it.toJpaEntity() },
+                profile = profile.toJpaEntity(),
+                desiredPartner = desiredPartner.toJpaEntity(),
+            )
+            return entity
+        }
     }
 
     fun toDomainEntity(): User {

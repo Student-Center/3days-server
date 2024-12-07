@@ -5,6 +5,7 @@ import com.threedays.application.auth.config.UserProperties
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.CompleteUserProfileImageUpload
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
+import com.threedays.application.user.port.inbound.DeleteUserProfileImage
 import com.threedays.application.user.port.inbound.GetUserProfileImageUploadUrl
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
@@ -32,7 +33,7 @@ class UserService(
     private val authProperties: AuthProperties,
     private val userProperties: UserProperties,
 ) : RegisterUser, PutProfileWidget, DeleteProfileWidget, UpdateUserInfo, UpdateDesiredPartner,
-    GetUserProfileImageUploadUrl, CompleteUserProfileImageUpload {
+    GetUserProfileImageUploadUrl, CompleteUserProfileImageUpload, DeleteUserProfileImage {
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -130,9 +131,17 @@ class UserService(
         userRepository
             .get(command.userId)
             .updateUserProfileImage(
+                id = command.imageId,
                 extension = command.extension,
                 getProfileImageUrlAction = userProfileImagePort::findImageUrlByIdAndExtension,
             )
+            .let { userRepository.save(it) }
+    }
+
+    override fun invoke(command: DeleteUserProfileImage.Command) {
+        userRepository
+            .get(command.userId)
+            .deleteUserProfileImage(command.imageId, userProfileImagePort::deleteImageById)
             .let { userRepository.save(it) }
     }
 

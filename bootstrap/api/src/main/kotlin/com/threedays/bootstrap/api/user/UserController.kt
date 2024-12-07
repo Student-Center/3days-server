@@ -2,6 +2,7 @@ package com.threedays.bootstrap.api.user
 
 import com.threedays.application.user.port.inbound.CompleteUserProfileImageUpload
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
+import com.threedays.application.user.port.inbound.DeleteUserProfileImage
 import com.threedays.application.user.port.inbound.GetUserProfileImageUploadUrl
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
@@ -25,6 +26,7 @@ import com.threedays.oas.model.GetProfileImageUploadUrlResponse
 import com.threedays.oas.model.JobOccupationDisplayInfo
 import com.threedays.oas.model.LocationDisplayInfo
 import com.threedays.oas.model.PreferDistance
+import com.threedays.oas.model.ProfileImage
 import com.threedays.oas.model.ProfileImageExtension
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
@@ -42,6 +44,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.time.Year
+import java.util.UUID
 
 @RestController
 class UserController(
@@ -53,6 +56,7 @@ class UserController(
     private val updateDesiredPartner: UpdateDesiredPartner,
     private val getUserProfileImageUploadUrl: GetUserProfileImageUploadUrl,
     private val completeUserProfileImageUpload: CompleteUserProfileImageUpload,
+    private val deleteUserProfileImage: DeleteUserProfileImage,
 ) : UsersApi {
 
     override fun registerUser(
@@ -104,6 +108,13 @@ class UserController(
             GetMyUserInfoResponse(
                 id = user.id.value,
                 name = user.name.value,
+                profileImages = user.profileImages.map {
+                    ProfileImage(
+                        id = it.id.value,
+                        url = it.url.toURI(),
+                        extension = ProfileImageExtension.valueOf(it.extension.name)
+                    )
+                },
                 phoneNumber = user.phoneNumber.value,
                 profile = UserProfileDisplayInfo(
                     gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
@@ -263,6 +274,16 @@ class UserController(
         completeUserProfileImageUpload.invoke(command)
         ResponseEntity.ok().build()
     }
+
+    override fun deleteProfileImage(imageId: UUID): ResponseEntity<Unit> =
+        withUserAuthentication { authentication ->
+            val command = DeleteUserProfileImage.Command(
+                userId = authentication.userId,
+                imageId = UUIDTypeId.from(imageId)
+            )
+            deleteUserProfileImage.invoke(command)
+            ResponseEntity.noContent().build()
+        }
 
     override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> = withUserAuthentication { _ ->
         val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
