@@ -14,8 +14,8 @@ spring:
 aws:
   s3:
     user-profile-image:
-      bucket-name: user-profile-image
-      key-prefix: user-profile-image/
+      bucket-name: threedays-dev-image-bucket
+      key-prefix: user-profile-image
 ---
 spring:
   config:
@@ -24,8 +24,8 @@ spring:
 aws:
   s3:
     user-profile-image:
-      bucket-name: user-profile-image
-      key-prefix: user-profile-image/
+      bucket-name: threedays-dev-image-bucket
+      key-prefix: user-profile-image
 ---
 spring:
   config:

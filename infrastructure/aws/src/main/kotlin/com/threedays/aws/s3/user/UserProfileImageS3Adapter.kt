@@ -32,7 +32,6 @@ class UserProfileImageS3Adapter(
             .apply {
                 bucket(s3Properties.userProfileImage.bucketName)
                 key(getObjectKey(id, extension))
-                contentLength(maxContentLength)
                 acl(ObjectCannedACL.PUBLIC_READ)
             }.build()
 

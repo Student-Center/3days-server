@@ -264,14 +264,14 @@ class UserController(
         ResponseEntity.ok().build()
     }
 
-    override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> {
+    override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> = withUserAuthentication { _ ->
         val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
             extension = UserProfileImage.Extension.valueOf(extension.name)
         )
 
         val result: GetUserProfileImageUploadUrl.Result = getUserProfileImageUploadUrl.invoke(command)
 
-        return GetProfileImageUploadUrlResponse(
+        GetProfileImageUploadUrlResponse(
             imageId = result.imageId,
             url = result.url.toString(),
             extension = ProfileImageExtension.valueOf(result.extension.name),
