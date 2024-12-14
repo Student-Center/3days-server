@@ -39,7 +39,6 @@ import com.threedays.oas.model.UpdateUserDesiredPartnerResponse
 import com.threedays.oas.model.UserProfile
 import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
-import com.threedays.support.common.exception.NotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -101,9 +100,7 @@ class UserController(
 
     override fun getMyUserInfo(): ResponseEntity<GetMyUserInfoResponse> =
         withUserAuthentication { userAuthentication ->
-            val user: User = userRepository
-                .find(userAuthentication.userId)
-                ?: throw NotFoundException("User not found")
+            val user: User = userRepository.get(userAuthentication.userId)
 
             GetMyUserInfoResponse(
                 id = user.id.value,
@@ -231,49 +228,51 @@ class UserController(
             ).let { ResponseEntity.ok(it) }
         }
 
-    override fun updateMyDesiredPartner(updateUserDesiredPartnerRequest: UpdateUserDesiredPartnerRequest): ResponseEntity<UpdateUserDesiredPartnerResponse> = withUserAuthentication { authentication ->
-        val command = UpdateDesiredPartner.Command(
-            userId = authentication.userId,
-            jobOccupations = updateUserDesiredPartnerRequest.jobOccupations.map {
-                JobOccupation.valueOf(it.name)
-            },
-            birthYearRange = updateUserDesiredPartnerRequest.birthYearRange.let {
-                BirthYearRange(
-                    start = it.start?.let { Year.of(it) },
-                    end = it.end?.let { Year.of(it) }
-                )
-            },
-            preferDistance = UserDesiredPartner.PreferDistance.valueOf(updateUserDesiredPartnerRequest.preferDistance.name),
-        )
-
-        val user: User = updateDesiredPartner.invoke(command)
-
-        UpdateUserDesiredPartnerResponse(
-            desiredPartner = com.threedays.oas.model.UserDesiredPartner(
-                birthYearRange = user.desiredPartner.birthYearRange.let {
-                    com.threedays.oas.model.BirthYearRange(
-                        it.start?.value,
-                        it.end?.value,
+    override fun updateMyDesiredPartner(updateUserDesiredPartnerRequest: UpdateUserDesiredPartnerRequest): ResponseEntity<UpdateUserDesiredPartnerResponse> =
+        withUserAuthentication { authentication ->
+            val command = UpdateDesiredPartner.Command(
+                userId = authentication.userId,
+                jobOccupations = updateUserDesiredPartnerRequest.jobOccupations.map {
+                    JobOccupation.valueOf(it.name)
+                },
+                birthYearRange = updateUserDesiredPartnerRequest.birthYearRange.let {
+                    BirthYearRange(
+                        start = it.start?.let { Year.of(it) },
+                        end = it.end?.let { Year.of(it) }
                     )
                 },
-                jobOccupations = user.desiredPartner.jobOccupations.map {
-                    com.threedays.oas.model.JobOccupation.valueOf(it.name)
-                },
-                preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+                preferDistance = UserDesiredPartner.PreferDistance.valueOf(updateUserDesiredPartnerRequest.preferDistance.name),
             )
-        ).let { ResponseEntity.ok(it) }
 
-    }
+            val user: User = updateDesiredPartner.invoke(command)
 
-    override fun completeProfileImageUpload(completeProfileImageUploadRequest: CompleteProfileImageUploadRequest): ResponseEntity<Unit> = withUserAuthentication { authentication ->
-        val command = CompleteUserProfileImageUpload.Command(
-            userId = authentication.userId,
-            imageId = UUIDTypeId.from(completeProfileImageUploadRequest.imageId),
-            extension = UserProfileImage.Extension.valueOf(completeProfileImageUploadRequest.extension.name)
-        )
-        completeUserProfileImageUpload.invoke(command)
-        ResponseEntity.ok().build()
-    }
+            UpdateUserDesiredPartnerResponse(
+                desiredPartner = com.threedays.oas.model.UserDesiredPartner(
+                    birthYearRange = user.desiredPartner.birthYearRange.let {
+                        com.threedays.oas.model.BirthYearRange(
+                            it.start?.value,
+                            it.end?.value,
+                        )
+                    },
+                    jobOccupations = user.desiredPartner.jobOccupations.map {
+                        com.threedays.oas.model.JobOccupation.valueOf(it.name)
+                    },
+                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
+                )
+            ).let { ResponseEntity.ok(it) }
+
+        }
+
+    override fun completeProfileImageUpload(completeProfileImageUploadRequest: CompleteProfileImageUploadRequest): ResponseEntity<Unit> =
+        withUserAuthentication { authentication ->
+            val command = CompleteUserProfileImageUpload.Command(
+                userId = authentication.userId,
+                imageId = UUIDTypeId.from(completeProfileImageUploadRequest.imageId),
+                extension = UserProfileImage.Extension.valueOf(completeProfileImageUploadRequest.extension.name)
+            )
+            completeUserProfileImageUpload.invoke(command)
+            ResponseEntity.ok().build()
+        }
 
     override fun deleteProfileImage(imageId: UUID): ResponseEntity<Unit> =
         withUserAuthentication { authentication ->
@@ -285,20 +284,21 @@ class UserController(
             ResponseEntity.noContent().build()
         }
 
-    override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> = withUserAuthentication { _ ->
-        val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
-            extension = UserProfileImage.Extension.valueOf(extension.name)
-        )
+    override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> =
+        withUserAuthentication { _ ->
+            val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
+                extension = UserProfileImage.Extension.valueOf(extension.name)
+            )
 
-        val result: GetUserProfileImageUploadUrl.Result = getUserProfileImageUploadUrl.invoke(command)
+            val result: GetUserProfileImageUploadUrl.Result = getUserProfileImageUploadUrl.invoke(command)
 
-        GetProfileImageUploadUrlResponse(
-            imageId = result.imageId,
-            url = result.url.toString(),
-            extension = ProfileImageExtension.valueOf(result.extension.name),
-            uploadExpiresIn = result.uploadExpiresIn.toInt(),
-        ).let {
-            ResponseEntity.ok(it)
+            GetProfileImageUploadUrlResponse(
+                imageId = result.imageId,
+                url = result.url.toString(),
+                extension = ProfileImageExtension.valueOf(result.extension.name),
+                uploadExpiresIn = result.uploadExpiresIn.toInt(),
+            ).let {
+                ResponseEntity.ok(it)
+            }
         }
-    }
 }
