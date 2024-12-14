@@ -121,7 +121,7 @@ class UserController(
                     birthYear = user.profile.birthYear.value,
                     jobOccupation = JobOccupationDisplayInfo(
                         code = com.threedays.oas.model.JobOccupation.valueOf(user.profile.jobOccupation.name),
-                        display = "test"
+                        display = user.profile.jobOccupation.koreanName
                     ),
                     locations = user.profile.locations.map {
                         LocationDisplayInfo(
