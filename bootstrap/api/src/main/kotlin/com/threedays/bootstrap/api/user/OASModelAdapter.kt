@@ -62,7 +62,6 @@ fun ProfileWidget.toDomainModel() = com.threedays.domain.user.entity.ProfileWidg
     content = this.content,
 )
 
-
 fun com.threedays.domain.user.entity.UserDesiredPartner.toOASModel() = UserDesiredPartner(
     jobOccupations = this.jobOccupations.map {
         JobOccupation.valueOf(it.name)
