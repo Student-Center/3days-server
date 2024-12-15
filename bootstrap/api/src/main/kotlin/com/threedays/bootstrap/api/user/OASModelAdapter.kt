@@ -1,8 +1,8 @@
 package com.threedays.bootstrap.api.user
 
-import com.threedays.domain.user.entity.UserProfileImage
 import com.threedays.oas.model.BirthYearRange
 import com.threedays.oas.model.CompanyDisplayInfo
+import com.threedays.oas.model.Gender
 import com.threedays.oas.model.JobOccupation
 import com.threedays.oas.model.JobOccupationDisplayInfo
 import com.threedays.oas.model.LocationDisplayInfo
@@ -12,14 +12,13 @@ import com.threedays.oas.model.ProfileImageExtension
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.UserDesiredPartner
-import com.threedays.oas.model.UserProfileDisplayInfo
-import com.threedays.oas.model.Gender
 import com.threedays.oas.model.UserProfile
+import com.threedays.oas.model.UserProfileDisplayInfo
 
-fun UserProfileImage.toOASModel(): ProfileImage = ProfileImage(
+fun com.threedays.domain.user.entity.UserProfileImage.toOASModel(): ProfileImage = ProfileImage(
     id = this.id.value,
     url = this.url.toURI(),
-    extension = ProfileImageExtension.valueOf(this.extension.name)
+    extension = ProfileImageExtension.valueOf(this.extension.name),
 )
 
 fun com.threedays.domain.user.entity.UserProfile.toUserProfileDisplayInfo(): UserProfileDisplayInfo =
