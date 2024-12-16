@@ -98,11 +98,11 @@ class UserController(
             GetMyUserInfoResponse(
                 id = user.id.value,
                 name = user.name.value,
-                profileImages = user.profileImages.map { it.toOASModel() },
+                profileImages = user.profileImages.map(OASModelAdapter::toOASModel),
                 phoneNumber = user.phoneNumber.value,
-                profile = user.profile.toUserProfileDisplayInfo(),
-                desiredPartner = user.desiredPartner.toOASModel(),
-                profileWidgets = user.profile.profileWidgets.map { it.toOASModel() },
+                profile = OASModelAdapter.toUserProfileDisplayInfo(user.profile),
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner),
+                profileWidgets = user.profile.profileWidgets.map(OASModelAdapter::toOASModel),
             ).let { ResponseEntity.ok(it) }
         }
 
@@ -110,7 +110,7 @@ class UserController(
         withUserAuthentication { userAuthentication: UserAuthentication ->
             val command = PutProfileWidget.Command(
                 userId = userAuthentication.userId,
-                profileWidget = body.toDomainModel()
+                profileWidget = OASModelAdapter.toDomainModel(body)
             )
 
             putProfileWidget
@@ -149,8 +149,8 @@ class UserController(
                 id = user.id.value,
                 name = user.name.value,
                 phoneNumber = user.phoneNumber.value,
-                profile = user.profile.toOASModel(),
-                desiredPartner = user.desiredPartner.toOASModel()
+                profile = OASModelAdapter.toOASModel(user.profile),
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner)
             ).let { ResponseEntity.ok(it) }
         }
 
@@ -173,7 +173,7 @@ class UserController(
             val user: User = updateDesiredPartner.invoke(command)
 
             UpdateUserDesiredPartnerResponse(
-                desiredPartner = user.desiredPartner.toOASModel()
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner)
             ).let { ResponseEntity.ok(it) }
         }
 
