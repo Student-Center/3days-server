@@ -19,14 +19,9 @@ import com.threedays.domain.user.vo.BirthYearRange
 import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
-import com.threedays.oas.model.CompanyDisplayInfo
 import com.threedays.oas.model.CompleteProfileImageUploadRequest
 import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.GetProfileImageUploadUrlResponse
-import com.threedays.oas.model.JobOccupationDisplayInfo
-import com.threedays.oas.model.LocationDisplayInfo
-import com.threedays.oas.model.PreferDistance
-import com.threedays.oas.model.ProfileImage
 import com.threedays.oas.model.ProfileImageExtension
 import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
@@ -36,8 +31,6 @@ import com.threedays.oas.model.UpdateMyUserInfoRequest
 import com.threedays.oas.model.UpdateMyUserInfoResponse
 import com.threedays.oas.model.UpdateUserDesiredPartnerRequest
 import com.threedays.oas.model.UpdateUserDesiredPartnerResponse
-import com.threedays.oas.model.UserProfile
-import com.threedays.oas.model.UserProfileDisplayInfo
 import com.threedays.support.common.base.domain.UUIDTypeId
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -60,7 +53,7 @@ class UserController(
 
     override fun registerUser(
         xRegisterToken: String,
-        registerUserRequest: RegisterUserRequest
+        registerUserRequest: RegisterUserRequest,
     ): ResponseEntity<TokenResponse> {
         val result: RegisterUser.Result = RegisterUser.Command(
             name = User.Name(registerUserRequest.name),
@@ -105,54 +98,11 @@ class UserController(
             GetMyUserInfoResponse(
                 id = user.id.value,
                 name = user.name.value,
-                profileImages = user.profileImages.map {
-                    ProfileImage(
-                        id = it.id.value,
-                        url = it.url.toURI(),
-                        extension = ProfileImageExtension.valueOf(it.extension.name)
-                    )
-                },
+                profileImages = user.profileImages.map(OASModelAdapter::toOASModel),
                 phoneNumber = user.phoneNumber.value,
-                profile = UserProfileDisplayInfo(
-                    gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
-                    birthYear = user.profile.birthYear.value,
-                    jobOccupation = JobOccupationDisplayInfo(
-                        code = com.threedays.oas.model.JobOccupation.valueOf(user.profile.jobOccupation.name),
-                        display = user.profile.jobOccupation.koreanName
-                    ),
-                    locations = user.profile.locations.map {
-                        LocationDisplayInfo(
-                            id = it.id.value,
-                            display = it.display,
-                        )
-                    },
-                    company = user.profile.company?.let {
-                        CompanyDisplayInfo(
-                            id = it.id.value,
-                            display = it.display,
-                        )
-                    },
-                ),
-                desiredPartner = com.threedays.oas.model.UserDesiredPartner(
-                    jobOccupations = user.desiredPartner.jobOccupations.map {
-                        com.threedays.oas.model.JobOccupation.valueOf(
-                            it.name
-                        )
-                    },
-                    birthYearRange = user.desiredPartner.birthYearRange.let {
-                        com.threedays.oas.model.BirthYearRange(
-                            it.start?.value,
-                            it.end?.value,
-                        )
-                    },
-                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
-                ),
-                profileWidgets = user.profile.profileWidgets.map {
-                    ProfileWidget(
-                        type = ProfileWidgetType.valueOf(it.type.name),
-                        content = it.content,
-                    )
-                }
+                profile = OASModelAdapter.toUserProfileDisplayInfo(user.profile),
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner),
+                profileWidgets = user.profile.profileWidgets.map(OASModelAdapter::toOASModel),
             ).let { ResponseEntity.ok(it) }
         }
 
@@ -160,10 +110,7 @@ class UserController(
         withUserAuthentication { userAuthentication: UserAuthentication ->
             val command = PutProfileWidget.Command(
                 userId = userAuthentication.userId,
-                profileWidget = com.threedays.domain.user.entity.ProfileWidget(
-                    type = com.threedays.domain.user.entity.ProfileWidget.Type.valueOf(body.type.name),
-                    content = body.content
-                )
+                profileWidget = OASModelAdapter.toDomainModel(body)
             )
 
             putProfileWidget
@@ -189,9 +136,7 @@ class UserController(
                 userId = authentication.userId,
                 name = updateMyUserInfoRequest.name.let { User.Name(it) },
                 jobOccupation = updateMyUserInfoRequest.jobOccupation.let {
-                    JobOccupation.valueOf(
-                        it.name
-                    )
+                    JobOccupation.valueOf(it.name)
                 },
                 locationIds = updateMyUserInfoRequest.locationIds.map(UUIDTypeId::from),
                 companyId = updateMyUserInfoRequest.companyId?.let { UUIDTypeId.from(it) },
@@ -204,27 +149,8 @@ class UserController(
                 id = user.id.value,
                 name = user.name.value,
                 phoneNumber = user.phoneNumber.value,
-                profile = UserProfile(
-                    gender = com.threedays.oas.model.Gender.valueOf(user.profile.gender.name),
-                    birthYear = user.profile.birthYear.value,
-                    jobOccupation = com.threedays.oas.model.JobOccupation.valueOf(user.profile.jobOccupation.name),
-                    locationIds = user.profile.locations.map { it.id.value },
-                    companyId = user.profile.company?.id?.value,
-                ),
-                desiredPartner = com.threedays.oas.model.UserDesiredPartner(
-                    jobOccupations = user.desiredPartner.jobOccupations.map {
-                        com.threedays.oas.model.JobOccupation.valueOf(
-                            it.name
-                        )
-                    },
-                    birthYearRange = user.desiredPartner.birthYearRange.let {
-                        com.threedays.oas.model.BirthYearRange(
-                            it.start?.value,
-                            it.end?.value,
-                        )
-                    },
-                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
-                )
+                profile = OASModelAdapter.toOASModel(user.profile),
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner)
             ).let { ResponseEntity.ok(it) }
         }
 
@@ -247,20 +173,8 @@ class UserController(
             val user: User = updateDesiredPartner.invoke(command)
 
             UpdateUserDesiredPartnerResponse(
-                desiredPartner = com.threedays.oas.model.UserDesiredPartner(
-                    birthYearRange = user.desiredPartner.birthYearRange.let {
-                        com.threedays.oas.model.BirthYearRange(
-                            it.start?.value,
-                            it.end?.value,
-                        )
-                    },
-                    jobOccupations = user.desiredPartner.jobOccupations.map {
-                        com.threedays.oas.model.JobOccupation.valueOf(it.name)
-                    },
-                    preferDistance = PreferDistance.valueOf(user.desiredPartner.preferDistance.name),
-                )
+                desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner)
             ).let { ResponseEntity.ok(it) }
-
         }
 
     override fun completeProfileImageUpload(completeProfileImageUploadRequest: CompleteProfileImageUploadRequest): ResponseEntity<Unit> =
