@@ -1,9 +1,3 @@
-// This file has been replaced by:
-// - RegisterUserService
-// - ProfileWidgetService
-// - UserInfoService
-// - UserProfileImageService
-
 package com.threedays.application.user.service
 
 import com.threedays.application.auth.config.AuthProperties
