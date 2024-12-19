@@ -9,7 +9,7 @@ import java.util.UUID
 data class ChatRoom(
     override val id: Id,
     val connectionId: Connection.Id,
-    val members: MutableList<ChatMember> = mutableListOf(),
+    val members: List<ChatMember>,
     val createdAt: LocalDateTime = LocalDateTime.now()
 ) : AggregateRoot<ChatRoom, ChatRoom.Id>() {
 

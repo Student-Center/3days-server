@@ -10,10 +10,10 @@ data class ChatMessage(
     val chatRoomId: ChatRoom.Id,
     val senderId: ChatMember.Id,
     val content: String,
-    var status: Status = Status.SENT,
+    val status: Status = Status.SENT,
     val createdAt: LocalDateTime = LocalDateTime.now(),
-    var updatedAt: LocalDateTime? = null,
-    var failureReason: FailureReason? = null
+    val updatedAt: LocalDateTime? = null,
+    val failureReason: FailureReason? = null
 ) : AggregateRoot<ChatMessage, ChatMessage.Id>() {
 
     data class Id(override val value: UUID) : TypeId<UUID>(value)
@@ -33,20 +33,23 @@ data class ChatMessage(
         UNKNOWN_ERROR
     }
 
-    fun markAsDelivered() {
-        status = Status.DELIVERED
-        updatedAt = LocalDateTime.now()
-    }
+    fun markAsDelivered(): ChatMessage =
+        this.copy(
+            status = Status.DELIVERED,
+            updatedAt = LocalDateTime.now()
+        )
 
-    fun markAsRead() {
-        status = Status.READ
-        updatedAt = LocalDateTime.now()
-    }
+    fun markAsRead(): ChatMessage =
+        this.copy(
+            status = Status.READ,
+            updatedAt = LocalDateTime.now()
+        )
 
-    fun markAsFailed(reason: FailureReason) {
-        status = Status.FAILED
-        failureReason = reason
-        updatedAt = LocalDateTime.now()
-    }
+    fun markAsFailed(reason: FailureReason) =
+        this.copy(
+            status = Status.FAILED,
+            updatedAt = LocalDateTime.now(),
+            failureReason = reason
+        )
 
 }
