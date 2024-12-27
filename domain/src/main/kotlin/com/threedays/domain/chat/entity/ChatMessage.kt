@@ -9,7 +9,7 @@ data class ChatMessage(
     override val id: Id,
     val chatRoomId: ChatRoom.Id,
     val senderId: ChatMember.Id,
-    val content: String,
+    val content: Content,
     val status: Status = Status.SENT,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime? = null,
@@ -18,6 +18,18 @@ data class ChatMessage(
 
     data class Id(override val value: UUID) : TypeId<UUID>(value)
 
+    sealed class Content {
+        data class Text(val text: String) : Content()
+        data class Card(
+            val text: String,
+            val color: Color
+        ) : Content() {
+
+            enum class Color {
+                BLUE, PINK,
+            }
+        }
+    }
 
     enum class Status {
         SENT,
@@ -40,14 +52,12 @@ data class ChatMessage(
         )
     }
 
-
-    fun markAsFailed(reason: FailureReason) {
+    fun markAsFailed(reason: FailureReason): ChatMessage {
         require(status == Status.SENT) { "전송된 상태의 메시지만 실패 처리가 가능합니다" }
-        this.copy(
+        return this.copy(
             status = Status.FAILED,
             updatedAt = LocalDateTime.now(),
             failureReason = reason
         )
     }
-
 }
