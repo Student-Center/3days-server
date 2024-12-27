@@ -6,12 +6,12 @@ import com.threedays.support.common.base.domain.TypeId
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class ChatRoom(
+data class Channel(
     override val id: Id,
     val connectionId: Connection.Id,
-    val members: List<ChatMember>,
+    val members: List<Member>,
     val createdAt: LocalDateTime = LocalDateTime.now()
-) : AggregateRoot<ChatRoom, ChatRoom.Id>() {
+) : AggregateRoot<Channel, Channel.Id>() {
 
     data class Id(override val value: UUID) : TypeId<UUID>(value)
 
