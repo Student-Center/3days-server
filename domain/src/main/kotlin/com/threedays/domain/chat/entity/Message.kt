@@ -13,7 +13,6 @@ data class Message(
     val status: Status = Status.SENT,
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime? = null,
-    val failureReason: FailureReason? = null
 ) : AggregateRoot<Message, Message.Id>() {
 
     data class Id(override val value: UUID) : TypeId<UUID>(value)
@@ -34,14 +33,6 @@ data class Message(
     enum class Status {
         SENT,
         READ,
-        FAILED,
-    }
-
-    enum class FailureReason {
-        NETWORK_ERROR,
-        INVALID_RECIPIENT,
-        MESSAGE_TOO_LARGE,
-        UNKNOWN_ERROR
     }
 
     fun markAsRead(): Message {
@@ -52,12 +43,4 @@ data class Message(
         )
     }
 
-    fun markAsFailed(reason: FailureReason): Message {
-        require(status == Status.SENT) { "전송된 상태의 메시지만 실패 처리가 가능합니다" }
-        return this.copy(
-            status = Status.FAILED,
-            updatedAt = LocalDateTime.now(),
-            failureReason = reason
-        )
-    }
 }
