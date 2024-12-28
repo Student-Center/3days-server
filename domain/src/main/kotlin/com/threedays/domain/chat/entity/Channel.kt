@@ -4,7 +4,7 @@ import com.threedays.domain.connection.entity.Connection
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.TypeId
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 data class Channel(
     override val id: Id,
@@ -15,5 +15,16 @@ data class Channel(
 
     data class Id(override val value: UUID) : TypeId<UUID>(value)
 
+    companion object {
+
+        fun create(connectionId: Connection.Id): Channel {
+            return Channel(
+                id = Id(UUID.randomUUID()),
+                connectionId = connectionId,
+                members = emptyList()
+            )
+        }
+
+    }
 
 }
