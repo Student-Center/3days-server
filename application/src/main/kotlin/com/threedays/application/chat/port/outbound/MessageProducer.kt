@@ -4,6 +4,6 @@ import com.threedays.domain.chat.entity.Message
 
 interface MessageProducer {
 
-    fun produce(message: Message)
+    fun produceSendEvent(message: Message)
 
 }

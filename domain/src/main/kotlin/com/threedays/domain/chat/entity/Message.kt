@@ -70,6 +70,9 @@ data class Message(
         }
     }
 
+    fun getPartitionKey(): String {
+        return channelId.value.toString()
+    }
 
     fun markAsRead(): Message {
         require(status == Status.SENT) { "메시지가 전송된 상태에서만 읽음 처리가 가능합니다" }

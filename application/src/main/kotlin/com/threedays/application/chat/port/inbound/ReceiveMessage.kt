@@ -4,6 +4,10 @@ import com.threedays.domain.chat.entity.Message
 
 interface ReceiveMessage {
 
-    fun invoke(command: Message)
+    fun invoke(command: Command)
+
+    data class Command(
+        val message: Message
+    )
 
 }

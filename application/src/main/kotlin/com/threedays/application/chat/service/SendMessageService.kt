@@ -26,7 +26,7 @@ class SendMessageService(
                 Message.createCardMessage(channelId, sender, messageContent)
         }
 
-        messageProducer.produce(message)
+        messageProducer.produceSendEvent(message)
     }
 
 
