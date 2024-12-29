@@ -19,6 +19,7 @@ dependencies {
     implementation(project(":infrastructure:aws"))
 
     implementation(libs.spring.boot.starter.web)
+    implementation(libs.spring.boot.starter.websocket)
     implementation(libs.springdoc.openapi.webmvc.ui)
     implementation(libs.swagger.annotations)
     implementation(libs.spring.boot.starter.validation)

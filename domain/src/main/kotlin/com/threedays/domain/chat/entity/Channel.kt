@@ -1,5 +1,6 @@
 package com.threedays.domain.chat.entity
 
+import com.threedays.domain.chat.repository.SessionRepository
 import com.threedays.domain.connection.entity.Connection
 import com.threedays.support.common.base.domain.AggregateRoot
 import com.threedays.support.common.base.domain.TypeId
@@ -26,5 +27,9 @@ data class Channel(
         }
 
     }
+
+    fun getMemberSessions(sessionRepository: SessionRepository): List<Session> =
+        members.mapNotNull { member -> sessionRepository.findByUserId(member.id) }
+
 
 }

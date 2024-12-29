@@ -8,11 +8,12 @@ import com.threedays.rest.support.config.RestConfig
 import com.threedays.sms.support.SmsConfig
 import jakarta.annotation.PostConstruct
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Import
 import java.util.*
 
-@SpringBootApplication
 @Import(
     value = [
         RestConfig::class,
@@ -23,6 +24,9 @@ import java.util.*
         ApplicationConfig::class,
     ]
 )
+@SpringBootApplication
+@EnableConfigurationProperties
+@ConfigurationPropertiesScan
 class ThreeDaysApplication {
 
     companion object {

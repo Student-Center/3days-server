@@ -14,6 +14,19 @@ spring:
   docker:
     compose:
       enabled: false
+websocket:
+  endpoint: /ws
+  allowed-origins:
+    - "*"
+  sock-js: true
+  broker:
+    application-destination-prefixes:
+      - /app
+    simple-broker:
+      - /channel
+  session:
+    send-time-limit: 10000
+    send-buffer-size-limit: 256
 ---
 spring:
   config:
