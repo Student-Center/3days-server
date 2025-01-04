@@ -3,6 +3,7 @@ package com.threedays.application.user.service
 import com.threedays.application.auth.config.AuthProperties
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.application.user.port.inbound.UpdateConnectionStatus
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.entity.User
@@ -19,7 +20,7 @@ class UserService(
     private val companyQueryRepository: CompanyQueryRepository,
     private val issueLoginTokens: IssueLoginTokens,
     private val authProperties: AuthProperties,
-) : RegisterUser {
+) : RegisterUser, UpdateConnectionStatus {
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -51,5 +52,12 @@ class UserService(
             refreshToken = result.refreshToken,
             expiresIn = authProperties.accessTokenExpirationSeconds,
         )
+    }
+
+    override fun invoke(command: UpdateConnectionStatus.Command): User {
+        val user: User = userRepository.get(command.userId)
+        return user
+            .updateConnectionStatus(command.status)
+            .also { userRepository.save(it) }
     }
 }

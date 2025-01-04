@@ -51,11 +51,12 @@ CREATE TABLE user_profiles
 
 CREATE TABLE users
 (
-    id                 BINARY(16)   NOT NULL,
-    name               VARCHAR(255) NOT NULL,
-    phone_number       VARCHAR(255) NOT NULL,
-    profile_id         BINARY(16)   NULL,
-    desired_partner_id BINARY(16)   NULL,
+    id                    BINARY(16)   NOT NULL,
+    name                  VARCHAR(255) NOT NULL,
+    phone_number          VARCHAR(255) NOT NULL,
+    profile_id            BINARY(16)   NULL,
+    desired_partner_id    BINARY(16)   NULL,
+    connection_status     VARCHAR(255) NOT NULL,
     CONSTRAINT pk_users PRIMARY KEY (id),
     CONSTRAINT uq_users_phone_number UNIQUE (phone_number)
 );

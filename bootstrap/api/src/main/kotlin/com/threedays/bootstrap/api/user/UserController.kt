@@ -6,6 +6,7 @@ import com.threedays.application.user.port.inbound.DeleteUserProfileImage
 import com.threedays.application.user.port.inbound.GetUserProfileImageUploadUrl
 import com.threedays.application.user.port.inbound.PutProfileWidget
 import com.threedays.application.user.port.inbound.RegisterUser
+import com.threedays.application.user.port.inbound.UpdateConnectionStatus
 import com.threedays.application.user.port.inbound.UpdateDesiredPartner
 import com.threedays.application.user.port.inbound.UpdateUserInfo
 import com.threedays.bootstrap.api.support.security.UserAuthentication
@@ -27,6 +28,8 @@ import com.threedays.oas.model.ProfileWidget
 import com.threedays.oas.model.ProfileWidgetType
 import com.threedays.oas.model.RegisterUserRequest
 import com.threedays.oas.model.TokenResponse
+import com.threedays.oas.model.UpdateConnectionStatusRequest
+import com.threedays.oas.model.UpdateConnectionStatusResponse
 import com.threedays.oas.model.UpdateMyUserInfoRequest
 import com.threedays.oas.model.UpdateMyUserInfoResponse
 import com.threedays.oas.model.UpdateUserDesiredPartnerRequest
@@ -36,7 +39,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import java.time.Year
-import java.util.UUID
+import java.util.*
 
 @RestController
 class UserController(
@@ -49,6 +52,7 @@ class UserController(
     private val getUserProfileImageUploadUrl: GetUserProfileImageUploadUrl,
     private val completeUserProfileImageUpload: CompleteUserProfileImageUpload,
     private val deleteUserProfileImage: DeleteUserProfileImage,
+    private val updateConnectionStatus: UpdateConnectionStatus,
 ) : UsersApi {
 
     override fun registerUser(
@@ -167,7 +171,9 @@ class UserController(
                         end = it.end?.let { Year.of(it) }
                     )
                 },
-                preferDistance = UserDesiredPartner.PreferDistance.valueOf(updateUserDesiredPartnerRequest.preferDistance.name),
+                preferDistance = UserDesiredPartner.PreferDistance.valueOf(
+                    updateUserDesiredPartnerRequest.preferDistance.name
+                ),
             )
 
             val user: User = updateDesiredPartner.invoke(command)
@@ -200,11 +206,13 @@ class UserController(
 
     override fun getProfileImageUploadUrl(extension: ProfileImageExtension): ResponseEntity<GetProfileImageUploadUrlResponse> =
         withUserAuthentication { _ ->
-            val command: GetUserProfileImageUploadUrl.Command = GetUserProfileImageUploadUrl.Command(
-                extension = UserProfileImage.Extension.valueOf(extension.name)
-            )
+            val command: GetUserProfileImageUploadUrl.Command =
+                GetUserProfileImageUploadUrl.Command(
+                    extension = UserProfileImage.Extension.valueOf(extension.name)
+                )
 
-            val result: GetUserProfileImageUploadUrl.Result = getUserProfileImageUploadUrl.invoke(command)
+            val result: GetUserProfileImageUploadUrl.Result =
+                getUserProfileImageUploadUrl.invoke(command)
 
             GetProfileImageUploadUrlResponse(
                 imageId = result.imageId,
@@ -214,5 +222,21 @@ class UserController(
             ).let {
                 ResponseEntity.ok(it)
             }
+        }
+
+    override fun updateConnectionStatus(
+        updateConnectionStatusRequest: UpdateConnectionStatusRequest
+    ): ResponseEntity<UpdateConnectionStatusResponse> =
+        withUserAuthentication { authentication ->
+            val command = UpdateConnectionStatus.Command(
+                userId = authentication.userId,
+                status = User.ConnectionStatus.valueOf(updateConnectionStatusRequest.status.name)
+            )
+
+            val result: User = updateConnectionStatus(command)
+
+            UpdateConnectionStatusResponse(
+                status = UpdateConnectionStatusResponse.Status.valueOf(result.connectionStatus.name)
+            ).let { ResponseEntity.ok(it) }
         }
 }

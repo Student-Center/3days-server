@@ -25,6 +25,7 @@ data class User(
     val profileImages: List<UserProfileImage> = emptyList(),
     val profile: UserProfile,
     val desiredPartner: UserDesiredPartner,
+    val connectionStatus: ConnectionStatus = ConnectionStatus.INACTIVE,
 ) : AggregateRoot<User, User.Id>() {
 
     data class Id(override val value: UUID) : UUIDTypeId(value)
@@ -36,6 +37,8 @@ data class User(
             require(value.isNotBlank()) { "이름은 공백일 수 없습니다." }
         }
     }
+
+    enum class ConnectionStatus { ACTIVE, INACTIVE }
 
     init {
         if (profile.company == null) {
@@ -168,6 +171,10 @@ data class User(
         val updatedProfileImages: List<UserProfileImage> = profileImages.filter { it.id != imageId }
 
         return copy(profileImages = updatedProfileImages)
+    }
+
+    fun updateConnectionStatus(connectionStatus: ConnectionStatus): User {
+        return copy(connectionStatus = connectionStatus)
     }
 
 }

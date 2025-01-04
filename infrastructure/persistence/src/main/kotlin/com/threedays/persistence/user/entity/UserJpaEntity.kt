@@ -2,12 +2,15 @@ package com.threedays.persistence.user.entity
 
 import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
+import com.threedays.domain.user.entity.User.ConnectionStatus
 import com.threedays.persistence.user.entity.UserDesiredPartnerJpaEntity.Companion.toJpaEntity
 import com.threedays.persistence.user.entity.UserProfileImageJpaEntity.Companion.toJpaEntity
 import com.threedays.persistence.user.entity.UserProfileJpaEntity.Companion.toJpaEntity
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
@@ -26,6 +29,7 @@ class UserJpaEntity(
     profileImages: List<UserProfileImageJpaEntity>,
     profile: UserProfileJpaEntity,
     desiredPartner: UserDesiredPartnerJpaEntity,
+    connectionStatus: ConnectionStatus
 ) {
 
     @Id
@@ -64,6 +68,11 @@ class UserJpaEntity(
     var desiredPartner: UserDesiredPartnerJpaEntity = desiredPartner
         private set
 
+    @Column(name = "connection_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    var connectionStatus: ConnectionStatus = connectionStatus
+        private set
+
     companion object {
 
         fun User.toJpaEntity(): UserJpaEntity {
@@ -74,6 +83,7 @@ class UserJpaEntity(
                 profileImages = profileImages.map { it.toJpaEntity() },
                 profile = profile.toJpaEntity(),
                 desiredPartner = desiredPartner.toJpaEntity(),
+                connectionStatus = connectionStatus,
             )
             return entity
         }
@@ -87,6 +97,7 @@ class UserJpaEntity(
             phoneNumber = PhoneNumber(phoneNumber),
             profile = profile.toDomainEntity(),
             desiredPartner = desiredPartner.toDomainEntity(),
+            connectionStatus = connectionStatus,
         )
     }
 
