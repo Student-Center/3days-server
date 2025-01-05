@@ -25,7 +25,7 @@ data class User(
     val profileImages: List<UserProfileImage> = emptyList(),
     val profile: UserProfile,
     val desiredPartner: UserDesiredPartner,
-    val connectionStatus: ConnectionStatus = ConnectionStatus.INACTIVE,
+    val connectionStatus: ConnectionStatus,
 ) : AggregateRoot<User, User.Id>() {
 
     data class Id(override val value: UUID) : UUIDTypeId(value)
@@ -68,6 +68,7 @@ data class User(
             partnerJobOccupations: List<JobOccupation>,
             partnerPreferDistance: PreferDistance,
             allowSameCompany: Boolean?,
+            connectionStatus: ConnectionStatus = ConnectionStatus.ACTIVE,
         ): User {
             val id: Id = UUIDTypeId.random<Id>()
 
@@ -94,6 +95,7 @@ data class User(
                 phoneNumber = phoneNumber,
                 profile = profile,
                 desiredPartner = desiredPartner,
+                connectionStatus = connectionStatus,
             )
         }
     }
