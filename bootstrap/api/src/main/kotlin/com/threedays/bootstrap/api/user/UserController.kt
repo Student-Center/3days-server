@@ -21,6 +21,7 @@ import com.threedays.domain.user.vo.Gender
 import com.threedays.domain.user.vo.JobOccupation
 import com.threedays.oas.api.UsersApi
 import com.threedays.oas.model.CompleteProfileImageUploadRequest
+import com.threedays.oas.model.ConnectionStatus
 import com.threedays.oas.model.GetMyUserInfoResponse
 import com.threedays.oas.model.GetProfileImageUploadUrlResponse
 import com.threedays.oas.model.ProfileImageExtension
@@ -107,6 +108,7 @@ class UserController(
                 profile = OASModelAdapter.toUserProfileDisplayInfo(user.profile),
                 desiredPartner = OASModelAdapter.toOASModel(user.desiredPartner),
                 profileWidgets = user.profile.profileWidgets.map(OASModelAdapter::toOASModel),
+                status = ConnectionStatus.valueOf(user.connectionStatus.name)
             ).let { ResponseEntity.ok(it) }
         }
 
@@ -236,7 +238,7 @@ class UserController(
             val result: User = updateConnectionStatus(command)
 
             UpdateConnectionStatusResponse(
-                status = UpdateConnectionStatusResponse.Status.valueOf(result.connectionStatus.name)
+                status = ConnectionStatus.valueOf(result.connectionStatus.name)
             ).let { ResponseEntity.ok(it) }
         }
 }
