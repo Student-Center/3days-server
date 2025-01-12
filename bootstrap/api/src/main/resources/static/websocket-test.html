@@ -64,7 +64,7 @@
   </div>
 
   <div class="input-group">
-    <input type="text" id="subscription" placeholder="Enter subscription path (e.g., /channel/messages)">
+    <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333" placeholder="Enter subscription path (e.g., /channel/messages)">
     <button onclick="subscribe()">Subscribe</button>
   </div>
 
@@ -74,10 +74,6 @@
   <h3>Send Message</h3>
   <div class="input-group">
     <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333" placeholder="Send path (e.g., /app/channel/33333333-3333-3333-3333-333333333333)">
-  </div>
-
-  <div class="input-group">
-    <input type="text" id="senderUserId" placeholder="Sender User ID (UUID)">
   </div>
 
   <div class="input-group">
@@ -98,24 +94,56 @@
 
 <script>
   let stompClient = null;
+  let currentUserId = null;
   const messagesDiv = document.getElementById('messages');
   const subscriptionsDiv = document.getElementById('subscriptions');
   const subscriptionsList = new Map();
 
-  function connect() {
+  async function fetchCurrentUser(token) {
+    try {
+      const response = await fetch('/users/my', {
+        headers: {
+          'Authorization': 'Bearer ' + token
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch user info');
+      }
+      const user = await response.json();
+      currentUserId = user.id;
+      addMessage('Current user ID: ' + currentUserId);
+    } catch (error) {
+      addMessage('Error fetching user info: ' + error.message);
+      throw error;
+    }
+  }
+
+  async function connect() {
     const token = document.getElementById('token').value;
-    const socket = new SockJS('/ws');
-    stompClient = Stomp.over(socket);
+    if (!token) {
+      addMessage('Error: Please enter a token');
+      return;
+    }
 
-    const headers = {
-      'Authorization': 'Bearer ' + token
-    };
+    try {
+      await fetchCurrentUser(token);
 
-    stompClient.connect(headers, function(frame) {
-      addMessage('Connected: ' + frame);
-    }, function(error) {
-      addMessage('Error: ' + error);
-    });
+      const socket = new SockJS('/ws');
+      stompClient = Stomp.over(socket);
+
+      const headers = {
+        'Authorization': 'Bearer ' + token
+      };
+
+      stompClient.connect(headers, function(frame) {
+        addMessage('Connected: ' + frame);
+      }, function(error) {
+        addMessage('Error: ' + error);
+        currentUserId = null;
+      });
+    } catch (error) {
+      addMessage('Connection failed: ' + error.message);
+    }
   }
 
   function disconnect() {
@@ -128,6 +156,7 @@
       
       stompClient.disconnect();
       addMessage('Disconnected');
+      currentUserId = null;
     }
   }
 
@@ -185,7 +214,6 @@
   function sendMessage() {
     const messageInput = document.getElementById('message');
     const sendPathInput = document.getElementById('sendPath');
-    const senderUserIdInput = document.getElementById('senderUserId');
     const messageTypeSelect = document.getElementById('messageType');
 
     if (!stompClient) {
@@ -198,25 +226,20 @@
       return;
     }
 
-    if (!senderUserIdInput.value) {
-      addMessage('Error: Please enter a sender user ID');
+    if (!currentUserId) {
+      addMessage('Error: Not connected or user ID not available');
       return;
     }
 
-    try {
+    const message = {
+      senderUserId: currentUserId,
+      messageContent: messageInput.value || "",
+      messageType: messageTypeSelect.value
+    };
 
-      const message = {
-        senderUserId: senderUserIdInput.value,
-        messageContent: messageInput.value || "",
-        messageType: messageTypeSelect.value
-      };
-
-      stompClient.send(sendPathInput.value, {}, JSON.stringify(message));
-      addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message)}`);
-      messageInput.value = '';
-    } catch (error) {
-      addMessage(`Error sending message: ${error.message}`);
-    }
+    stompClient.send(sendPathInput.value, {}, JSON.stringify(message));
+    addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message)}`);
+    messageInput.value = '';
   }
 
   function addMessage(message) {
