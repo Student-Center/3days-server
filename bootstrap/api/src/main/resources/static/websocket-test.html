@@ -1,95 +1,405 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>WebSocket Test</title>
+  <meta charset="UTF-8">
+  <title>WebSocket Chat Test</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
-    .container {
-      max-width: 600px;
-      margin: 50px auto;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #f5f5f5;
     }
+
+    .container {
+      max-width: 1400px;
+      margin: 30px auto;
+      padding: 30px;
+      display: grid;
+      grid-template-columns: 500px 1fr;
+      gap: 20px;
+    }
+
+    .left-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .right-panel {
+      position: sticky;
+      top: 30px;
+      align-self: start;
+    }
+
+    .section {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .section-content {
+      background: #f8f9fa;
+      border-radius: 6px;
+      border-left: 4px solid #007bff;
+      padding: 20px;
+    }
+
+    .section h3 {
+      margin-top: 0;
+      color: #007bff;
+    }
+
+    .section-info {
+      margin-bottom: 15px;
+      font-size: 0.9em;
+      color: #666;
+      display: none;
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+    }
+
+    .section-info.expanded {
+      display: block;
+    }
+
+    .section-info pre {
+      background: #fff;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #dee2e6;
+      margin: 10px 0;
+      white-space: pre-wrap;
+    }
+
+    .section-info p {
+      margin: 15px 0 8px 0;
+    }
+
+    .section-info p:first-child {
+      margin-top: 0;
+    }
+
+    .section-info strong {
+      color: #333;
+    }
+
+    .info-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #007bff;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 15px;
+    }
+
+    .info-toggle:hover {
+      color: #0056b3;
+    }
+
+    .info-toggle i {
+      transition: transform 0.3s;
+    }
+
+    .info-toggle.expanded i {
+      transform: rotate(90deg);
+    }
+
     #messages, #subscriptions {
-      height: 200px;
+      height: 300px;
       overflow-y: auto;
-      border: 1px solid #eee;
-      margin: 20px 0;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin: 10px 0;
+      padding: 10px;
+      background: white;
+    }
+
+    #messages {
+      height: calc(100vh - 200px);
+      min-height: 400px;
+    }
+
+    #subscriptions {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      border: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #subscriptions.has-items {
+      max-height: 500px;
+      border: 1px solid #dee2e6;
+      border-radius: 4px;
+      margin: 10px 0;
       padding: 10px;
     }
+
     .input-group {
-      margin: 10px 0;
+      margin: 15px 0;
+      display: flex;
+      gap: 10px;
     }
+
     input[type="text"], select {
-      width: 70%;
-      padding: 8px;
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
     }
+
     button {
       padding: 8px 15px;
-      margin-left: 10px;
-      background-color: #4CAF50;
+      background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 3px;
+      border-radius: 4px;
       cursor: pointer;
+      transition: all 0.2s;
     }
-    button:hover {
-      background-color: #45a049;
+
+    button:hover:not(:disabled) {
+      background-color: #0056b3;
     }
+
+    button:disabled {
+      background-color: #ccc;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+
+    button.disconnect {
+      background-color: #dc3545;
+    }
+
+    button.disconnect:hover:not(:disabled) {
+      background-color: #c82333;
+    }
+
     .subscription-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 5px;
-      border-bottom: 1px solid #eee;
+      padding: 8px;
+      margin: 5px 0;
+      background: #f8f9fa;
+      border-radius: 4px;
     }
+
     .subscription-item button {
-      background-color: #f44336;
+      background-color: #dc3545;
     }
+
     .subscription-item button:hover {
-      background-color: #da190b;
+      background-color: #c82333;
+    }
+
+    .message {
+      padding: 8px;
+      margin: 5px 0;
+      border-radius: 4px;
+      background: #f8f9fa;
+      word-break: break-all;
+    }
+
+    .message.sent {
+      background: #e3f2fd;
+    }
+
+    .message.received {
+      background: #f1f8e9;
+    }
+
+    .message.error {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .message.info {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .subscription-container {
+      margin-top: 15px;
+    }
+
+    .subscription-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .subscription-count {
+      background: #007bff;
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 0.8em;
     }
   </style>
 </head>
 <body>
 <div class="container">
-  <h2>WebSocket Chat Test</h2>
+  <div class="left-panel">
+    <div class="section">
+      <h2>WebSocket Chat Test Page</h2>
+    </div>
 
-  <div class="input-group">
-    <input type="text" id="token" placeholder="Enter your Bearer token">
-    <button onclick="connect()">Connect</button>
-    <button onclick="disconnect()">Disconnect</button>
+    <div class="section">
+      <h3>1. 인증</h3>
+      <div class="section-content">
+        <div class="info-toggle" onclick="toggleInfo(this)">
+          <i class="fas fa-chevron-right"></i>
+          <span>인증 방법</span>
+        </div>
+        <div class="section-info">
+          <p><strong>사용자 인증 방법</strong></p>
+          1. 테스트용 사용자 계정:<br>
+          &nbsp;&nbsp;• 전화번호: 01000000001<br>
+          &nbsp;&nbsp;• 전화번호: 01000000002<br>
+          2. POST /auth/codes로 사용자 인증을 진행한 후 토큰을 발급받으세요.<br>
+          3. 발급받은 토큰으로 WebSocket에 연결합니다.<br>
+          <br>
+          <p><strong>WebSocket 연결 설정</strong></p>
+          1. SockJS와 STOMP 클라이언트 라이브러리를 사용합니다.<br>
+          2. WebSocket 핸드쉐이크: /ws 엔드포인트로 연결<br>
+          3. STOMP 연결 설정:<br>
+          &nbsp;&nbsp;• 연결 헤더: { "Authorization": "Bearer {발급받은 토큰}" }<br>
+          &nbsp;&nbsp;• 자동 재연결: 15초 간격<br>
+        </div>
+        <div class="input-group">
+          <input type="text" id="token" placeholder="인증 토큰을 입력하세요">
+          <button id="connectBtn" onclick="connect()">Connect</button>
+          <button id="disconnectBtn" class="disconnect" onclick="disconnect()" disabled>Disconnect</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>2. 채널 구독</h3>
+      <div class="section-content">
+        <div class="info-toggle" onclick="toggleInfo(this)">
+          <i class="fas fa-chevron-right"></i>
+          <span>채널 구독 방법</span>
+        </div>
+        <div class="section-info">
+          <p><strong>채널 구독 방법</strong></p>
+          1. 구독할 채널 ID를 입력하세요.<br>
+          2. Subscribe를 통해 해당 채널의 메시지를 수신합니다.<br>
+          <br>
+          <br>
+          <p><strong>채널 구독 프로토콜</strong></p>
+          - STOMP subscribe 명령어 사용<br>
+          - 구독 Destination: /channel/{channelId}<br>
+          - channelId 형식: UUID (예: 33333333-3333-3333-3333-333333333333)<br>
+          <br>
+          <p><strong>수신 메시지 스키마</strong></p>
+          <pre>{
+  "id": "UUID",            // 메시지 고유 ID
+  "channelId": "UUID",     // 채널 ID
+  "senderUserId": "UUID",  // 발신자 ID
+  "contentType": "TEXT" | "CARD",  // 메시지 타입
+  "contentText": "string", // 메시지 내용
+  "contentCardColor": "BLUE" | "PINK" | null,  // CARD 타입일 경우 색상
+  "createdAt": "2025-01-13T00:39:24"  // ISO-8601 형식
+}</pre>
+        </div>
+        <div class="input-group">
+          <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333" 
+                 placeholder="구독 경로 (예시: /channel/33333333-3333-3333-3333-333333333333)">
+          <button onclick="subscribe()">Subscribe</button>
+        </div>
+        <div class="subscription-container">
+          <div class="subscription-header">
+            <h4>활성 구독 목록</h4>
+            <div class="subscription-count">0</div>
+          </div>
+          <div id="subscriptions"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>3. 메시지 전송</h3>
+      <div class="section-content">
+        <div class="info-toggle" onclick="toggleInfo(this)">
+          <i class="fas fa-chevron-right"></i>
+          <span>메시지 전송 방법</span>
+        </div>
+        <div class="section-info">
+          <p><strong>메시지 전송 방법</strong></p>
+          1. 메시지를 전송할 채널 경로를 입력하세요.<br>
+          2. 메시지 내용과 타입을 선택하세요.<br>
+          3. Send 버튼을 클릭하면 메시지가 전송됩니다.<br>
+          <br>
+          <p><strong>메시지 전송 프로토콜</strong></p>
+          - STOMP send 명령어 사용<br>
+          - 전송 Destination: /app/channel/{channelId}<br>
+          - channelId 형식: UUID<br>
+          <br>
+          <p><strong>전송 메시지 스키마</strong></p>
+          <pre>{
+  "senderUserId": "UUID",     // 발신자 ID (자동 설정)
+  "messageContent": "string",  // 메시지 내용
+  "messageType": "TEXT" | "CARD"  // 메시지 타입
+}</pre>
+          <br>
+          <p><strong>메시지 타입 상세</strong></p>
+          - TEXT: 일반 텍스트 메시지<br>
+          - CARD: 색상이 있는 카드 형태 메시지 (BLUE 또는 PINK)<br>
+        </div>
+        <div class="input-group">
+          <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333" 
+                 placeholder="전송 경로 (예시: /app/channel/33333333-3333-3333-3333-333333333333)">
+        </div>
+        <div class="input-group">
+          <input type="text" id="message" placeholder="메시지 내용">
+          <select id="messageType">
+            <option value="TEXT">TEXT</option>
+            <option value="CARD">CARD</option>
+          </select>
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="input-group">
-    <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333" placeholder="Enter subscription path (e.g., /channel/messages)">
-    <button onclick="subscribe()">Subscribe</button>
+  <div class="right-panel">
+    <div class="section">
+      <h3>4. 메시지 로그</h3>
+      <div class="section-content">
+        <div class="info-toggle" onclick="toggleInfo(this)">
+          <i class="fas fa-chevron-right"></i>
+          <span>메시지 로그 설명</span>
+        </div>
+        <div class="section-info">
+          <p><strong>메시지 로그 설명</strong></p>
+          - 파란색: 전송한 메시지<br>
+          - 초록색: 수신한 메시지<br>
+          - 빨간색: 오류 메시지<br>
+          - 연두색: 시스템 알림<br>
+          <br>
+          <p><strong>메시지 상태 코드</strong></p>
+          - 200: 메시지 전송 성공<br>
+          - 401: 인증 실패<br>
+          - 404: 채널 없음<br>
+        </div>
+        <div id="messages"></div>
+      </div>
+    </div>
   </div>
-
-  <h3>Active Subscriptions</h3>
-  <div id="subscriptions"></div>
-
-  <h3>Send Message</h3>
-  <div class="input-group">
-    <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333" placeholder="Send path (e.g., /app/channel/33333333-3333-3333-3333-333333333333)">
-  </div>
-
-  <div class="input-group">
-    <input type="text" id="message" placeholder="Message content">
-    <select id="messageType">
-      <option value="TEXT">TEXT</option>
-      <option value="CARD">CARD</option>
-    </select>
-  </div>
-
-  <div class="input-group">
-    <button onclick="sendMessage()">Send</button>
-  </div>
-
-  <h3>Messages</h3>
-  <div id="messages"></div>
 </div>
 
 <script>
@@ -111,42 +421,55 @@
       }
       const user = await response.json();
       currentUserId = user.id;
-      addMessage('Current user ID: ' + currentUserId);
+      addMessage('Successfully fetched user info. User ID: ' + currentUserId, 'info');
     } catch (error) {
-      addMessage('Error fetching user info: ' + error.message);
+      addMessage('Error fetching user info: ' + error.message, 'error');
       throw error;
     }
   }
 
   async function connect() {
     const token = document.getElementById('token').value;
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+
     if (!token) {
-      addMessage('Error: Please enter a token');
+      addMessage('Please enter a token', 'error');
       return;
     }
 
     try {
+      connectBtn.disabled = true;
+      disconnectBtn.disabled = false;
       await fetchCurrentUser(token);
 
       const socket = new SockJS('/ws');
       stompClient = Stomp.over(socket);
+      stompClient.debug = null; // Disable debug logs
 
       const headers = {
         'Authorization': 'Bearer ' + token
       };
 
       stompClient.connect(headers, function(frame) {
-        addMessage('Connected: ' + frame);
+        addMessage('WebSocket connection established', 'info');
       }, function(error) {
-        addMessage('Error: ' + error);
+        addMessage('WebSocket connection error: ' + error, 'error');
         currentUserId = null;
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
       });
     } catch (error) {
-      addMessage('Connection failed: ' + error.message);
+      addMessage('Connection failed: ' + error.message, 'error');
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
     }
   }
 
   function disconnect() {
+    const connectBtn = document.getElementById('connectBtn');
+    const disconnectBtn = document.getElementById('disconnectBtn');
+
     if (stompClient !== null) {
       subscriptionsList.forEach((subscription) => {
         subscription.unsubscribe();
@@ -155,36 +478,38 @@
       updateSubscriptionsList();
       
       stompClient.disconnect();
-      addMessage('Disconnected');
+      addMessage('Disconnected from WebSocket', 'info');
       currentUserId = null;
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
     }
   }
 
   function subscribe() {
     if (!stompClient) {
-      addMessage('Error: Please connect first');
+      addMessage('Please connect first', 'error');
       return;
     }
 
     const path = document.getElementById('subscription').value;
     if (!path) {
-      addMessage('Error: Please enter a subscription path');
+      addMessage('Please enter a subscription path', 'error');
       return;
     }
 
     if (subscriptionsList.has(path)) {
-      addMessage('Error: Already subscribed to ' + path);
+      addMessage('Already subscribed to ' + path, 'error');
       return;
     }
 
     const subscription = stompClient.subscribe(path, function(message) {
       const content = JSON.parse(message.body);
-      addMessage(`Received from ${path}: ${JSON.stringify(content)}`);
+      addMessage(`Received from ${path}: ${JSON.stringify(content, null, 2)}`, 'received');
     });
 
     subscriptionsList.set(path, subscription);
     updateSubscriptionsList();
-    addMessage('Subscribed to: ' + path);
+    addMessage('Subscribed to: ' + path, 'info');
     document.getElementById('subscription').value = '';
   }
 
@@ -194,21 +519,32 @@
       subscription.unsubscribe();
       subscriptionsList.delete(path);
       updateSubscriptionsList();
-      addMessage('Unsubscribed from: ' + path);
+      addMessage('Unsubscribed from: ' + path, 'info');
     }
   }
 
   function updateSubscriptionsList() {
-    subscriptionsDiv.innerHTML = '';
-    subscriptionsList.forEach((subscription, path) => {
-      const item = document.createElement('div');
-      item.className = 'subscription-item';
-      item.innerHTML = `
-        <span>${path}</span>
-        <button onclick="unsubscribe('${path}')">Unsubscribe</button>
-      `;
-      subscriptionsDiv.appendChild(item);
-    });
+    const subscriptionsDiv = document.getElementById('subscriptions');
+    const countElement = document.querySelector('.subscription-count');
+    const count = subscriptionsList.size;
+    
+    countElement.textContent = count;
+    subscriptionsDiv.classList.toggle('has-items', count > 0);
+
+    if (count > 0) {
+      subscriptionsDiv.innerHTML = '';
+      subscriptionsList.forEach((subscription, path) => {
+        const item = document.createElement('div');
+        item.className = 'subscription-item';
+        item.innerHTML = `
+          <span>${path}</span>
+          <button onclick="unsubscribe('${path}')">Unsubscribe</button>
+        `;
+        subscriptionsDiv.appendChild(item);
+      });
+    } else {
+      subscriptionsDiv.innerHTML = '';
+    }
   }
 
   function sendMessage() {
@@ -217,17 +553,17 @@
     const messageTypeSelect = document.getElementById('messageType');
 
     if (!stompClient) {
-      addMessage('Error: Please connect first');
+      addMessage('Please connect first', 'error');
       return;
     }
 
     if (!sendPathInput.value) {
-      addMessage('Error: Please enter a send path');
+      addMessage('Please enter a send path', 'error');
       return;
     }
 
     if (!currentUserId) {
-      addMessage('Error: Not connected or user ID not available');
+      addMessage('Not connected or user ID not available', 'error');
       return;
     }
 
@@ -238,15 +574,23 @@
     };
 
     stompClient.send(sendPathInput.value, {}, JSON.stringify(message));
-    addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message)}`);
+    addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message, null, 2)}`, 'sent');
     messageInput.value = '';
   }
 
-  function addMessage(message) {
+  function addMessage(message, type = '') {
     const messageElement = document.createElement('div');
+    messageElement.className = 'message ' + type;
     messageElement.textContent = message;
     messagesDiv.appendChild(messageElement);
     messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+
+  function toggleInfo(element) {
+    element.classList.toggle('expanded');
+    element.nextElementSibling.classList.toggle('expanded');
+    const span = element.querySelector('span');
+    span.textContent = element.classList.contains('expanded') ? 'Hide instructions' : 'Show instructions';
   }
 </script>
 </body>
