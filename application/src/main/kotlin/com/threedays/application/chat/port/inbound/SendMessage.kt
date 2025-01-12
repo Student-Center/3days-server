@@ -5,7 +5,7 @@ import com.threedays.domain.user.entity.User
 
 interface SendMessage {
 
-    fun invoke(command: Command)
+    operator fun invoke(command: Command)
 
     data class Command(
         val senderUserId: User.Id,

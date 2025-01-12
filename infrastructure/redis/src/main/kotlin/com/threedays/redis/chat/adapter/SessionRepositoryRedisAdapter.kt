@@ -22,4 +22,9 @@ class SessionRepositoryRedisAdapter(
             ?.toDomain()
     }
 
+    override fun deleteById(sessionId: Session.Id) {
+        sessionRedisRepository.deleteById(sessionId.toString())
+    }
+
+
 }

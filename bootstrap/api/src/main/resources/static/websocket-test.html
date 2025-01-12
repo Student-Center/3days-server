@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+  <style>
+    .container {
+      max-width: 600px;
+      margin: 50px auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #messages, #subscriptions {
+      height: 200px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      margin: 20px 0;
+      padding: 10px;
+    }
+    .input-group {
+      margin: 10px 0;
+    }
+    input[type="text"], select {
+      width: 70%;
+      padding: 8px;
+    }
+    button {
+      padding: 8px 15px;
+      margin-left: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .subscription-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      border-bottom: 1px solid #eee;
+    }
+    .subscription-item button {
+      background-color: #f44336;
+    }
+    .subscription-item button:hover {
+      background-color: #da190b;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <h2>WebSocket Chat Test</h2>
+
+  <div class="input-group">
+    <input type="text" id="token" placeholder="Enter your Bearer token">
+    <button onclick="connect()">Connect</button>
+    <button onclick="disconnect()">Disconnect</button>
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="subscription" placeholder="Enter subscription path (e.g., /channel/messages)">
+    <button onclick="subscribe()">Subscribe</button>
+  </div>
+
+  <h3>Active Subscriptions</h3>
+  <div id="subscriptions"></div>
+
+  <h3>Send Message</h3>
+  <div class="input-group">
+    <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333" placeholder="Send path (e.g., /app/channel/33333333-3333-3333-3333-333333333333)">
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="senderUserId" placeholder="Sender User ID (UUID)">
+  </div>
+
+  <div class="input-group">
+    <input type="text" id="message" placeholder="Message content">
+    <select id="messageType">
+      <option value="TEXT">TEXT</option>
+      <option value="CARD">CARD</option>
+    </select>
+  </div>
+
+  <div class="input-group">
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <h3>Messages</h3>
+  <div id="messages"></div>
+</div>
+
+<script>
+  let stompClient = null;
+  const messagesDiv = document.getElementById('messages');
+  const subscriptionsDiv = document.getElementById('subscriptions');
+  const subscriptionsList = new Map();
+
+  function connect() {
+    const token = document.getElementById('token').value;
+    const socket = new SockJS('/ws');
+    stompClient = Stomp.over(socket);
+
+    const headers = {
+      'Authorization': 'Bearer ' + token
+    };
+
+    stompClient.connect(headers, function(frame) {
+      addMessage('Connected: ' + frame);
+    }, function(error) {
+      addMessage('Error: ' + error);
+    });
+  }
+
+  function disconnect() {
+    if (stompClient !== null) {
+      subscriptionsList.forEach((subscription) => {
+        subscription.unsubscribe();
+      });
+      subscriptionsList.clear();
+      updateSubscriptionsList();
+      
+      stompClient.disconnect();
+      addMessage('Disconnected');
+    }
+  }
+
+  function subscribe() {
+    if (!stompClient) {
+      addMessage('Error: Please connect first');
+      return;
+    }
+
+    const path = document.getElementById('subscription').value;
+    if (!path) {
+      addMessage('Error: Please enter a subscription path');
+      return;
+    }
+
+    if (subscriptionsList.has(path)) {
+      addMessage('Error: Already subscribed to ' + path);
+      return;
+    }
+
+    const subscription = stompClient.subscribe(path, function(message) {
+      const content = JSON.parse(message.body);
+      addMessage(`Received from ${path}: ${JSON.stringify(content)}`);
+    });
+
+    subscriptionsList.set(path, subscription);
+    updateSubscriptionsList();
+    addMessage('Subscribed to: ' + path);
+    document.getElementById('subscription').value = '';
+  }
+
+  function unsubscribe(path) {
+    const subscription = subscriptionsList.get(path);
+    if (subscription) {
+      subscription.unsubscribe();
+      subscriptionsList.delete(path);
+      updateSubscriptionsList();
+      addMessage('Unsubscribed from: ' + path);
+    }
+  }
+
+  function updateSubscriptionsList() {
+    subscriptionsDiv.innerHTML = '';
+    subscriptionsList.forEach((subscription, path) => {
+      const item = document.createElement('div');
+      item.className = 'subscription-item';
+      item.innerHTML = `
+        <span>${path}</span>
+        <button onclick="unsubscribe('${path}')">Unsubscribe</button>
+      `;
+      subscriptionsDiv.appendChild(item);
+    });
+  }
+
+  function sendMessage() {
+    const messageInput = document.getElementById('message');
+    const sendPathInput = document.getElementById('sendPath');
+    const senderUserIdInput = document.getElementById('senderUserId');
+    const messageTypeSelect = document.getElementById('messageType');
+
+    if (!stompClient) {
+      addMessage('Error: Please connect first');
+      return;
+    }
+
+    if (!sendPathInput.value) {
+      addMessage('Error: Please enter a send path');
+      return;
+    }
+
+    if (!senderUserIdInput.value) {
+      addMessage('Error: Please enter a sender user ID');
+      return;
+    }
+
+    try {
+
+      const message = {
+        senderUserId: senderUserIdInput.value,
+        messageContent: messageInput.value || "",
+        messageType: messageTypeSelect.value
+      };
+
+      stompClient.send(sendPathInput.value, {}, JSON.stringify(message));
+      addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message)}`);
+      messageInput.value = '';
+    } catch (error) {
+      addMessage(`Error sending message: ${error.message}`);
+    }
+  }
+
+  function addMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    messagesDiv.appendChild(messageElement);
+    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  }
+</script>
+</body>
+</html>

@@ -35,6 +35,7 @@ class StompAuthInterceptor(
 
         when (command) {
             StompCommand.CONNECT -> handleConnect(sessionId, message)
+            StompCommand.DISCONNECT -> handleDisconnect(sessionId)
             else -> return message
         }
 
@@ -53,6 +54,10 @@ class StompAuthInterceptor(
                 .let { Session.create(sessionId, it.userId) }
                 .also { sessionRepository.save(it) }
         }
+    }
+
+    private fun handleDisconnect(sessionId: Session.Id) {
+        sessionRepository.deleteById(sessionId)
     }
 
     private fun extractToken(message: Message<*>): String? {

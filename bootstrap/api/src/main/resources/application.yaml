@@ -36,6 +36,11 @@ spring:
     compose:
       file: ./bootstrap/api/compose.yaml
       enabled: true
+logging:
+  level:
+    org.springframework.web: DEBUG
+    com.threedays.redis: DEBUG
+    org.springframework.data.redis: DEBUG
 ---
 spring:
   config:

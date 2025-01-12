@@ -15,10 +15,8 @@ class MessageSubscriberRedisAdapter(
 ) : MessageListener {
 
     companion object {
-
         private val logger = KotlinLogging.logger {}
     }
-
 
     override fun onMessage(
         message: Message,
@@ -29,18 +27,16 @@ class MessageSubscriberRedisAdapter(
             val body = String(message.body)
             logger.debug { "Received message from channel '$channel': $body" }
 
-            val event: MessageRedisEvent.Sent = objectMapper.readValue(body, MessageRedisEvent.Sent::class.java)
+            val event = objectMapper.readValue(body, MessageRedisEvent::class.java)
             handleEvent(event)
         } catch (e: Exception) {
             logger.error(e) { "Failed to process Redis message" }
         }
     }
 
-    private fun handleEvent(event: MessageRedisEvent.Sent) {
+    private fun handleEvent(event: MessageRedisEvent) {
         logger.info { "Handling received event: $event" }
-        val command = ReceiveMessage.Command(event.message)
+        val command = ReceiveMessage.Command(event.toDomain())
         receiveMessage.invoke(command)
     }
-
-
 }

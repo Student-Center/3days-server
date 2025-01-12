@@ -7,5 +7,6 @@ interface SessionRepository {
 
     fun save(session: Session)
     fun findByUserId(userId: User.Id): Session?
+    fun deleteById(sessionId: Session.Id)
 
 }
