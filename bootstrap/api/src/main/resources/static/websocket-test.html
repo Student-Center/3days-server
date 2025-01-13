@@ -310,11 +310,44 @@
   "id": "UUID",            // 메시지 고유 ID
   "channelId": "UUID",     // 채널 ID
   "senderUserId": "UUID",  // 발신자 ID
-  "contentType": "TEXT" | "CARD",  // 메시지 타입
-  "contentText": "string", // 메시지 내용
-  "contentCardColor": "BLUE" | "PINK" | null,  // CARD 타입일 경우 색상
-  "createdAt": "2025-01-13T00:39:24"  // ISO-8601 형식
+  "content": {             // 메시지 내용
+    "type": "TEXT" | "CARD",   // 메시지 타입
+    "text": "string",          // 메시지 텍스트
+    "cardColor": "BLUE" | "PINK" | null  // CARD 타입일 경우 색상
+  },
+  "createdAt": "2025-01-13T22:25:56"  // ISO-8601 형식
+}
+
+// 예시 - TEXT 타입
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "channelId": "33333333-3333-3333-3333-333333333333",
+  "senderUserId": "44444444-4444-4444-4444-444444444444",
+  "content": {
+    "type": "TEXT",
+    "text": "안녕하세요",
+    "cardColor": null
+  },
+  "createdAt": "2025-01-13T22:25:56"
+}
+
+// 예시 - CARD 타입
+{
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "channelId": "33333333-3333-3333-3333-333333333333",
+  "senderUserId": "44444444-4444-4444-4444-444444444444",
+  "content": {
+    "type": "CARD",
+    "text": "카드 메시지입니다",
+    "cardColor": "BLUE"
+  },
+  "createdAt": "2025-01-13T22:25:56"
 }</pre>
+          <br>
+          <p><strong>수신 메시지 상태 코드</strong></p>
+          - 200: 메시지 수신 성공<br>
+          - 401: 인증 실패<br>
+          - 404: 채널 없음<br>
         </div>
         <div class="input-group">
           <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333" 

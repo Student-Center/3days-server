@@ -9,29 +9,36 @@ data class ReceiveMessageWebSocketEvent(
     val id: UUID,
     val channelId: UUID,
     val senderUserId: UUID,
-    val contentType: String,
-    val contentText: String,
-    val contentCardColor: String?,
+    val content: Content,
     val createdAt: LocalDateTime,
 ) {
+
+    data class Content(
+        val type: String,
+        val text: String,
+        val cardColor: String?,
+    )
+
     companion object {
+
         fun ReceiveMessageEvent.toWebSocketEvent(): ReceiveMessageWebSocketEvent {
             return ReceiveMessageWebSocketEvent(
                 id = id.value,
                 channelId = channelId.value,
                 senderUserId = senderUserId.value,
-                contentType = content::class.simpleName!!,
-                contentText = when (content) {
-                    is Message.Content.Text -> (content as Message.Content.Text).text
-                    is Message.Content.Card -> (content as Message.Content.Card).text
-                },
-                contentCardColor = when (content) {
-                    is Message.Content.Card -> (content as Message.Content.Card).color.name
-                    else -> null
-                },
+                content = Content(
+                    type = content::class.simpleName!!,
+                    text = when (content) {
+                        is Message.Content.Text -> (content as Message.Content.Text).text
+                        is Message.Content.Card -> (content as Message.Content.Card).text
+                    },
+                    cardColor = when (content) {
+                        is Message.Content.Card -> (content as Message.Content.Card).color.name
+                        else -> null
+                    }
+                ),
                 createdAt = createdAt,
             )
         }
     }
-
 }
