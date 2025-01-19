@@ -1,7 +1,7 @@
-package com.threedays.bootstrap.api.chat.adapter
+package com.threedays.bootstrap.api.chat.adapter.websocket
 
 import com.threedays.application.chat.port.outbound.ChatClient
-import com.threedays.bootstrap.api.chat.adapter.dto.ReceiveMessageWebSocketEvent.Companion.toWebSocketEvent
+import com.threedays.bootstrap.api.chat.adapter.websocket.dto.ReceiveMessageWebSocketEvent.Companion.toWebSocketEvent
 import com.threedays.domain.chat.entity.Channel
 import com.threedays.domain.chat.event.ReceiveMessageEvent
 import io.github.oshai.kotlinlogging.KotlinLogging

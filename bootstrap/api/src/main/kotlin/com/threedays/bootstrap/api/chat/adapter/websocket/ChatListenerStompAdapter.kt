@@ -1,7 +1,7 @@
-package com.threedays.bootstrap.api.chat.adapter
+package com.threedays.bootstrap.api.chat.adapter.websocket
 
 import com.threedays.application.chat.port.inbound.SendMessage
-import com.threedays.bootstrap.api.chat.adapter.dto.SendMessageWebSocketCommand
+import com.threedays.bootstrap.api.chat.adapter.websocket.dto.SendMessageWebSocketCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping

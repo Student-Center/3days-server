@@ -1,4 +1,4 @@
-package com.threedays.bootstrap.api.chat.adapter.dto
+package com.threedays.bootstrap.api.chat.adapter.websocket.dto
 
 import com.threedays.domain.chat.entity.Message
 import com.threedays.domain.chat.event.ReceiveMessageEvent
