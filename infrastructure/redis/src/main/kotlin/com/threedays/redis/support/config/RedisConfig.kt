@@ -28,7 +28,6 @@ const val BASE_PACKAGE = "com.threedays.redis"
 @EnableRedisRepositories(basePackages = [BASE_PACKAGE])
 class RedisConfig(
     private val redisProperties: RedisProperties,
-    private val messageSubscriberRedisAdapter: MessageSubscriberRedisAdapter
 ) {
 
     @Bean
@@ -48,7 +47,10 @@ class RedisConfig(
     }
 
     @Bean
-    fun redisMessageListenerContainer(redisConnectionFactory: RedisConnectionFactory): RedisMessageListenerContainer {
+    fun redisMessageListenerContainer(
+        redisConnectionFactory: RedisConnectionFactory,
+        messageSubscriberRedisAdapter: MessageSubscriberRedisAdapter
+    ): RedisMessageListenerContainer {
         val container = RedisMessageListenerContainer()
         container.setConnectionFactory(redisConnectionFactory)
         

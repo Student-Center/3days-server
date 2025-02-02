@@ -4,6 +4,7 @@ import com.threedays.application.auth.config.AuthProperties
 import com.threedays.domain.auth.entity.AccessToken
 import com.threedays.domain.chat.entity.Session
 import com.threedays.domain.chat.repository.SessionRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.Message
 import org.springframework.messaging.MessageChannel
 import org.springframework.messaging.simp.stomp.StompCommand
@@ -21,6 +22,7 @@ class StompAuthInterceptor(
 
         private const val AUTHORIZATION_HEADER = "Authorization"
         private const val BEARER_PREFIX = "Bearer "
+        private val logger = KotlinLogging.logger {}
     }
 
     override fun preSend(
@@ -52,12 +54,16 @@ class StompAuthInterceptor(
                 secret = authProperties.tokenSecret,
             )
                 .let { Session.create(sessionId, it.userId) }
-                .also { sessionRepository.save(it) }
+                .also {
+                    sessionRepository.save(it)
+                    logger.info { "User ${it.userId} connected with session $sessionId" }
+                }
         }
     }
 
     private fun handleDisconnect(sessionId: Session.Id) {
         sessionRepository.deleteById(sessionId)
+        logger.info { "Session $sessionId disconnected" }
     }
 
     private fun extractToken(message: Message<*>): String? {
