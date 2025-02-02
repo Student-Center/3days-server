@@ -3,7 +3,7 @@ package com.threedays.domain.chat.entity
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.vo.Gender
 import com.threedays.support.common.base.domain.AggregateRoot
-import com.threedays.support.common.base.domain.TypeId
+import com.threedays.support.common.base.domain.UUIDTypeId
 import java.time.LocalDateTime
 import java.util.*
 
@@ -17,7 +17,7 @@ data class Message(
     val updatedAt: LocalDateTime? = null,
 ) : AggregateRoot<Message, Message.Id>() {
 
-    data class Id(override val value: UUID) : TypeId<UUID>(value)
+    data class Id(override val value: UUID) : UUIDTypeId(value)
 
     sealed class Content {
         data class Text(val text: String) : Content()
@@ -38,18 +38,19 @@ data class Message(
     }
 
     companion object {
+
         fun createCardMessage(
             channelId: Channel.Id,
             sender: User,
             text: String,
         ): Message {
-            val color: Content.Card.Color = when(sender.profile.gender) {
+            val color: Content.Card.Color = when (sender.profile.gender) {
                 Gender.MALE -> Content.Card.Color.BLUE
                 Gender.FEMALE -> Content.Card.Color.PINK
             }
 
             return Message(
-                id = Id(UUID.randomUUID()),
+                id = UUIDTypeId.random(),
                 channelId = channelId,
                 senderUserId = sender.id,
                 content = Content.Card(text, color)
@@ -62,7 +63,7 @@ data class Message(
             text: String
         ): Message {
             return Message(
-                id = Id(UUID.randomUUID()),
+                id = UUIDTypeId.random(),
                 channelId = channelId,
                 senderUserId = sender.id,
                 content = Content.Text(text)
