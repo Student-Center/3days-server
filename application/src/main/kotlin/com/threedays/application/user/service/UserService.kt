@@ -1,7 +1,9 @@
 package com.threedays.application.user.service
 
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.port.inbound.ClearTokens
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
+import com.threedays.application.user.port.inbound.DeleteMyUser
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.application.user.port.inbound.UpdateConnectionStatus
 import com.threedays.domain.user.entity.Company
@@ -19,8 +21,9 @@ class UserService(
     private val locationQueryRepository: LocationQueryRepository,
     private val companyQueryRepository: CompanyQueryRepository,
     private val issueLoginTokens: IssueLoginTokens,
+    private val clearTokens: ClearTokens,
     private val authProperties: AuthProperties,
-) : RegisterUser, UpdateConnectionStatus {
+) : RegisterUser, UpdateConnectionStatus, DeleteMyUser {
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -60,4 +63,11 @@ class UserService(
             .updateConnectionStatus(command.status)
             .also { userRepository.save(it) }
     }
+
+    override fun invoke(command: DeleteMyUser.Command) {
+        // TODO(connection): 현재 connecting 여부를 체크하고 있는 경우 에러를 반환해야함.
+        userRepository.delete(command.userId)
+        clearTokens.invoke(ClearTokens.Command(command.userId))
+    }
+
 }
