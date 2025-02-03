@@ -64,6 +64,7 @@ class UserService(
             .also { userRepository.save(it) }
     }
 
+    @Transactional
     override fun invoke(command: DeleteMyUser.Command) {
         // TODO(connection): 현재 connecting 여부를 체크하고 있는 경우 에러를 반환해야함.
         userRepository.delete(command.userId)
