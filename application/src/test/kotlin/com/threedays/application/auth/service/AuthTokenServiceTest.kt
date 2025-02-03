@@ -224,7 +224,7 @@ class AuthTokenServiceTest : DescribeSpec({
                 val refreshToken = RefreshToken.generate(
                     secret = secret,
                     expirationSeconds = refreshTokenExpirationSeconds.toLong(),
-                    userId = UUIDTypeId.random<User.Id>()
+                    userId = userId
                 )
 
                 refreshTokenRepository.save(refreshToken, refreshTokenExpirationSeconds.toLong())
