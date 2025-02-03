@@ -12,4 +12,6 @@ interface RefreshTokenRepository {
 
     fun find(userId: User.Id): RefreshToken?
 
+    fun delete(userId: User.Id)
+
 }

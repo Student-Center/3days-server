@@ -5,6 +5,7 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.port.inbound.ClearTokens
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.auth.port.inbound.RefreshLoginTokens
 import com.threedays.domain.auth.entity.RefreshToken
@@ -17,6 +18,7 @@ import com.threedays.domain.user.entity.UserProfile
 import com.threedays.domain.user.entity.UserProfileImage
 import com.threedays.support.common.base.domain.UUIDTypeId
 import com.threedays.support.common.security.jwt.JwtTokenProvider
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
@@ -186,6 +188,52 @@ class AuthTokenServiceTest : DescribeSpec({
                 shouldThrow<AuthException.InvalidRefreshTokenException> {
                     sut.invoke(command)
                 }
+            }
+        }
+    }
+
+    describe("리프레시 토큰 삭제") {
+
+        context("RefreshToken이 저장되어있지 않은 경우") {
+            it("에러를 반환하지 않는다.") {
+                // arrange
+                val userId = UUIDTypeId.random<User.Id>()
+                val command = fixtureMonkey
+                    .giveMeBuilder<ClearTokens.Command>()
+                    .set(ClearTokens.Command::userId, userId)
+                    .sample()
+
+                // act
+                shouldNotThrow<Exception> {
+                    sut.invoke(command)
+                }
+
+                // assert
+                refreshTokenRepository.find(userId) shouldBe null
+            }
+        }
+
+        context("RefreshToken이 저장되어있는 경우") {
+            it("삭제 처리된다.") {
+                // arrange
+                val userId = UUIDTypeId.random<User.Id>()
+                val command = fixtureMonkey
+                    .giveMeBuilder<ClearTokens.Command>()
+                    .set(ClearTokens.Command::userId, userId)
+                    .sample()
+                val refreshToken = RefreshToken.generate(
+                    secret = secret,
+                    expirationSeconds = refreshTokenExpirationSeconds.toLong(),
+                    userId = UUIDTypeId.random<User.Id>()
+                )
+
+                refreshTokenRepository.save(refreshToken, refreshTokenExpirationSeconds.toLong())
+
+                // act
+                sut.invoke(command)
+
+                // assert
+                refreshTokenRepository.find(userId) shouldBe null
             }
         }
     }

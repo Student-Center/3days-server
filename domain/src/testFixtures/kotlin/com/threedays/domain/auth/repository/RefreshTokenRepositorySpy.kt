@@ -10,13 +10,17 @@ class RefreshTokenRepositorySpy : RefreshTokenRepository {
 
     override fun save(
         refreshToken: RefreshToken,
-        expiresIn: Long
+        expiresIn: Long,
     ) {
         store[refreshToken.userId] = refreshToken
     }
 
     override fun find(userId: User.Id): RefreshToken? {
         return store[userId]
+    }
+
+    override fun delete(userId: User.Id) {
+        store.remove(userId)
     }
 
     fun clear() {
