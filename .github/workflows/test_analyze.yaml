@@ -7,6 +7,14 @@ on:
       - '.github/**'
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      clean:
+        description: 'Run with clean option'
+        required: false
+        default: false
+        type: boolean
+
 jobs:
   Test-And-Analyze:
     name: Run unit test and static analysis
@@ -37,4 +45,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew test testCodeCoverageReport sonar --info
+        run: |
+          if [[ "${{ github.event.inputs.clean }}" == 'true' ]]; then
+            ./gradlew clean test testCodeCoverageReport sonar --info
+          else
+            ./gradlew test testCodeCoverageReport sonar --info
+          fi
