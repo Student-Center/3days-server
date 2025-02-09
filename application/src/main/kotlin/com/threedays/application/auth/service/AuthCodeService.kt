@@ -90,11 +90,14 @@ class AuthCodeService(
         }
     }
 
-    private fun createTesterAuthCode(phoneNumber: PhoneNumber): AuthCode = AuthCode.testerCode(
+    private fun createTesterAuthCode(
+        phoneNumber: PhoneNumber
+    ): AuthCode = AuthCode.testerCode(
         id = authTesterProperties.authCodeId,
         phoneNumber = phoneNumber,
         code = authTesterProperties.authCode
     ).also {
+        authCodeSmsSender.send(it)
         authCodeRepository.save(it)
     }
 
