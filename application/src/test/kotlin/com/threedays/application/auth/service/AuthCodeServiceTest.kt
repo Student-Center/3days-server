@@ -5,6 +5,7 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.config.AuthTesterProperties
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
 import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
@@ -47,6 +48,7 @@ class AuthCodeServiceTest : DescribeSpec({
         accessTokenExpirationSeconds = expirationSeconds,
         refreshTokenExpirationSeconds = expirationSeconds,
     )
+    val authTesterProperties = fixtureMonkey.giveMeBuilder<AuthTesterProperties>().sample()
     val issueLoginTokens = IssueLoginTokensStub(authProperties)
     val authCodeService = AuthCodeService(
         userRepository = userRepository,
@@ -54,6 +56,7 @@ class AuthCodeServiceTest : DescribeSpec({
         authCodeSmsSender = authCodeSmsSender,
         issueLoginTokens = issueLoginTokens,
         authProperties = authProperties,
+        authTesterProperties = authTesterProperties,
     )
 
     beforeEach {
@@ -242,7 +245,10 @@ class AuthCodeServiceTest : DescribeSpec({
                 val result: VerifyNewUserAuthCode.Result = authCodeService.invoke(command)
 
                 // assert
-                JwtTokenProvider.verifyToken(result.registerToken.value, tokenSecret).isSuccess shouldBe true
+                JwtTokenProvider.verifyToken(
+                    result.registerToken.value,
+                    tokenSecret
+                ).isSuccess shouldBe true
             }
         }
     }
@@ -271,8 +277,8 @@ class AuthCodeServiceTest : DescribeSpec({
                 val (_, command) = createAuthCode(LocalDateTime.now().minusSeconds(1))
 
                 // act, assert
-                shouldThrow<AuthException.AuthCodeExpiredException> { 
-                    authCodeService.invoke(command) 
+                shouldThrow<AuthException.AuthCodeExpiredException> {
+                    authCodeService.invoke(command)
                 }
             }
         }
@@ -280,7 +286,9 @@ class AuthCodeServiceTest : DescribeSpec({
         context("인증코드가 유효하지 않으면") {
             it("AuthException.InvalidAuthCodeException 예외를 발생시킨다") {
                 // arrange
-                val (authCode, _) = createAuthCode(LocalDateTime.now().plusSeconds(expirationSeconds))
+                val (authCode, _) = createAuthCode(
+                    LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
 
                 val invalidCommand = fixtureMonkey
                     .giveMeBuilder<VerifyExistingUserAuthCode.Command>()
@@ -289,8 +297,8 @@ class AuthCodeServiceTest : DescribeSpec({
                     .sample()
 
                 // act, assert
-                shouldThrow<AuthException.InvalidAuthCodeException> { 
-                    authCodeService.invoke(invalidCommand) 
+                shouldThrow<AuthException.InvalidAuthCodeException> {
+                    authCodeService.invoke(invalidCommand)
                 }
             }
         }
@@ -326,14 +334,22 @@ class AuthCodeServiceTest : DescribeSpec({
                     .sample()
                     .also { userRepository.save(it) }
 
-                val (_, command) = createAuthCode(LocalDateTime.now().plusSeconds(expirationSeconds))
+                val (_, command) = createAuthCode(
+                    LocalDateTime.now().plusSeconds(expirationSeconds)
+                )
 
                 // act
                 val result: VerifyExistingUserAuthCode.Result = authCodeService.invoke(command)
 
                 // assert
-                JwtTokenProvider.verifyToken(result.accessToken.value, tokenSecret).isSuccess shouldBe true
-                JwtTokenProvider.verifyToken(result.refreshToken.value, tokenSecret).isSuccess shouldBe true
+                JwtTokenProvider.verifyToken(
+                    result.accessToken.value,
+                    tokenSecret
+                ).isSuccess shouldBe true
+                JwtTokenProvider.verifyToken(
+                    result.refreshToken.value,
+                    tokenSecret
+                ).isSuccess shouldBe true
             }
         }
     }

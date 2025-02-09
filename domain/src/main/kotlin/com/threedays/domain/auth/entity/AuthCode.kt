@@ -52,6 +52,20 @@ data class AuthCode(
                 expireAt = expireAt
             )
         }
+
+        fun testerCode(
+            id: UUID,
+            phoneNumber: PhoneNumber,
+            code: String
+        ): AuthCode {
+            return AuthCode(
+                id = Id(id),
+                clientOS = ClientOS.AOS,
+                phoneNumber = phoneNumber,
+                code = Code(code),
+                expireAt = LocalDateTime.MAX
+            )
+        }
     }
 
     fun verify(code: Code): AuthCode {

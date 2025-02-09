@@ -1,6 +1,7 @@
 package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.config.AuthTesterProperties
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
@@ -12,6 +13,7 @@ import com.threedays.domain.auth.entity.RefreshToken
 import com.threedays.domain.auth.entity.RegisterToken
 import com.threedays.domain.auth.exception.AuthException
 import com.threedays.domain.auth.repository.AuthCodeRepository
+import com.threedays.domain.auth.vo.PhoneNumber
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -23,24 +25,14 @@ class AuthCodeService(
     private val authCodeRepository: AuthCodeRepository,
     private val authCodeSmsSender: AuthCodeSmsSender,
     private val issueLoginTokens: IssueLoginTokens,
-    private val authProperties: AuthProperties
+    private val authProperties: AuthProperties,
+    private val authTesterProperties: AuthTesterProperties,
 ) : SendAuthCode,
     VerifyNewUserAuthCode,
     VerifyExistingUserAuthCode {
 
     override fun invoke(command: SendAuthCode.Command): SendAuthCode.Result {
-        val expireAt: LocalDateTime = LocalDateTime
-            .now()
-            .plusSeconds(authProperties.authCodeExpirationSeconds)
-
-        val authCode: AuthCode = AuthCode.create(
-            clientOS = command.clientOS,
-            phoneNumber = command.phoneNumber,
-            expireAt = expireAt
-        ).also {
-            authCodeSmsSender.send(it)
-            authCodeRepository.save(it)
-        }
+        val authCode: AuthCode = createAuthCode(command)
 
         return if (userRepository.findByPhoneNumber(command.phoneNumber) == null) {
             SendAuthCode.Result.NewUser(authCode)
@@ -86,6 +78,36 @@ class AuthCodeService(
             accessTokenExpiresIn = authProperties.accessTokenExpirationSeconds,
             refreshTokenExpiresIn = authProperties.refreshTokenExpirationSeconds
         )
+    }
+
+    private fun createAuthCode(command: SendAuthCode.Command): AuthCode {
+        val expireAt = LocalDateTime.now().plusSeconds(authProperties.authCodeExpirationSeconds)
+
+        return if (command.phoneNumber.value == authTesterProperties.phoneNumber) {
+            createTesterAuthCode(command.phoneNumber)
+        } else {
+            createRegularAuthCode(command, expireAt)
+        }
+    }
+
+    private fun createTesterAuthCode(phoneNumber: PhoneNumber): AuthCode = AuthCode.testerCode(
+        id = authTesterProperties.authCodeId,
+        phoneNumber = phoneNumber,
+        code = authTesterProperties.authCode
+    ).also {
+        authCodeRepository.save(it)
+    }
+
+    private fun createRegularAuthCode(
+        command: SendAuthCode.Command,
+        expireAt: LocalDateTime
+    ): AuthCode = AuthCode.create(
+        clientOS = command.clientOS,
+        phoneNumber = command.phoneNumber,
+        expireAt = expireAt
+    ).also {
+        authCodeSmsSender.send(it)
+        authCodeRepository.save(it)
     }
 
 }
