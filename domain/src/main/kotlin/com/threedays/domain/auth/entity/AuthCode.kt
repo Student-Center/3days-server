@@ -63,7 +63,7 @@ data class AuthCode(
                 clientOS = ClientOS.AOS,
                 phoneNumber = phoneNumber,
                 code = Code(code),
-                expireAt = LocalDateTime.MAX
+                expireAt = LocalDateTime.now().plusYears(1)
             )
         }
     }
