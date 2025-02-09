@@ -27,6 +27,14 @@ websocket:
   session:
     send-time-limit: 10000
     send-buffer-size-limit: 256
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
 ---
 spring:
   config:

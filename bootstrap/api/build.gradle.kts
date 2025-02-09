@@ -23,6 +23,7 @@ dependencies {
     implementation(libs.springdoc.openapi.webmvc.ui)
     implementation(libs.swagger.annotations)
     implementation(libs.spring.boot.starter.validation)
+    implementation(libs.spring.boot.starter.actuator)
 
     developmentOnly(libs.spring.boot.devtools)
     developmentOnly(libs.spring.boot.docker.compose)
