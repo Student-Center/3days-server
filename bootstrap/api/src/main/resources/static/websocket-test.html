@@ -2,8 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>WebSocket Chat Test</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+  <title>WebSocket Chat Test (Pure WebSocket + STOMP)</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
@@ -13,7 +12,6 @@
       color: #333;
       background-color: #f5f5f5;
     }
-
     .container {
       max-width: 1400px;
       margin: 30px auto;
@@ -22,38 +20,32 @@
       grid-template-columns: 500px 1fr;
       gap: 20px;
     }
-
     .left-panel {
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
-
     .right-panel {
       position: sticky;
       top: 30px;
       align-self: start;
     }
-
     .section {
       background: white;
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       padding: 20px;
     }
-
     .section-content {
       background: #f8f9fa;
       border-radius: 6px;
       border-left: 4px solid #007bff;
       padding: 20px;
     }
-
     .section h3 {
       margin-top: 0;
       color: #007bff;
     }
-
     .section-info {
       margin-bottom: 15px;
       font-size: 0.9em;
@@ -63,11 +55,9 @@
       padding: 15px;
       border-radius: 4px;
     }
-
     .section-info.expanded {
       display: block;
     }
-
     .section-info pre {
       background: #fff;
       padding: 10px;
@@ -76,19 +66,15 @@
       margin: 10px 0;
       white-space: pre-wrap;
     }
-
     .section-info p {
       margin: 15px 0 8px 0;
     }
-
     .section-info p:first-child {
       margin-top: 0;
     }
-
     .section-info strong {
       color: #333;
     }
-
     .info-toggle {
       display: flex;
       align-items: center;
@@ -98,19 +84,15 @@
       user-select: none;
       margin-bottom: 15px;
     }
-
     .info-toggle:hover {
       color: #0056b3;
     }
-
     .info-toggle i {
       transition: transform 0.3s;
     }
-
     .info-toggle.expanded i {
       transform: rotate(90deg);
     }
-
     #messages, #subscriptions {
       height: 300px;
       overflow-y: auto;
@@ -120,12 +102,10 @@
       padding: 10px;
       background: white;
     }
-
     #messages {
       height: calc(100vh - 200px);
       min-height: 400px;
     }
-
     #subscriptions {
       max-height: 0;
       overflow: hidden;
@@ -134,7 +114,6 @@
       margin: 0;
       padding: 0;
     }
-
     #subscriptions.has-items {
       max-height: 500px;
       border: 1px solid #dee2e6;
@@ -142,13 +121,11 @@
       margin: 10px 0;
       padding: 10px;
     }
-
     .input-group {
       margin: 15px 0;
       display: flex;
       gap: 10px;
     }
-
     input[type="text"], select {
       flex: 1;
       padding: 8px 12px;
@@ -156,7 +133,6 @@
       border-radius: 4px;
       font-size: 14px;
     }
-
     button {
       padding: 8px 15px;
       background-color: #007bff;
@@ -166,25 +142,20 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     button:hover:not(:disabled) {
       background-color: #0056b3;
     }
-
     button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
       opacity: 0.7;
     }
-
     button.disconnect {
       background-color: #dc3545;
     }
-
     button.disconnect:hover:not(:disabled) {
       background-color: #c82333;
     }
-
     .subscription-item {
       display: flex;
       justify-content: space-between;
@@ -194,15 +165,12 @@
       background: #f8f9fa;
       border-radius: 4px;
     }
-
     .subscription-item button {
       background-color: #dc3545;
     }
-
     .subscription-item button:hover {
       background-color: #c82333;
     }
-
     .message {
       padding: 8px;
       margin: 5px 0;
@@ -210,29 +178,23 @@
       background: #f8f9fa;
       word-break: break-all;
     }
-
     .message.sent {
       background: #e3f2fd;
     }
-
     .message.received {
       background: #f1f8e9;
     }
-
     .message.error {
       background: #ffebee;
       color: #c62828;
     }
-
     .message.info {
       background: #e8f5e9;
       color: #2e7d32;
     }
-
     .subscription-container {
       margin-top: 15px;
     }
-
     .subscription-header {
       display: flex;
       align-items: center;
@@ -240,7 +202,6 @@
       color: #666;
       margin-bottom: 10px;
     }
-
     .subscription-count {
       background: #007bff;
       color: white;
@@ -273,7 +234,7 @@
           3. 발급받은 토큰으로 WebSocket에 연결합니다.<br>
           <br>
           <p><strong>WebSocket 연결 설정</strong></p>
-          1. SockJS와 STOMP 클라이언트 라이브러리를 사용합니다.<br>
+          1. 순수 WebSocket과 STOMP 클라이언트를 사용합니다.<br>
           2. WebSocket 핸드쉐이크: /ws 엔드포인트로 연결<br>
           3. STOMP 연결 설정:<br>
           &nbsp;&nbsp;• 연결 헤더: { "Authorization": "Bearer {발급받은 토큰}" }<br>
@@ -299,7 +260,6 @@
           1. 구독할 채널 ID를 입력하세요.<br>
           2. Subscribe를 통해 해당 채널의 메시지를 수신합니다.<br>
           <br>
-          <br>
           <p><strong>채널 구독 프로토콜</strong></p>
           - STOMP subscribe 명령어 사용<br>
           - 구독 Destination: /channel/{channelId}<br>
@@ -316,32 +276,6 @@
     "cardColor": "BLUE" | "PINK" | null  // CARD 타입일 경우 색상
   },
   "createdAt": "2025-01-13T22:25:56"  // ISO-8601 형식
-}
-
-// 예시 - TEXT 타입
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "channelId": "33333333-3333-3333-3333-333333333333",
-  "senderUserId": "44444444-4444-4444-4444-444444444444",
-  "content": {
-    "type": "TEXT",
-    "text": "안녕하세요",
-    "cardColor": null
-  },
-  "createdAt": "2025-01-13T22:25:56"
-}
-
-// 예시 - CARD 타입
-{
-  "id": "550e8400-e29b-41d4-a716-446655440000",
-  "channelId": "33333333-3333-3333-3333-333333333333",
-  "senderUserId": "44444444-4444-4444-4444-444444444444",
-  "content": {
-    "type": "CARD",
-    "text": "카드 메시지입니다",
-    "cardColor": "BLUE"
-  },
-  "createdAt": "2025-01-13T22:25:56"
 }</pre>
           <br>
           <p><strong>수신 메시지 상태 코드</strong></p>
@@ -350,7 +284,7 @@
           - 404: 채널 없음<br>
         </div>
         <div class="input-group">
-          <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333" 
+          <input type="text" id="subscription" value="/channel/33333333-3333-3333-3333-333333333333"
                  placeholder="구독 경로 (예시: /channel/33333333-3333-3333-3333-333333333333)">
           <button onclick="subscribe()">Subscribe</button>
         </div>
@@ -394,7 +328,7 @@
           - CARD: 색상이 있는 카드 형태 메시지 (BLUE 또는 PINK)<br>
         </div>
         <div class="input-group">
-          <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333" 
+          <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333"
                  placeholder="전송 경로 (예시: /app/channel/33333333-3333-3333-3333-333333333333)">
         </div>
         <div class="input-group">
@@ -476,9 +410,14 @@
       disconnectBtn.disabled = false;
       await fetchCurrentUser(token);
 
-      const socket = new SockJS('/ws');
+      // 순수 WebSocket 사용 (SockJS 제거)
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+      const wsUrl = wsProtocol + window.location.host + '/ws';
+      const socket = new WebSocket(wsUrl);
+
+      // WebSocket 객체에 STOMP 적용
       stompClient = Stomp.over(socket);
-      stompClient.debug = null; // Disable debug logs
+      stompClient.debug = null; // 디버그 로그 비활성화
 
       const headers = {
         'Authorization': 'Bearer ' + token
@@ -509,7 +448,7 @@
       });
       subscriptionsList.clear();
       updateSubscriptionsList();
-      
+
       stompClient.disconnect();
       addMessage('Disconnected from WebSocket', 'info');
       currentUserId = null;
@@ -560,7 +499,7 @@
     const subscriptionsDiv = document.getElementById('subscriptions');
     const countElement = document.querySelector('.subscription-count');
     const count = subscriptionsList.size;
-    
+
     countElement.textContent = count;
     subscriptionsDiv.classList.toggle('has-items', count > 0);
 
