@@ -1,6 +1,7 @@
 package com.threedays.bootstrap.api.user
 
 import com.threedays.application.user.port.inbound.CompleteUserProfileImageUpload
+import com.threedays.application.user.port.inbound.DeleteMyUser
 import com.threedays.application.user.port.inbound.DeleteProfileWidget
 import com.threedays.application.user.port.inbound.DeleteUserProfileImage
 import com.threedays.application.user.port.inbound.GetUserProfileImageUploadUrl
@@ -45,6 +46,7 @@ import java.util.*
 @RestController
 class UserController(
     private val registerUser: RegisterUser,
+    private val deleteMyUser: DeleteMyUser,
     private val putProfileWidget: PutProfileWidget,
     private val userRepository: UserRepository,
     private val deleteProfileWidget: DeleteProfileWidget,
@@ -94,6 +96,14 @@ class UserController(
                 .status(HttpStatus.CREATED)
                 .body(it)
         }
+    }
+
+    override fun deleteMyUser(): ResponseEntity<Unit> = withUserAuthentication { userAuthentication ->
+        userRepository.get(userAuthentication.userId).let { user ->
+            deleteMyUser.invoke(DeleteMyUser.Command(userId = user.id))
+
+        }
+        ResponseEntity.noContent().build()
     }
 
     override fun getMyUserInfo(): ResponseEntity<GetMyUserInfoResponse> =
@@ -227,7 +237,7 @@ class UserController(
         }
 
     override fun updateConnectionStatus(
-        updateConnectionStatusRequest: UpdateConnectionStatusRequest
+        updateConnectionStatusRequest: UpdateConnectionStatusRequest,
     ): ResponseEntity<UpdateConnectionStatusResponse> =
         withUserAuthentication { authentication ->
             val command = UpdateConnectionStatus.Command(
