@@ -38,7 +38,7 @@ class CompanyQueryPersistenceAdapter(
 
         val result: List<Company> = entityManager
             .createQuery(query, jdslRenderContext)
-            .apply { setMaxResults(limit + 1) }
+            .apply { maxResults = limit + 1 }
             .resultList
             .map { it.toDomainEntity() }
 
