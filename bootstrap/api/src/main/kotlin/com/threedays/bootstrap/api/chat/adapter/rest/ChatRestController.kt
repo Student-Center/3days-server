@@ -1,5 +1,6 @@
 package com.threedays.bootstrap.api.chat.adapter.rest
 
+import com.threedays.domain.chat.entity.Channel
 import com.threedays.domain.chat.repository.MessageQueryRepository
 import com.threedays.oas.api.ChatApi
 import com.threedays.oas.model.GetChannelMessagesResponse
@@ -22,7 +23,7 @@ class ChatRestController(
         limit: Int
     ): ResponseEntity<GetChannelMessagesResponse> {
         val (resultMessages, resultNext) = messageQueryRepository.scrollByChannelId(
-            channelId = UUIDTypeId.from(channelId),
+            channelId = Channel.Id(channelId),
             next = next?.let { UUIDTypeId.from(it) },
             limit = limit
         )
