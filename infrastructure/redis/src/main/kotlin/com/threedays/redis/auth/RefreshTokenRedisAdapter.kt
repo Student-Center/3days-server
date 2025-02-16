@@ -26,4 +26,8 @@ class RefreshTokenRedisAdapter(
             .orElse(null)
     }
 
+    override fun delete(userId: User.Id) {
+        refreshTokenRedisRepository.deleteById(userId.value.toString())
+    }
+
 }

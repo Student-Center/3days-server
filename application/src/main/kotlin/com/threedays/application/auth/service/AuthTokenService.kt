@@ -1,6 +1,7 @@
 package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
+import com.threedays.application.auth.port.inbound.ClearTokens
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.auth.port.inbound.RefreshLoginTokens
 import com.threedays.domain.auth.entity.AccessToken
@@ -13,9 +14,8 @@ import org.springframework.stereotype.Service
 @Service
 class AuthTokenService(
     private val authProperties: AuthProperties,
-    private val refreshTokenRepository: RefreshTokenRepository
-) : IssueLoginTokens,
-    RefreshLoginTokens {
+    private val refreshTokenRepository: RefreshTokenRepository,
+) : IssueLoginTokens, RefreshLoginTokens, ClearTokens {
 
     override fun invoke(command: IssueLoginTokens.Command): IssueLoginTokens.Result {
         val user: User = command.user
@@ -76,4 +76,9 @@ class AuthTokenService(
             secret = authProperties.tokenSecret
         )
     }
+
+    override fun invoke(command: ClearTokens.Command) {
+        refreshTokenRepository.delete(command.userId)
+    }
+
 }
