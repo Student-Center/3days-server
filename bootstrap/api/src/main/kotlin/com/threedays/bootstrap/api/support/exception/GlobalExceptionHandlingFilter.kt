@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 
 @Component
@@ -47,7 +47,7 @@ class GlobalExceptionHandlingFilter(
         val errorResponse = ErrorResponse(
             code = exception.code,
             message = exception.message,
-            time = OffsetDateTime.now(),
+            time = LocalDateTime.now().toString(),
             type = exception.type,
         )
         response.status = HttpStatus.FORBIDDEN.value()

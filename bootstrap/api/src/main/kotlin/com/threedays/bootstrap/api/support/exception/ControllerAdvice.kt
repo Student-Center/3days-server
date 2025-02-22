@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 @RestControllerAdvice
 class ControllerAdvice {
@@ -61,7 +61,7 @@ class ControllerAdvice {
         code: String
     ): ErrorResponse {
         return ErrorResponse(
-            time = OffsetDateTime.now(),
+            time = LocalDateTime.now().toString(),
             type = type,
             code = code
         )

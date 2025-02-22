@@ -9,7 +9,6 @@ import com.threedays.oas.model.MessageContent
 import com.threedays.support.common.base.domain.UUIDTypeId
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
-import java.time.ZoneOffset
 import java.util.*
 
 @RestController
@@ -51,7 +50,7 @@ class ChatRestController(
                         else -> null
                     }
                 ),
-                createdAt = it.createdAt.atOffset(ZoneOffset.UTC)
+                createdAt = it.createdAt.toString(),
             )
         }
         return GetChannelMessagesResponse(
