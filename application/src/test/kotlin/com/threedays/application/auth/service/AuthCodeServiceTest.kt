@@ -5,7 +5,6 @@ import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
 import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.application.auth.config.AuthProperties
-import com.threedays.application.auth.config.AuthTesterProperties
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
 import com.threedays.application.auth.port.inbound.VerifyNewUserAuthCode
@@ -48,7 +47,6 @@ class AuthCodeServiceTest : DescribeSpec({
         accessTokenExpirationSeconds = expirationSeconds,
         refreshTokenExpirationSeconds = expirationSeconds,
     )
-    val authTesterProperties = fixtureMonkey.giveMeBuilder<AuthTesterProperties>().sample()
     val issueLoginTokens = IssueLoginTokensStub(authProperties)
     val authCodeService = AuthCodeService(
         userRepository = userRepository,
@@ -56,7 +54,6 @@ class AuthCodeServiceTest : DescribeSpec({
         authCodeSmsSender = authCodeSmsSender,
         issueLoginTokens = issueLoginTokens,
         authProperties = authProperties,
-        authTesterProperties = authTesterProperties,
     )
 
     beforeEach {
