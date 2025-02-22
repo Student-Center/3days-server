@@ -1,7 +1,6 @@
 package com.threedays.application.auth.service
 
 import com.threedays.application.auth.config.AuthProperties
-import com.threedays.application.auth.config.AuthTesterProperties
 import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.auth.port.inbound.SendAuthCode
 import com.threedays.application.auth.port.inbound.VerifyExistingUserAuthCode
@@ -26,7 +25,6 @@ class AuthCodeService(
     private val authCodeSmsSender: AuthCodeSmsSender,
     private val issueLoginTokens: IssueLoginTokens,
     private val authProperties: AuthProperties,
-    private val authTesterProperties: AuthTesterProperties,
 ) : SendAuthCode,
     VerifyNewUserAuthCode,
     VerifyExistingUserAuthCode {
@@ -83,7 +81,7 @@ class AuthCodeService(
     private fun createAuthCode(command: SendAuthCode.Command): AuthCode {
         val expireAt = LocalDateTime.now().plusSeconds(authProperties.authCodeExpirationSeconds)
 
-        return if (command.phoneNumber.value == authTesterProperties.phoneNumber) {
+        return if (authProperties.isTesterPhoneNumber(command.phoneNumber)) {
             createTesterAuthCode(command.phoneNumber)
         } else {
             createRegularAuthCode(command, expireAt)
@@ -92,13 +90,17 @@ class AuthCodeService(
 
     private fun createTesterAuthCode(
         phoneNumber: PhoneNumber
-    ): AuthCode = AuthCode.testerCode(
-        id = authTesterProperties.authCodeId,
-        phoneNumber = phoneNumber,
-        code = authTesterProperties.authCode
-    ).also {
-        authCodeSmsSender.send(it)
-        authCodeRepository.save(it)
+    ): AuthCode {
+        val testerInfo: AuthProperties.Tester = authProperties.getTesterByPhoneNumber(phoneNumber)
+
+        return AuthCode.testerCode(
+            id = testerInfo.authCodeId,
+            phoneNumber = phoneNumber,
+            code = testerInfo.authCode
+        ).also {
+            authCodeSmsSender.send(it)
+            authCodeRepository.save(it)
+        }
     }
 
     private fun createRegularAuthCode(

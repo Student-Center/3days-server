@@ -5,9 +5,12 @@ auth:
   refresh-token-expiration-seconds: ${REFRESH_TOKEN_EXPIRATION_SECONDS:604800}  # 1 week
   register-token-expiration-seconds: ${REGISTER_TOKEN_EXPIRATION_SECONDS:86400} # 1 day
   tester:
-    phone-number: ${AUTH_TESTER_PHONE_NUMBER:01000000001}
-    auth-code: ${AUTH_TESTER_AUTH_CODE:123456}
-    auth-code-id: ${AUTH_TESTER_AUTH_CODE_ID:04028505-2aae-4881-9bfb-ef60b6eaca97}
+    - phone-number: ${AUTH_TESTER_PHONE_NUMBER:01000000001}
+      auth-code: ${AUTH_TESTER_AUTH_CODE:123456}
+      auth-code-id: ${AUTH_TESTER_AUTH_CODE_ID:04028505-2aae-4881-9bfb-ef60b6eaca97}
+    - phone-number: ${AUTH_TESTER_PHONE_NUMBER:01000000002}
+      auth-code: ${AUTH_TESTER_AUTH_CODE:123456}
+      auth-code-id: ${AUTH_TESTER_AUTH_CODE_ID:04028505-2aae-4881-9bfb-ef60b6eaca98}
 
 user:
   profile-image:
