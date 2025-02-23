@@ -42,7 +42,7 @@ class MessageQueryPersistenceAdapter(
                 path(MessageJpaEntity::channelId).eq(channelId.value),
                 next?.let { path(MessageJpaEntity::id).greaterThanOrEqualTo(it.value) }
             ).orderBy(
-                path(MessageJpaEntity::id).desc()
+                path(MessageJpaEntity::createdAt).desc()
             )
         }
 
@@ -51,7 +51,6 @@ class MessageQueryPersistenceAdapter(
             .apply { maxResults = limit + 1 }
             .resultList
             .map { it.toDomain() }
-
 
         val hasNextPage: Boolean = result.size > limit
         val nextId: Message.Id? = if (hasNextPage) {

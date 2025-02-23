@@ -10,7 +10,8 @@ CREATE TABLE messages
     created_at     DATETIME(6) NOT NULL COMMENT '생성일시',
     updated_at     DATETIME(6) COMMENT '수정일시',
     PRIMARY KEY (id),
-    INDEX idx_messages_channel_id (channel_id)
+    INDEX idx_messages_channel_id (channel_id),
+    INDEX idx_messages_channel_id_created_at (channel_id, created_at)
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='채팅 메시지';
