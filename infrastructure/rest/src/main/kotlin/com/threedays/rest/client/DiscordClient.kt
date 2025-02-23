@@ -6,12 +6,11 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.net.URI
 
-@FunctionalInterface
 @FeignClient(
     name = "discord",
     url = "dyanamic-discord-client-url"
 )
-interface DiscordClient {
+fun interface DiscordClient {
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun send(
