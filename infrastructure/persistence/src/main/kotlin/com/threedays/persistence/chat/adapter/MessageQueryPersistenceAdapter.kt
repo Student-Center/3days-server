@@ -40,7 +40,7 @@ class MessageQueryPersistenceAdapter(
                 entity(MessageJpaEntity::class)
             ).whereAnd(
                 path(MessageJpaEntity::channelId).eq(channelId.value),
-                next?.let { path(MessageJpaEntity::id).greaterThanOrEqualTo(it.value) }
+                next?.let { path(MessageJpaEntity::id).lessThanOrEqualTo(it.value) }
             ).orderBy(
                 path(MessageJpaEntity::createdAt).desc()
             )
