@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import java.net.URI
 
+@FunctionalInterface
 @FeignClient(
     name = "discord",
     url = "dyanamic-discord-client-url"
