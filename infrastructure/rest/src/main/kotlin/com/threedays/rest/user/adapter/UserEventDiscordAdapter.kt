@@ -25,7 +25,7 @@ class UserEventDiscordAdapter(
             Gender.FEMALE -> "여성"
         }
         val content = """
-            @evenryone
+            @everyone
             ${birthYear.value}년생 $displayTextForGender 신규 유저(${id.value}) 회원가입 이벤트 발생!
         """.trimIndent()
 
