@@ -58,7 +58,6 @@ class UserService(
             birthYear = command.userBirthYear,
         )
 
-
         return RegisterUser.Result(
             accessToken = result.accessToken,
             refreshToken = result.refreshToken,
