@@ -6,6 +6,7 @@ import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.DeleteMyUser
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.application.user.port.inbound.UpdateConnectionStatus
+import com.threedays.application.user.port.outbound.UserEventPort
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.entity.User
@@ -23,6 +24,7 @@ class UserService(
     private val issueLoginTokens: IssueLoginTokens,
     private val clearTokens: ClearTokens,
     private val authProperties: AuthProperties,
+    private val userEventPort: UserEventPort,
 ) : RegisterUser, UpdateConnectionStatus, DeleteMyUser {
 
     @Transactional
@@ -49,6 +51,13 @@ class UserService(
 
         val result: IssueLoginTokens.Result = IssueLoginTokens.Command(user)
             .let { issueLoginTokens.invoke(it) }
+
+        userEventPort.issueRegisterEvent(
+            id = user.id,
+            gender = command.userGender,
+            birthYear = command.userBirthYear,
+        )
+
 
         return RegisterUser.Result(
             accessToken = result.accessToken,
