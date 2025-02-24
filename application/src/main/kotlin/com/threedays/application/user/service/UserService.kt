@@ -6,12 +6,14 @@ import com.threedays.application.auth.port.inbound.IssueLoginTokens
 import com.threedays.application.user.port.inbound.DeleteMyUser
 import com.threedays.application.user.port.inbound.RegisterUser
 import com.threedays.application.user.port.inbound.UpdateConnectionStatus
+import com.threedays.application.user.port.outbound.UserEventPort
 import com.threedays.domain.user.entity.Company
 import com.threedays.domain.user.entity.Location
 import com.threedays.domain.user.entity.User
 import com.threedays.domain.user.repository.CompanyQueryRepository
 import com.threedays.domain.user.repository.LocationQueryRepository
 import com.threedays.domain.user.repository.UserRepository
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -23,7 +25,12 @@ class UserService(
     private val issueLoginTokens: IssueLoginTokens,
     private val clearTokens: ClearTokens,
     private val authProperties: AuthProperties,
+    private val userEventPort: UserEventPort,
 ) : RegisterUser, UpdateConnectionStatus, DeleteMyUser {
+
+    companion object {
+        private val logger = KotlinLogging.logger { }
+    }
 
     @Transactional
     override fun invoke(command: RegisterUser.Command): RegisterUser.Result {
@@ -50,6 +57,8 @@ class UserService(
         val result: IssueLoginTokens.Result = IssueLoginTokens.Command(user)
             .let { issueLoginTokens.invoke(it) }
 
+        issueEvent(user, command)
+
         return RegisterUser.Result(
             accessToken = result.accessToken,
             refreshToken = result.refreshToken,
@@ -71,4 +80,18 @@ class UserService(
         clearTokens.invoke(ClearTokens.Command(command.userId))
     }
 
+    private fun issueEvent(
+        user: User,
+        command: RegisterUser.Command,
+    ) {
+        try {
+            userEventPort.issueRegisterEvent(
+                id = user.id,
+                gender = command.userGender,
+                birthYear = command.userBirthYear,
+            )
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to issue register event for user ${user.id}" }
+        }
+    }
 }

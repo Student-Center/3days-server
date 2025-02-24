@@ -4,6 +4,7 @@ spring:
       on-profile: local
 discord:
   auth-sms-hook-url: ${DISCORD_AUTH_SMS_HOOK_URL}
+  app-event-and-metric-hook-url: ${DISCORD_APP_EVENT_AND_METRIC_HOOK_URL}
 ---
 spring:
   config:
@@ -11,8 +12,11 @@ spring:
       on-profile: dev
 discord:
   auth-sms-hook-url: ${DISCORD_AUTH_SMS_HOOK_URL}
+  app-event-and-metric-hook-url: ${DISCORD_APP_EVENT_AND_METRIC_HOOK_URL}
 ---
 spring:
   config:
     activate:
       on-profile: prod
+discord:
+  app-event-and-metric-hook-url: ${DISCORD_APP_EVENT_AND_METRIC_HOOK_URL}
