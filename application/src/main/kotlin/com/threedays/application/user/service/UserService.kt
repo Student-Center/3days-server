@@ -56,15 +56,8 @@ class UserService(
 
         val result: IssueLoginTokens.Result = IssueLoginTokens.Command(user)
             .let { issueLoginTokens.invoke(it) }
-        try {
-            userEventPort.issueRegisterEvent(
-                id = user.id,
-                gender = command.userGender,
-                birthYear = command.userBirthYear,
-            )
-        } catch (e: Exception) {
-            logger.warn(e) { "Failed to issue register event for user ${user.id}" }
-        }
+
+        issueEvent(user, command)
 
         return RegisterUser.Result(
             accessToken = result.accessToken,
@@ -87,4 +80,18 @@ class UserService(
         clearTokens.invoke(ClearTokens.Command(command.userId))
     }
 
+    private fun issueEvent(
+        user: User,
+        command: RegisterUser.Command,
+    ) {
+        try {
+            userEventPort.issueRegisterEvent(
+                id = user.id,
+                gender = command.userGender,
+                birthYear = command.userBirthYear,
+            )
+        } catch (e: Exception) {
+            logger.warn(e) { "Failed to issue register event for user ${user.id}" }
+        }
+    }
 }
