@@ -2,17 +2,23 @@ package com.threedays.rest.auth.adapter
 
 import com.threedays.application.auth.port.outbound.AuthCodeSmsSender
 import com.threedays.domain.auth.entity.AuthCode
-import com.threedays.rest.auth.client.DiscordClient
-import com.threedays.rest.auth.dto.SendDiscordMessageRequest
+import com.threedays.rest.client.DiscordClient
+import com.threedays.rest.support.properties.DiscordProperties
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
+import java.net.URI
 
 @Component
 @Profile("dev", "local")
 class AuthCodeSmsSenderDiscordAdapter(
-    private val discordClient: DiscordClient
+    private val discordProperties: DiscordProperties,
+    private val discordClient: DiscordClient,
 ) : AuthCodeSmsSender {
+
+    private val uri by lazy {
+        URI.create(discordProperties.authSmsHookUrl)
+    }
 
     companion object {
         private val logger = KotlinLogging.logger { }
@@ -26,8 +32,8 @@ class AuthCodeSmsSenderDiscordAdapter(
             Message: ${authCode.getSmsMessage()}
         """.trimIndent()
 
-        val request = SendDiscordMessageRequest(content)
-        discordClient.send(request)
+        val request = DiscordClient.Message(content)
+        discordClient.send(uri = uri, message = request)
     }
 
 }

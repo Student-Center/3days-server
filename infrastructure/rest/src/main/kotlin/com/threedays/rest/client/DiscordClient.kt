@@ -1,20 +1,26 @@
-package com.threedays.rest.auth.client
+package com.threedays.rest.client
 
-import com.threedays.rest.auth.dto.SendDiscordMessageRequest
 import org.springframework.cloud.openfeign.FeignClient
-import org.springframework.context.annotation.Profile
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import java.net.URI
 
 @FeignClient(
     name = "discord",
-    url = "\${discord.auth-sms-hook-url}"
+    url = "dyanamic-discord-client-url"
 )
-@Profile("dev", "local")
-interface DiscordClient {
+fun interface DiscordClient {
 
     @PostMapping(consumes = [MediaType.APPLICATION_JSON_VALUE])
-    fun send(@RequestBody message: SendDiscordMessageRequest)
+    fun send(
+        uri: URI,
+        @RequestBody message: Message,
+    )
+
+    data class Message(
+        val content: String,
+    )
+
 
 }
