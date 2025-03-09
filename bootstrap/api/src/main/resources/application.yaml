@@ -1,5 +1,3 @@
-
-
 server:
   port: 8080
   shutdown: graceful
@@ -43,6 +41,17 @@ webmvc:
       - "3daysapp.com"
       - "dev.3daysapp.com"
       - "localhost:8080"
+swagger:
+  server-config:
+    local:
+      url: http://localhost:8080
+      description: Local API
+    dev:
+      url: https://dev.3daysapp.com
+      description: Development API
+    prod:
+      url: https://api.3daysapp.com
+      description: Production API
 ---
 spring:
   config:
