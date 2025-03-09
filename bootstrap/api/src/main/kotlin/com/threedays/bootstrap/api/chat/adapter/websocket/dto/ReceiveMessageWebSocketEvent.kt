@@ -27,7 +27,7 @@ data class ReceiveMessageWebSocketEvent(
                 channelId = channelId.value,
                 senderUserId = senderUserId.value,
                 content = Content(
-                    type = content::class.simpleName!!,
+                    type = content.getTypeNameString(),
                     text = when (content) {
                         is Message.Content.Text -> (content as Message.Content.Text).text
                         is Message.Content.Card -> (content as Message.Content.Card).text

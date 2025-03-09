@@ -41,6 +41,7 @@ class ChatRestController(
                 senderUserId = it.senderUserId.value,
 
                 content = MessageContent(
+                    type = MessageContent.Type.valueOf(it.content.getTypeNameString()),
                     text = when (it.content) {
                         is com.threedays.domain.chat.entity.Message.Content.Text -> (it.content as com.threedays.domain.chat.entity.Message.Content.Text).text
                         is com.threedays.domain.chat.entity.Message.Content.Card -> (it.content as com.threedays.domain.chat.entity.Message.Content.Card).text

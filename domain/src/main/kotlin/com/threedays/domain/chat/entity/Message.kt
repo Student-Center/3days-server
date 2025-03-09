@@ -30,6 +30,11 @@ data class Message(
                 BLUE, PINK,
             }
         }
+
+
+        fun getTypeNameString(): String {
+            return this::class.simpleName!!.toUpperCase()
+        }
     }
 
     enum class Status {
