@@ -38,9 +38,10 @@ management:
 webmvc:
   cors:
     allowed-origins:
-      - "3daysapp.com"
-      - "dev.3daysapp.com"
-      - "localhost:8080"
+      - "http://localhost:8080"
+      - "https://localhost:8080"
+      - "https://api.3daysapp.com"
+      - "https://dev.3daysapp.com"
 swagger:
   server-config:
     local:
