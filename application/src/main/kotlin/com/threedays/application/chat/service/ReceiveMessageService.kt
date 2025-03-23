@@ -28,6 +28,7 @@ class ReceiveMessageService(
 
     private fun broadcastMessage(message: Message) {
         val channel: Channel = channelRepository.findById(message.channelId) ?: return
-        chatClient.broadcastEvent(channel.id, message.toReceiveMessageEvent())
+        chatClient.
+        broadcastEvent(channel.id, message.toReceiveMessageEvent())
     }
 }

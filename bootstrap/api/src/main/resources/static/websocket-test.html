@@ -209,6 +209,30 @@
       border-radius: 10px;
       font-size: 0.8em;
     }
+    .message-section {
+      border-top: 1px solid #dee2e6;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+    .message-section h4 {
+      margin-top: 0;
+      color: #495057;
+    }
+    .hidden {
+      display: none;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+    .tag.admin {
+      background-color: #dc3545;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -269,11 +293,14 @@
           <pre>{
   "id": "UUID",            // 메시지 고유 ID
   "channelId": "UUID",     // 채널 ID
-  "senderUserId": "UUID",  // 발신자 ID
+  "senderUserId": "UUID",  // 발신자 ID (시스템 메시지는 null)
   "content": {             // 메시지 내용
-    "type": "TEXT" | "CARD",   // 메시지 타입
+    "type": "TEXT" | "CARD" | "SYSTEM",   // 메시지 타입
     "text": "string",          // 메시지 텍스트
-    "cardColor": "BLUE" | "PINK" | null  // CARD 타입일 경우 색상
+    "title": "string" | null,  // 카드 제목 (CARD 타입일 경우)
+    "cardColor": "BLUE" | "PINK" | null,  // CARD 타입일 경우 색상
+    "systemType": "INFO" | "NEXT_CARD" | null,  // SYSTEM 타입일 경우 타입
+    "nextCardTitle": "string" | null  // NEXT_CARD 시스템 타입일 경우 다음 카드 제목
   },
   "createdAt": "2025-01-13T22:25:56"  // ISO-8601 형식
 }</pre>
@@ -327,17 +354,68 @@
           - TEXT: 일반 텍스트 메시지<br>
           - CARD: 색상이 있는 카드 형태 메시지 (BLUE 또는 PINK)<br>
         </div>
-        <div class="input-group">
-          <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333"
-                 placeholder="전송 경로 (예시: /app/channel/33333333-3333-3333-3333-333333333333)">
+
+        <!-- 일반 메시지 및 카드 메시지 전송 섹션 -->
+        <div class="message-section">
+          <h4>텍스트/카드 메시지 전송</h4>
+          <div class="input-group">
+            <input type="text" id="sendPath" value="/app/channel/33333333-3333-3333-3333-333333333333"
+                   placeholder="전송 경로 (예시: /app/channel/33333333-3333-3333-3333-333333333333)">
+          </div>
+          <div class="input-group">
+            <input type="text" id="message" placeholder="메시지 내용">
+            <select id="messageType" onchange="updateMessageForm()">
+              <option value="TEXT">TEXT</option>
+              <option value="CARD">CARD</option>
+            </select>
+            <button onclick="sendMessage()">Send</button>
+          </div>
+          <div id="cardFields" class="input-group hidden">
+            <input type="text" id="cardTitle" placeholder="카드 제목">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 시스템 메시지 전송 섹션 (REST API 사용) -->
+    <div class="section">
+      <h3>4. 시스템 메시지 전송 <span class="tag admin">Admin API</span></h3>
+      <div class="section-content">
+        <div class="info-toggle" onclick="toggleInfo(this)">
+          <i class="fas fa-chevron-right"></i>
+          <span>시스템 메시지 전송 방법</span>
+        </div>
+        <div class="section-info">
+          <p><strong>시스템 메시지 전송 방법</strong></p>
+          1. 메시지를 전송할 채널 ID를 입력하세요.<br>
+          2. 메시지 내용과 타입을 선택하세요.<br>
+          3. Send System Message 버튼을 클릭하면 REST API를 통해 메시지가 전송됩니다.<br>
+          <br>
+          <p><strong>시스템 메시지 전송 API</strong></p>
+          - REST API 엔드포인트: POST /admin/chat/channels/{channelId}/system-message<br>
+          - 인증: Bearer 토큰 사용<br>
+          <br>
+          <p><strong>시스템 메시지 요청 스키마</strong></p>
+          <pre>{
+  "type": "INFO" | "NEXT_CARD",  // 시스템 메시지 타입
+  "text": "string",              // 메시지 내용
+  "nextCardTitle": "string"      // 다음 카드 제목 (NEXT_CARD 타입일 경우)
+}</pre>
         </div>
         <div class="input-group">
-          <input type="text" id="message" placeholder="메시지 내용">
-          <select id="messageType">
-            <option value="TEXT">TEXT</option>
-            <option value="CARD">CARD</option>
+          <input type="text" id="systemChannelId" value="33333333-3333-3333-3333-333333333333"
+                 placeholder="채널 ID (예시: 33333333-3333-3333-3333-333333333333)">
+        </div>
+        <div class="input-group">
+          <input type="text" id="systemMessage" placeholder="시스템 메시지 내용">
+          <select id="systemType" onchange="updateSystemForm()">
+            <option value="INFO">INFO</option>
+            <option value="NEXT_CARD">NEXT_CARD</option>
           </select>
-          <button onclick="sendMessage()">Send</button>
+          <button onclick="sendSystemMessage()">Send System Message</button>
+        </div>
+        <div id="nextCardFields" class="input-group hidden">
+          <input type="text" id="nextCardTitle" placeholder="다음 카드 제목">
         </div>
       </div>
     </div>
@@ -345,7 +423,7 @@
 
   <div class="right-panel">
     <div class="section">
-      <h3>4. 메시지 로그</h3>
+      <h3>5. 메시지 로그</h3>
       <div class="section-content">
         <div class="info-toggle" onclick="toggleInfo(this)">
           <i class="fas fa-chevron-right"></i>
@@ -372,9 +450,32 @@
 <script>
   let stompClient = null;
   let currentUserId = null;
+  let currentToken = null;
   const messagesDiv = document.getElementById('messages');
   const subscriptionsDiv = document.getElementById('subscriptions');
   const subscriptionsList = new Map();
+
+  function updateMessageForm() {
+    const messageType = document.getElementById('messageType').value;
+    const cardFields = document.getElementById('cardFields');
+
+    if (messageType === 'CARD') {
+      cardFields.classList.remove('hidden');
+    } else {
+      cardFields.classList.add('hidden');
+    }
+  }
+
+  function updateSystemForm() {
+    const systemType = document.getElementById('systemType').value;
+    const nextCardFields = document.getElementById('nextCardFields');
+
+    if (systemType === 'NEXT_CARD') {
+      nextCardFields.classList.remove('hidden');
+    } else {
+      nextCardFields.classList.add('hidden');
+    }
+  }
 
   async function fetchCurrentUser(token) {
     try {
@@ -408,6 +509,7 @@
     try {
       connectBtn.disabled = true;
       disconnectBtn.disabled = false;
+      currentToken = token;
       await fetchCurrentUser(token);
 
       // 순수 WebSocket 사용 (SockJS 제거)
@@ -428,6 +530,7 @@
       }, function(error) {
         addMessage('WebSocket connection error: ' + error, 'error');
         currentUserId = null;
+        currentToken = null;
         connectBtn.disabled = false;
         disconnectBtn.disabled = true;
       });
@@ -452,6 +555,7 @@
       stompClient.disconnect();
       addMessage('Disconnected from WebSocket', 'info');
       currentUserId = null;
+      currentToken = null;
       connectBtn.disabled = false;
       disconnectBtn.disabled = true;
     }
@@ -523,6 +627,7 @@
     const messageInput = document.getElementById('message');
     const sendPathInput = document.getElementById('sendPath');
     const messageTypeSelect = document.getElementById('messageType');
+    const cardTitleInput = document.getElementById('cardTitle');
 
     if (!stompClient) {
       addMessage('Please connect first', 'error');
@@ -539,15 +644,78 @@
       return;
     }
 
-    const message = {
+    const messageType = messageTypeSelect.value;
+    let messageObj = {
       senderUserId: currentUserId,
       messageContent: messageInput.value || "",
-      messageType: messageTypeSelect.value
+      messageType: messageType
     };
 
-    stompClient.send(sendPathInput.value, {}, JSON.stringify(message));
-    addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(message, null, 2)}`, 'sent');
+    // CARD 타입인 경우 title 추가
+    if (messageType === 'CARD') {
+      messageObj.cardTitle = cardTitleInput.value || "제목 없음";
+    }
+
+    stompClient.send(sendPathInput.value, {}, JSON.stringify(messageObj));
+    addMessage(`Sent to ${sendPathInput.value}: ${JSON.stringify(messageObj, null, 2)}`, 'sent');
     messageInput.value = '';
+    if (cardTitleInput) {
+      cardTitleInput.value = '';
+    }
+  }
+
+  // REST API를 사용하여 시스템 메시지 전송
+  async function sendSystemMessage() {
+    const systemMessageInput = document.getElementById('systemMessage');
+    const systemChannelIdInput = document.getElementById('systemChannelId');
+    const systemTypeSelect = document.getElementById('systemType');
+    const nextCardTitleInput = document.getElementById('nextCardTitle');
+
+    if (!currentToken) {
+      addMessage('Please connect first to get a valid token', 'error');
+      return;
+    }
+
+    if (!systemChannelIdInput.value) {
+      addMessage('Please enter a channel ID', 'error');
+      return;
+    }
+
+    const systemType = systemTypeSelect.value;
+    let messageObj = {
+      type: systemType,
+      text: systemMessageInput.value || ""
+    };
+
+    // NEXT_CARD 타입인 경우 nextCardTitle 추가
+    if (systemType === 'NEXT_CARD') {
+      messageObj.nextCardTitle = nextCardTitleInput.value || "다음 카드";
+    }
+
+    try {
+      const url = `/admin/chat/channels/${systemChannelIdInput.value}/system-message`;
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + currentToken
+        },
+        body: JSON.stringify(messageObj)
+      });
+
+      if (response.ok) {
+        addMessage(`System message sent successfully to channel ${systemChannelIdInput.value}: ${JSON.stringify(messageObj, null, 2)}`, 'sent');
+        systemMessageInput.value = '';
+        if (nextCardTitleInput) {
+          nextCardTitleInput.value = '';
+        }
+      } else {
+        const errorData = await response.json();
+        addMessage(`Failed to send system message: ${response.status} - ${JSON.stringify(errorData)}`, 'error');
+      }
+    } catch (error) {
+      addMessage(`Error sending system message: ${error.message}`, 'error');
+    }
   }
 
   function addMessage(message, type = '') {
@@ -564,6 +732,12 @@
     const span = element.querySelector('span');
     span.textContent = element.classList.contains('expanded') ? 'Hide instructions' : 'Show instructions';
   }
+
+  // 페이지 로드 시 폼 상태 초기화
+  window.onload = function() {
+    updateMessageForm();
+    updateSystemForm();
+  };
 </script>
 </body>
 </html>

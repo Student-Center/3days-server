@@ -1,7 +1,7 @@
 package com.threedays.bootstrap.api.chat.adapter.websocket
 
 import com.threedays.application.chat.port.inbound.SendMessage
-import com.threedays.bootstrap.api.chat.adapter.websocket.dto.SendMessageWebSocketCommand
+import com.threedays.bootstrap.api.chat.adapter.websocket.dto.SendUserMessageWebSocketCommand
 import io.github.oshai.kotlinlogging.KotlinLogging
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -21,7 +21,7 @@ class ChatListenerStompAdapter(
     @MessageMapping("/channel/{channelId}")
     fun onChatMessage(
         @DestinationVariable channelId: String,
-        @Payload message: SendMessageWebSocketCommand
+        @Payload message: SendUserMessageWebSocketCommand
     ) {
         val channelId = UUID.fromString(channelId)
         logger.info { "Send message request to channel $channelId: $channelId" }

@@ -10,7 +10,7 @@ import java.util.*
 data class Message(
     override val id: Id,
     val channelId: Channel.Id,
-    val senderUserId: User.Id,
+    val senderUserId: User.Id?,
     val content: Content,
     val status: Status = Status.SENT,
     val createdAt: LocalDateTime = LocalDateTime.now(),
@@ -22,6 +22,7 @@ data class Message(
     sealed class Content {
         data class Text(val text: String) : Content()
         data class Card(
+            val title: String,
             val text: String,
             val color: Color
         ) : Content() {
@@ -31,6 +32,17 @@ data class Message(
             }
         }
 
+        data class System(
+            val text: String,
+            val type: Type = Type.INFO,
+            val nextCardTitle: String? = null
+        ) : Content() {
+
+            enum class Type {
+                INFO,
+                NEXT_CARD
+            }
+        }
 
         fun getTypeNameString(): String {
             return this::class.simpleName!!.toUpperCase()
@@ -47,6 +59,7 @@ data class Message(
         fun createCardMessage(
             channelId: Channel.Id,
             sender: User,
+            title: String,
             text: String,
         ): Message {
             val color: Content.Card.Color = when (sender.profile.gender) {
@@ -58,7 +71,7 @@ data class Message(
                 id = UUIDTypeId.random(),
                 channelId = channelId,
                 senderUserId = sender.id,
-                content = Content.Card(text, color)
+                content = Content.Card(title, text, color)
             )
         }
 
@@ -74,6 +87,38 @@ data class Message(
                 content = Content.Text(text)
             )
         }
-    }
 
+        fun createSystemMessage(
+            channelId: Channel.Id,
+            text: String,
+            type: Content.System.Type = Content.System.Type.INFO,
+        ): Message {
+            return Message(
+                id = UUIDTypeId.random(),
+                channelId = channelId,
+                senderUserId = null,
+                content = Content.System(
+                    text = text,
+                    type = type,
+                )
+            )
+        }
+
+        fun createNextCardSystemMessage(
+            channelId: Channel.Id,
+            text: String,
+            nextCardTitle: String
+        ): Message {
+            return Message(
+                id = UUIDTypeId.random(),
+                channelId = channelId,
+                senderUserId = null,
+                content = Content.System(
+                    text = text,
+                    type = Content.System.Type.NEXT_CARD,
+                    nextCardTitle = nextCardTitle
+                )
+            )
+        }
+    }
 }
