@@ -9,7 +9,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.OneToOne
 import jakarta.persistence.Table
 import java.time.LocalDateTime
-import java.util.*
+import java.util.UUID
 
 @Entity
 @Table(name = "connection")
@@ -18,6 +18,7 @@ class ConnectionJpaEntity(
     participant1: ParticipantJpaEntity,
     participant2: ParticipantJpaEntity,
     connectedAt: LocalDateTime,
+    cancellation: ConnectionCancellationJpaEntity?,
 ) {
 
     @Id
@@ -42,12 +43,21 @@ class ConnectionJpaEntity(
     var connectedAt: LocalDateTime = connectedAt
         private set
 
+    @OneToOne(
+        fetch = FetchType.EAGER,
+        cascade = [CascadeType.ALL],
+    )
+    var cancellation: ConnectionCancellationJpaEntity? = cancellation
+        private set
+
+
     fun toDomain(): Connection {
         return Connection(
             id = Connection.Id(id),
             participant1 = participant1.toDomain(),
             participant2 = participant2.toDomain(),
-            connectedAt = connectedAt
+            connectedAt = connectedAt,
+            cancellation = cancellation?.toDomain(),
         )
     }
 
@@ -58,7 +68,8 @@ class ConnectionJpaEntity(
                 id = domain.id.value,
                 participant1 = ParticipantJpaEntity.from(domain.participant1),
                 participant2 = ParticipantJpaEntity.from(domain.participant2),
-                connectedAt = domain.connectedAt
+                connectedAt = domain.connectedAt,
+                cancellation = domain.cancellation?.let { ConnectionCancellationJpaEntity.from(it) },
             )
         }
     }
