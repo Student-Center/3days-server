@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository
 import java.util.UUID
 
 @Repository
-interface ConnectionAttemptJpaRepository : JpaRepository<ConnectionAttemptJpaEntity, UUID>
+interface ConnectionAttemptJpaRepository : JpaRepository<ConnectionAttemptJpaEntity, UUID> {
+    fun findFirstByUserIdOrderByCreatedAtDesc(userId: UUID): ConnectionAttemptJpaEntity?
+}

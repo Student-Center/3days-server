@@ -1,16 +1,15 @@
 package com.threedays.domain.connection.entity
 
-import com.threedays.domain.user.entity.User
-import com.threedays.support.common.base.domain.UUIDTypeId
-import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import com.navercorp.fixturemonkey.FixtureMonkey
 import com.navercorp.fixturemonkey.kotlin.KotlinPlugin
 import com.navercorp.fixturemonkey.kotlin.giveMeOne
+import com.threedays.domain.user.entity.User
+import com.threedays.support.common.base.domain.UUIDTypeId
 import io.kotest.core.annotation.DisplayName
+import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.comparables.shouldBeGreaterThan
-import io.kotest.matchers.comparables.shouldBeLessThan
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import java.time.LocalDateTime
 import java.util.UUID
@@ -25,19 +24,19 @@ class ConnectionTest : DescribeSpec({
     describe("Connection 생성") {
         it("두 유저를 매칭하여 Connection을 생성한다") {
             // arrange
-            val user1Id = User.Id(UUID.randomUUID())
-            val user2Id = User.Id(UUID.randomUUID())
+            val user1 = fixtureMonkey.giveMeOne<User>()
+            val user2 = fixtureMonkey.giveMeOne<User>()
             val beforeConnectAt = LocalDateTime.now()
 
             // act
-            val connection = Connection.match(user1Id, user2Id)
+            val connection = Connection.match(user1, user2)
 
             // assert
             connection.id shouldNotBe null
             connection.connectedAt shouldBeGreaterThan  beforeConnectAt
             connection.cancellation shouldBe null
-            connection.isParticipant(user1Id) shouldBe true
-            connection.isParticipant(user2Id) shouldBe true
+            connection.isParticipant(user1.id) shouldBe true
+            connection.isParticipant(user2.id) shouldBe true
         }
     }
 
