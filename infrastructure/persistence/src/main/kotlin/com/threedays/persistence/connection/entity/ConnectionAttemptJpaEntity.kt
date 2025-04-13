@@ -1,5 +1,6 @@
 package com.threedays.persistence.connection.entity
 
+import com.threedays.domain.connection.entity.Connection
 import com.threedays.domain.connection.entity.ConnectionAttempt
 import com.threedays.domain.user.entity.User
 import jakarta.persistence.CascadeType
@@ -65,7 +66,16 @@ class ConnectionAttemptJpaEntity(
     fun toDomainEntity() = ConnectionAttempt(
         id = ConnectionAttempt.Id(id),
         userId = User.Id(userId),
-        connection = connection?.toDomain(),
+        connection = null,
+        status = ConnectionAttempt.Status.from(status),
+        attemptDate = attemptDate,
+        createdAt = createdAt,
+    )
+
+    fun toDomainEntity(connection: Connection) = ConnectionAttempt(
+        id = ConnectionAttempt.Id(id),
+        userId = User.Id(userId),
+        connection = connection,
         status = ConnectionAttempt.Status.from(status),
         attemptDate = attemptDate,
         createdAt = createdAt,

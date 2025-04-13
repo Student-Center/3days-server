@@ -38,13 +38,13 @@ data class Connection(
     companion object {
 
         fun match(
-            user1: User.Id,
-            user2: User.Id,
+            user1: User,
+            user2: User,
         ): Connection {
             return Connection(
                 id = UUIDTypeId.random(),
-                participant1 = Participant(user1),
-                participant2 = Participant(user2),
+                participant1 = Participant.from(user1),
+                participant2 = Participant.from(user2),
                 connectedAt = LocalDateTime.now(),
                 cancellation = null,
             )
