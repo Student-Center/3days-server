@@ -1,11 +1,9 @@
 package com.threedays.domain.connection.entity
 
 import com.navercorp.fixturemonkey.FixtureMonkey
-import com.navercorp.fixturemonkey.kotlin.giveMeBuilder
-import com.navercorp.fixturemonkey.kotlin.giveMeOne
 import com.navercorp.fixturemonkey.kotlin.introspector.PrimaryConstructorArbitraryIntrospector
-import com.navercorp.fixturemonkey.kotlin.set
 import com.threedays.domain.user.entity.User
+import com.threedays.domain.user.entity.UserMother
 import com.threedays.support.common.base.domain.UUIDTypeId
 import io.kotest.core.annotation.DisplayName
 import io.kotest.core.spec.style.DescribeSpec
@@ -20,6 +18,7 @@ class ConnectionAttemptTest : DescribeSpec({
     val fixtureMonkey: FixtureMonkey = FixtureMonkey.builder()
         .objectIntrospector(PrimaryConstructorArbitraryIntrospector.INSTANCE)
         .build()
+    val userMother = UserMother(fixtureMonkey)
 
     describe("연결 시도 생성") {
         it("새로운 연결 시도를 생성한다") {
@@ -40,10 +39,10 @@ class ConnectionAttemptTest : DescribeSpec({
     describe("연결 성공") {
         it("연결 성공 상태로 변경한다") {
             // arrange
-            val connectionAttempt = fixtureMonkey.giveMeBuilder<ConnectionAttempt>()
-                .set(ConnectionAttempt::status, ConnectionAttempt.Status.CONNECTING)
-                .sample()
-            val connection = fixtureMonkey.giveMeOne<Connection>()
+            val user1 = userMother.createUser()
+            val user2 = userMother.createUser()
+            val connectionAttempt = ConnectionAttempt.create(user1.id)
+            val connection = Connection.match(user1, user2)
 
             // act
             val connectedAttempt = connectionAttempt.connect(connection)
@@ -57,16 +56,17 @@ class ConnectionAttemptTest : DescribeSpec({
     describe("연결 실패") {
         it("연결 실패 상태로 변경한다") {
             // arrange
-            val connectionAttempt = fixtureMonkey.giveMeBuilder<ConnectionAttempt>()
-                .set(ConnectionAttempt::status, ConnectionAttempt.Status.CONNECTING)
-                .sample()
+            val user = userMother.createUser()
+            val connectionAttempt = ConnectionAttempt.create(user.id)
+            val connection = Connection.match(user, userMother.createUser())
+            val connectedAttempt = connectionAttempt.connect(connection)
 
             // act
-            val failedAttempt = connectionAttempt.fail()
+            val failedAttempt = connectedAttempt.fail()
 
             // assert
             failedAttempt.status shouldBe ConnectionAttempt.Status.FAILED
-            failedAttempt.connection shouldBe connectionAttempt.connection
+            failedAttempt.connection shouldBe connectedAttempt.connection
         }
     }
 
